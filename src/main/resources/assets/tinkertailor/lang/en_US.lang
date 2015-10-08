@@ -1,0 +1,25 @@
+gui.toolmodifystation1=Modification
+gui.toolmodifystation2=Mass upgrading of Tools
+
+item.TinkerTailor.Hat.name=Helmet
+item.TinkerTailor.Shirt.name=Chestplate
+item.TinkerTailor.Trousers.name=Leggings
+item.TinkerTailor.Shoes.name=Boots
+
+item.TinkerTailor.ArmorPattern.helmet.name=Helmet Pattern
+item.TinkerTailor.ArmorPattern.chestplate.name=Chestplate Pattern
+item.TinkerTailor.ArmorPattern.leggings.name=Leggings Pattern
+item.TinkerTailor.ArmorPattern.boots.name=Boots Pattern
+
+itemGroup.tinkertailor.items=Tinker Tailor
+itemGroup.tinkertailor.armors=Tinker Tailor Armors
+
+tile.TinkerTailor.ArmorCast.helmet.name=Helmet Cast
+tile.TinkerTailor.ArmorCast.chestplate.name=Chestplate Cast
+tile.TinkerTailor.ArmorCast.leggings.name=Leggings Cast
+tile.TinkerTailor.ArmorCast.boots.name=Boots Cast
+
+tile.TinkerTailor.ToolModifyStation.name=Modification Station
+
+tooltip.resistance=Damage Resistance: +%s
+tooltip.threshold=Damage Threshold: +%s

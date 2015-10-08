@@ -1,0 +1,24 @@
+# Gradle
+build
+.gradle
+
+# Minecraft
+run
+eclipse
+
+# IntelliJ
+out
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Keystore
+keystore/*
+
+# Decomp
+decomp/*
+
+libs/*.jar
+*~
+eclipse/
