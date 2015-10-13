@@ -1,7 +1,7 @@
 package com.rwtema.tinkertailor.items;
 
-import com.rwtema.tinkertailor.TinkerTailor;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.TinkersTailor;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import mantle.items.abstracts.CraftingItem;
 import net.minecraft.item.ItemStack;
 import tconstruct.library.TConstructRegistry;
@@ -12,8 +12,8 @@ public class ItemArmorPattern extends CraftingItem implements IPattern {
 	static String[] names = new String[]{"helmet", "chestplate", "leggings", "boots"};
 
 	public ItemArmorPattern() {
-		super(names, getTex("pattern_"), "", TinkerTailorConstants.RESOURCE_FOLDER, TinkerTailor.creativeTabItems);
-		setCreativeTab(TinkerTailor.creativeTabItems);
+		super(names, getTex("pattern_"), "", TinkersTailorConstants.RESOURCE_FOLDER, TinkersTailor.creativeTabItems);
+		setCreativeTab(TinkersTailor.creativeTabItems);
 		setUnlocalizedName("TinkerTailor.ArmorPattern");
 	}
 

@@ -87,4 +87,16 @@ public class ColorHelper {
 		}
 		return p;
 	}
+
+	public static float getR(int col){
+		return ((col >> 16) & 255)/255.0F;
+	}
+
+	public static float getG(int col){
+		return ((col >> 8) & 255)/255.0F;
+	}
+
+	public static float getB(int col){
+		return ((col) & 255)/255.0F;
+	}
 }

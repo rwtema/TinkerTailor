@@ -1,7 +1,7 @@
 package com.rwtema.tinkertailor.blocks;
 
-import com.rwtema.tinkertailor.TinkerTailor;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.TinkersTailor;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mantle.blocks.abstracts.InventoryBlock;
@@ -19,7 +19,7 @@ import tconstruct.tools.model.TableRender;
 public class BlockToolModifyStation extends InventoryBlock {
 	public BlockToolModifyStation(Material material) {
 		super(material);
-		this.setCreativeTab(TinkerTailor.creativeTabItems);
+		this.setCreativeTab(TinkersTailor.creativeTabItems);
 		this.setHardness(2f);
 		this.setStepSound(Block.soundTypeWood);
 	}
@@ -91,12 +91,12 @@ public class BlockToolModifyStation extends InventoryBlock {
 
 	@Override
 	public Object getModInstance() {
-		return TinkerTailor.instance;
+		return TinkersTailor.instance;
 	}
 
 	@Override
 	public String getTextureDomain(int textureNameIndex) {
-		return TinkerTailorConstants.RESOURCE_FOLDER;
+		return TinkersTailorConstants.RESOURCE_FOLDER;
 	}
 
 }

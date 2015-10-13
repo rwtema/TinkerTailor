@@ -68,8 +68,6 @@ public class TileEntityToolModifyStation extends ToolStationLogic {
 				}
 			}
 
-//			if (output != null && !name.equals("")) //Name item
-//				output = tryRenameTool(output, name);
 		}
 
 
@@ -84,8 +82,15 @@ public class TileEntityToolModifyStation extends ToolStationLogic {
 	}
 
 	@Override
-	public String getDefaultName ()
-	{
+	public String getDefaultName() {
 		return "tile.TinkerTailor.ToolModifyStation.name";
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack) {
+		if (slot == 0) {
+			return itemstack != null && itemstack.getItem() instanceof IModifyable && itemstack.getMaxStackSize() == 1;
+		}
+		return super.isItemValidForSlot(slot, itemstack);
 	}
 }

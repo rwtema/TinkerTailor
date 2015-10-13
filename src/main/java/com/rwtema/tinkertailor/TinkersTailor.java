@@ -6,10 +6,12 @@ import com.rwtema.tinkertailor.crafting.BlockArmorCast;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.items.ItemArmorCast;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
+import com.rwtema.tinkertailor.items.ItemTailorsBook;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.ConfigKeys;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.RendererHandler;
+import com.rwtema.tinkertailor.utils.ICallableClient;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -19,10 +21,13 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import java.util.List;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
@@ -39,11 +44,11 @@ import tconstruct.library.crafting.Smeltery;
 import tconstruct.smeltery.TinkerSmeltery;
 import tconstruct.tools.TinkerTools;
 
-@Mod(name = TinkerTailorConstants.MOD_ID, modid = TinkerTailorConstants.MOD_ID, dependencies = "after:TConstruct")
-public class TinkerTailor {
+@Mod(name = TinkersTailorConstants.MOD_ID, modid = TinkersTailorConstants.MOD_ID, dependencies = "required-after:TConstruct")
+public class TinkersTailor {
 
-	@Mod.Instance(TinkerTailorConstants.MOD_ID)
-	public static TinkerTailor instance;
+	@Mod.Instance(TinkersTailorConstants.MOD_ID)
+	public static TinkersTailor instance;
 
 	public static ArmorCore hat;
 	public static ArmorCore shirt;
@@ -53,6 +58,8 @@ public class TinkerTailor {
 
 	public static BlockArmorCast armorCast;
 	public static ItemArmorPattern armorPattern;
+
+	public static ItemTailorsBook book;
 
 	public static final CreativeTabs creativeTabItems = new CreativeTabs("tinkertailor.items") {
 		@Override
@@ -99,6 +106,12 @@ public class TinkerTailor {
 			return icon;
 		}
 
+		@Override
+		public void displayAllReleventItems(List list) {
+			for (ArmorCore armor : ArmorCore.armors) {
+				armor.getSubItems(armor, this, list);
+			}
+		}
 	};
 
 	@SidedProxy(serverSide = "com.rwtema.tinkertailor.Proxy", clientSide = "com.rwtema.tinkertailor.ProxyClient")
@@ -138,13 +151,15 @@ public class TinkerTailor {
 		armorPattern = new ItemArmorPattern();
 		GameRegistry.registerItem(armorPattern, "ArmorPattern");
 
-		if (ConfigKeys.ModifyStation.getBool(true)) {
-			toolModifyStation = new BlockToolModifyStation(Material.wood).setBlockName("TinkerTailor.ToolModifyStation");
-			GameRegistry.registerBlock(toolModifyStation, "ToolModifyStation");
-			GameRegistry.registerTileEntity(TileEntityToolModifyStation.class, "ToolModifyStation");
-		}
+		toolModifyStation = new BlockToolModifyStation(Material.wood).setBlockName("TinkerTailor.ToolModifyStation");
+		GameRegistry.registerBlock(toolModifyStation, "ToolModifyStation");
+		GameRegistry.registerTileEntity(TileEntityToolModifyStation.class, "ToolModifyStation");
+
+		book = new ItemTailorsBook();
+		GameRegistry.registerItem(book, "Book");
 
 		ModifierRegistry.init();
+		proxy.preInit();
 	}
 
 	@Mod.EventHandler
@@ -169,15 +184,16 @@ public class TinkerTailor {
 //			});
 //		}
 		// I HATE THIS BUT IT'LL DO FOR NOW
-		GameRegistry.addRecipe(new ItemStack(armorPattern, 1, 0), "SSS", "S S", 'S', TinkerTools.blankPattern);
-		GameRegistry.addRecipe(new ItemStack(armorPattern, 1, 1), "S S", "SSS", "SSS", 'S', TinkerTools.blankPattern);
-		GameRegistry.addRecipe(new ItemStack(armorPattern, 1, 2), "SSS", "S S", "S S", 'S', TinkerTools.blankPattern);
-		GameRegistry.addRecipe(new ItemStack(armorPattern, 1, 3), "S S", "S S", 'S', TinkerTools.blankPattern);
+
+		proxy.addShapedRecipe("armorPatternHelmet", new ItemStack(armorPattern, 1, 0), "SSS", "S S", 'S', TinkerTools.blankPattern);
+		proxy.addShapedRecipe("armorPatternChestplate", new ItemStack(armorPattern, 1, 1), "S S", "SSS", "SSS", 'S', TinkerTools.blankPattern);
+		proxy.addShapedRecipe("armorPatternLeggings", new ItemStack(armorPattern, 1, 2), "SSS", "S S", "S S", 'S', TinkerTools.blankPattern);
+		proxy.addShapedRecipe("armorPatternBoots", new ItemStack(armorPattern, 1, 3), "S S", "S S", 'S', TinkerTools.blankPattern);
 
 
 		LiquidCasting basinCasting = TConstructRegistry.getBasinCasting();
 		for (int meta = 0; meta < 4; meta++) {
-			ItemStack metalCast = new ItemStack(TinkerTailor.armorCast, 1, meta);
+			ItemStack metalCast = new ItemStack(TinkersTailor.armorCast, 1, meta);
 
 			int[] liquidDamage = new int[]{2, 13, 10, 11, 12, 14, 15, 6, 16, 18}; // ItemStack
 
@@ -189,8 +205,8 @@ public class TinkerTailor {
 				Smeltery.addMelting(FluidType.getFluidType(fs), output, 0, fluidAmount);
 			}
 
-			for (int mat = 0; mat < TinkerTailorConstants.NON_METALS.length; mat++) {
-				TConstructRegistry.addPartMapping(TinkerTailor.armorPattern, meta, mat, ArmorCore.armors[meta].createDefaultStack(mat));
+			for (int mat = 0; mat < TinkersTailorConstants.NON_METALS.length; mat++) {
+				TConstructRegistry.addPartMapping(TinkersTailor.armorPattern, meta, mat, ArmorCore.armors[meta].createDefaultStack(mat));
 			}
 
 		}
@@ -200,7 +216,8 @@ public class TinkerTailor {
 
 			ItemStack input = ArmorCore.armors[meta].createDefaultStack(TinkerTools.MaterialID.Stone);
 			input.setItemDamage(Short.MAX_VALUE);
-			basinCasting.addCastingRecipe(output, alBrass, input, true, 100);
+			proxy.addCastingRecipe("cast" + TinkersTailorConstants.NAMES[meta], output, alBrass, input, true, 100);
+
 			Smeltery.addMelting(FluidType.getFluidType(TinkerSmeltery.moltenAlubrassFluid), output, 0, TConstruct.blockLiquidValue);
 		}
 
@@ -211,11 +228,18 @@ public class TinkerTailor {
 				}
 
 				for (int meta = 0; meta < 4; meta++) {
-					TConstructRegistry.addPartMapping(TinkerTailor.armorPattern, meta, mat, ArmorCore.armors[meta].createDefaultStack(mat));
+					TConstructRegistry.addPartMapping(TinkersTailor.armorPattern, meta, mat, ArmorCore.armors[meta].createDefaultStack(mat));
 				}
 			}
 		}
 
+
+		ItemStack smelteryStack = TinkerSmeltery.smeltery != null ? new ItemStack(TinkerSmeltery.smeltery, 1, 2) : new ItemStack(Blocks.obsidian, 1, 0);
+		ItemStack searedbrick = TinkerSmeltery.smeltery != null ? new ItemStack(TinkerTools.materials, 1, 2) : new ItemStack(Items.brick);
+		proxy.addShapedRecipe("modifyStation", new ItemStack(toolModifyStation, 1), "bbb", "msm", "m m", 'b', smelteryStack, 's', new ItemStack(TinkerTools.toolStationWood, 1, 0), 'm', searedbrick);
+
+
+		proxy.init();
 	}
 
 	@Mod.EventHandler
@@ -224,6 +248,6 @@ public class TinkerTailor {
 	}
 
 
-	public static final Logger logger = LogManager.getLogger(TinkerTailorConstants.MOD_ID);
+	public static final Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
 
 }

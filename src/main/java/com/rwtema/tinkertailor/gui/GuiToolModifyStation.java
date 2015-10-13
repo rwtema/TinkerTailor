@@ -4,7 +4,7 @@ import codechicken.nei.VisiblityData;
 import codechicken.nei.api.INEIGuiHandler;
 import codechicken.nei.api.TaggedInventoryArea;
 import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -106,7 +106,7 @@ public class GuiToolModifyStation extends GuiContainer implements INEIGuiHandler
 		fontRendererObj.drawSplitString(body, 294, 24, 115, 0xffffff);
 	}
 
-	private static final ResourceLocation background = new ResourceLocation(TinkerTailorConstants.RESOURCE_FOLDER, "textures/toolmodifystation.png");
+	private static final ResourceLocation background = new ResourceLocation(TinkersTailorConstants.RESOURCE_FOLDER, "textures/toolmodifystation.png");
 	private static final ResourceLocation icons = new ResourceLocation("tinker", "textures/gui/icons.png");
 	private static final ResourceLocation description = new ResourceLocation("tinker", "textures/gui/description.png");
 

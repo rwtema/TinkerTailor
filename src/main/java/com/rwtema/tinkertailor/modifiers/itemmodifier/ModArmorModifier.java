@@ -3,7 +3,8 @@ package com.rwtema.tinkertailor.modifiers.itemmodifier;
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.Modifier;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import java.util.ArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import tconstruct.library.modifier.IModifyable;
@@ -15,8 +16,8 @@ public class ModArmorModifier extends ItemModifier {
 	int maxLevel = -1;
 	int armorAllowMask = 0;
 
-	public ModArmorModifier(Modifier modifier) {
-		super(modifier.recipe(), modifier.effect, modifier.name);
+	public ModArmorModifier(Modifier modifier, ItemStack[] recipe) {
+		super(recipe, modifier.effect, modifier.name);
 		modifierStep = modifier.getModifierStep();
 		maxLevel = modifier.getMaxLevel();
 		armorAllowMask = modifier.getAllowedArmorTypes();
@@ -39,24 +40,27 @@ public class ModArmorModifier extends ItemModifier {
 			return false;
 
 		int val = totalValue(recipe);
-		if (val > modifierStep) return false;
+		if (val == 0 || val > modifierStep) return false;
+		if (modifierStep != 1) {
+			int nextMax = (curValue / modifierStep + 1) * modifierStep;
+			if ((curValue + val) > nextMax) return false;
+		}
 
 		int modifiers = tags.getInteger("Modifiers");
 		if (modifiers > 0) return true;
 		if (modifierStep == 1 || curValue % modifierStep == 0) return false;
-		return (curValue / modifierStep) == ((curValue + val) / modifierStep);
-
+		return curValue == 0 || ((curValue) / modifierStep) == ((curValue + val) / modifierStep);
 	}
 
 
 	@Override
 	public boolean validType(IModifyable input) {
-		return input.getModifyType().equals(TinkerTailorConstants.MODIFY_TYPE);
+		return input.getModifyType().equals(TinkersTailorConstants.MODIFY_TYPE);
 	}
 
 	@Override
 	public void modify(ItemStack[] recipe, ItemStack tool) {
-		NBTTagCompound tags = tool.getTagCompound().getCompoundTag(TinkerTailorConstants.NBT_MAINTAG);
+		NBTTagCompound tags = tool.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
 
 		int curValue;
 		int val = totalValue(recipe);
@@ -70,7 +74,7 @@ public class ModArmorModifier extends ItemModifier {
 			tags.setInteger(key, val);
 		}
 
-		if ((curValue / modifierStep) != ((curValue + val) / modifierStep)) {
+		if (curValue % modifierStep == 0) {
 			int modifiers = tags.getInteger("Modifiers");
 			modifiers -= 1;
 			tags.setInteger("Modifiers", modifiers);
@@ -80,11 +84,39 @@ public class ModArmorModifier extends ItemModifier {
 	}
 
 	protected int totalValue(ItemStack[] recipe) {
-		int v = 0;
-		for (ItemStack itemStack : recipe) {
-			if (itemStack != null)
-				v++;
+//		int v = 0;
+//		for (ItemStack itemStack : recipe) {
+//			if (itemStack != null)
+//				v++;
+//		}
+		return 1;
+	}
+
+	@Override
+	public boolean matches(ItemStack[] recipe, ItemStack input) {
+		if (!canModify(input, recipe))
+			return false;
+
+		ArrayList<ItemStack> list = new ArrayList<ItemStack>(this.stacks);
+
+		for (ItemStack craftingStack : recipe) {
+			if (craftingStack != null) {
+				boolean canCraft = false;
+
+				for (ItemStack removeStack : list) {
+					if (craftingStack.getItem() == removeStack.getItem() && (removeStack.getItemDamage() == Short.MAX_VALUE || craftingStack.getItemDamage() == removeStack.getItemDamage())) {
+						canCraft = true;
+						list.remove(removeStack);
+						break;
+					}
+				}
+
+				if (!canCraft) {
+					return false;
+				}
+			}
 		}
-		return v;
+
+		return list.isEmpty();
 	}
 }

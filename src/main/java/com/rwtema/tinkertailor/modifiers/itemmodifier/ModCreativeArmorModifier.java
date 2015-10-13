@@ -1,7 +1,7 @@
 package com.rwtema.tinkertailor.modifiers.itemmodifier;
 
 import com.rwtema.tinkertailor.items.ArmorCore;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import tconstruct.library.modifier.IModifyable;
@@ -30,7 +30,7 @@ public class ModCreativeArmorModifier extends ItemModifier {
 
 	@Override
 	public boolean validType(IModifyable input) {
-		return input.getModifyType().equals(TinkerTailorConstants.MODIFY_TYPE);
+		return input.getModifyType().equals(TinkersTailorConstants.MODIFY_TYPE);
 	}
 
 }

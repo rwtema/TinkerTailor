@@ -1,6 +1,6 @@
 package com.rwtema.tinkertailor.items;
 
-import com.rwtema.tinkertailor.TinkerTailor;
+import com.rwtema.tinkertailor.TinkersTailor;
 import mantle.blocks.abstracts.MultiItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ public class ItemArmorCast extends MultiItemBlock implements IPattern {
 		super(b, "", ItemArmorPattern.names);
 		setMaxDamage(0);
 		setHasSubtypes(true);
-		setCreativeTab(TinkerTailor.creativeTabItems);
+		setCreativeTab(TinkersTailor.creativeTabItems);
 	}
 
 	@Override

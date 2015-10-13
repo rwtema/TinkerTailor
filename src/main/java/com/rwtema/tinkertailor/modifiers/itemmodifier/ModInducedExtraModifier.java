@@ -1,7 +1,7 @@
 package com.rwtema.tinkertailor.modifiers.itemmodifier;
 
 
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +107,7 @@ public class ModInducedExtraModifier extends ItemModifier {
 
 	@Override
 	public boolean validType(IModifyable input) {
-		return input.getModifyType().equals(TinkerTailorConstants.MODIFY_TYPE);
+		return input.getModifyType().equals(TinkersTailorConstants.MODIFY_TYPE);
 	}
 
 }

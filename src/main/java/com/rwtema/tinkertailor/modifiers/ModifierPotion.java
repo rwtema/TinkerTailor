@@ -1,11 +1,13 @@
 package com.rwtema.tinkertailor.modifiers;
 
+import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import tconstruct.library.modifier.ItemModifier;
 
 public class ModifierPotion extends Modifier {
 	public final Potion potion;
@@ -24,10 +26,9 @@ public class ModifierPotion extends Modifier {
 	}
 
 	@Override
-	public ItemStack[] recipe() {
-		return items;
+	public ItemModifier createItemModifier() {
+		return new ModArmorModifier(this, items);
 	}
-
 
 	@Override
 	public boolean doesTick(ItemStack item, int level) {
@@ -40,7 +41,7 @@ public class ModifierPotion extends Modifier {
 	}
 
 	private PotionEffect makePotionEffect(int level) {
-		return new PotionEffect(potion.getId(), duration, level - 1);
+		return new PotionEffect(potion.getId(), duration, level - 1, true);
 	}
 
 	public ModifierPotion setDuration(int duration) {

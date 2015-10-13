@@ -1,6 +1,6 @@
 package com.rwtema.tinkertailor.gui;
 
-import com.rwtema.tinkertailor.TinkerTailor;
+import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -79,11 +79,47 @@ public class ContainerToolModifyStation extends ToolStationContainer {
 	public boolean canInteractWith (EntityPlayer entityplayer)
 	{
 		Block block = logic.getWorldObj().getBlock(logic.xCoord, logic.yCoord, logic.zCoord);
-		return block == TinkerTailor.toolModifyStation && logic.isUseableByPlayer(entityplayer);
+		return block == TinkersTailor.toolModifyStation && logic.isUseableByPlayer(entityplayer);
 	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotID) {
-		return null;
+		ItemStack stack = null;
+		Slot slot = (Slot) this.inventorySlots.get(slotID);
+
+		if (slot != null && slot.getHasStack())
+		{
+			ItemStack slotStack = slot.getStack();
+			stack = slotStack.copy();
+			if (slotID < logic.getSizeInventory())
+			{
+				if (slotID == 0)
+				{
+					if (!this.mergeCraftedStack(slotStack, logic.getSizeInventory(), this.inventorySlots.size(), true, player))
+					{
+						return null;
+					}
+				}
+				else if (!this.mergeItemStack(slotStack, logic.getSizeInventory(), this.inventorySlots.size(), true))
+				{
+					return null;
+				}
+			}
+			else if (!this.mergeItemStack(slotStack, 1, logic.getSizeInventory(), false))
+			{
+				return null;
+			}
+
+			if (slotStack.stackSize == 0)
+			{
+				slot.putStack((ItemStack) null);
+			}
+			else
+			{
+				slot.onSlotChanged();
+			}
+		}
+
+		return stack;
 	}
 }

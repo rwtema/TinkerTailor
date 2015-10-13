@@ -2,7 +2,7 @@ package com.rwtema.tinkertailor;
 
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
-import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
+import com.rwtema.tinkertailor.modifiers.ModifierInstance;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.map.hash.TIntDoubleHashMap;
@@ -28,7 +28,6 @@ public class DamageEventHandler {
 	@SubscribeEvent
 	public void livingHurt(LivingHurtEvent event) {
 		float dR = 0;
-		float dT = 0;
 
 
 		float bonusResistance = 0;
@@ -36,10 +35,9 @@ public class DamageEventHandler {
 			if (itemStack != null && itemStack.getItem() instanceof ArmorCore) {
 				ArmorCore armorCore = (ArmorCore) itemStack.getItem();
 				dR += armorCore.getDamageResistance(itemStack);
-				dT += armorCore.getDamageThreshold(itemStack);
 
-				for (ModifierRegistry.ArmorModifierInstance armorModifierInstance : Caches.modifiers.get(itemStack)) {
-					bonusResistance += armorModifierInstance.modifier.getBonusResistance(event.entityLiving, event.source, event.ammount, itemStack, armorCore.armorType, armorModifierInstance.level);
+				for (ModifierInstance modifierInstance : Caches.modifiers.get(itemStack)) {
+					bonusResistance += modifierInstance.modifier.getBonusResistance(event.entityLiving, event.source, event.ammount, itemStack, armorCore.armorType, modifierInstance.level);
 				}
 			}
 		}
@@ -50,7 +48,6 @@ public class DamageEventHandler {
 		float damage = event.ammount;
 		if (!event.source.isUnblockable()) {
 			damage = damage * (1 - dR);
-			damage = Math.max(damage - dT, damage * MIN_REDUCTION);
 		}
 
 		damage = damage * (1 - bonusResistance);

@@ -1,8 +1,8 @@
 package com.rwtema.tinkertailor.crafting;
 
-import com.rwtema.tinkertailor.TinkerTailor;
+import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
@@ -18,7 +18,7 @@ public class BlockArmorCast extends MantleBlock {
 	public BlockArmorCast() {
 		super(Material.iron);
 		setHardness(1);
-		this.setCreativeTab(TinkerTailor.creativeTabItems);
+		this.setCreativeTab(TinkersTailor.creativeTabItems);
 		this.setBlockName("TinkerTailor.ArmorCast");
 	}
 
@@ -32,11 +32,11 @@ public class BlockArmorCast extends MantleBlock {
 	public void registerBlockIcons(IIconRegister iconRegister) {
 		String[] tex = ItemArmorPattern.getTex("cast_");
 		for (int i = 0; i < 4; ++i) {
-			topIcons[i] = iconRegister.registerIcon(TinkerTailorConstants.RESOURCE_FOLDER + ":" + tex[i]);
+			topIcons[i] = iconRegister.registerIcon(TinkersTailorConstants.RESOURCE_FOLDER + ":" + tex[i]);
 		}
 
-		sideIcon = iconRegister.registerIcon(TinkerTailorConstants.RESOURCE_FOLDER + ":" + "cast_base");
-		edgeIcon = iconRegister.registerIcon(TinkerTailorConstants.RESOURCE_FOLDER + ":" + "cast_side");
+		sideIcon = iconRegister.registerIcon(TinkersTailorConstants.RESOURCE_FOLDER + ":" + "cast_base");
+		edgeIcon = iconRegister.registerIcon(TinkersTailorConstants.RESOURCE_FOLDER + ":" + "cast_side");
 	}
 
 	@Override

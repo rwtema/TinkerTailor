@@ -1,7 +1,7 @@
 package com.rwtema.tinkertailor.render.textures;
 
 import com.rwtema.tinkertailor.items.ArmorCore;
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -30,7 +30,7 @@ public class ArmorTextureManager {
 			return boots;
 	}
 
-	public static final String prefix = TinkerTailorConstants.RESOURCE_FOLDER + ":textures/items/armor/";
+	public static final String prefix = TinkersTailorConstants.RESOURCE_FOLDER + ":textures/items/armor/";
 
 	static final ArmorTextureManager helmet = new ArmorTextureManager(
 			"tinkers:textures/items/armor/helmet_%s.png",

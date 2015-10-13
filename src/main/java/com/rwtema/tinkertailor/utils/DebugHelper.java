@@ -1,12 +1,12 @@
 package com.rwtema.tinkertailor.utils;
 
-import com.rwtema.tinkertailor.nbt.TinkerTailorConstants;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class DebugHelper {
 	static long timer;
-	public static Logger logger = LogManager.getLogger(TinkerTailorConstants.MOD_ID);
+	public static Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
 
 	public static void resetTimer() {
 		timer = System.nanoTime();

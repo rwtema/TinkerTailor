@@ -1,56 +1,73 @@
 package com.rwtema.tinkertailor.nbt;
 
+import com.google.common.collect.Lists;
+import com.rwtema.tinkertailor.modifiers.Modifier;
+import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
 public enum DamageType {
-	normal(new DamageSource("normal"), 8, new ItemStack(Items.iron_ingot), EnumChatFormatting.GRAY) {
+	normal(new DamageSource("normal"), 12, "ingotIron", EnumChatFormatting.GRAY) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return !source.isMagicDamage();
 		}
-	},
 
-	explosion((new DamageSource("explosion")).setDifficultyScaled().setExplosion(), 5, new ItemStack(Items.gunpowder), EnumChatFormatting.YELLOW) {
 		@Override
-		public boolean handles(DamageSource source) {
-			return  source.isExplosion();
+		public OreIntMap getOreValues() {
+			return super.getOreValues().put("blockIron", 9);
 		}
 	},
 
-	projectile((new DamageSource("projectile")).setProjectile(), 5, new ItemStack(Items.slime_ball, 1 , Short.MAX_VALUE), EnumChatFormatting.GREEN) {
+	explosion((new DamageSource("explosion")).setDifficultyScaled().setExplosion(), 6, Lists.newArrayList(Items.gunpowder, "dustGunpowder"), EnumChatFormatting.YELLOW) {
 		@Override
 		public boolean handles(DamageSource source) {
-			return  source.isProjectile();
+			return source.isExplosion();
 		}
 	},
 
-	magic(DamageSource.magic, 8, new ItemStack(Items.diamond), EnumChatFormatting.BLUE) {
+	projectile((new DamageSource("projectile")).setProjectile(), 6, "slimeball", EnumChatFormatting.GREEN) {
 		@Override
 		public boolean handles(DamageSource source) {
-			return source.isMagicDamage() && !(source == DamageSource.wither || "wither".equals(source.damageType));
+			return source.isProjectile();
 		}
 	},
 
-	fire((new DamageSource("fire")).setFireDamage(), 4, new ItemStack(Items.netherbrick), EnumChatFormatting.RED) {
+	magic(DamageSource.magic, 20, "gemDiamond", EnumChatFormatting.BLUE) {
+		@Override
+		public boolean handles(DamageSource source) {
+			return source.isMagicDamage() || (source == DamageSource.wither || "wither".equals(source.damageType));
+		}
+
+		@Override
+		public OreIntMap getOreValues() {
+			return super.getOreValues().put("blockDiamond", 9);
+		}
+	},
+
+	fire((new DamageSource("fire")).setFireDamage(), 6, "ingotBrickNether", EnumChatFormatting.RED) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isFireDamage();
 		}
+
+		@Override
+		public OreIntMap getOreValues() {
+			return super.getOreValues().put(Blocks.nether_brick, 4).put("blockBrickNether", 4);
+		}
 	},
 
-	wither(DamageSource.wither, 4, new ItemStack(Items.skull, 1, Short.MAX_VALUE), EnumChatFormatting.DARK_GRAY) {
+	wither(DamageSource.wither, 8, Items.skull, EnumChatFormatting.DARK_GRAY) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isMagicDamage() && (source == DamageSource.wither || "wither".equals(source.damageType));
 		}
 	},
 
-	fall(DamageSource.fall, 1, new ItemStack(Items.feather), EnumChatFormatting.AQUA) {
+	fall(DamageSource.fall, 4, Items.feather, EnumChatFormatting.AQUA) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source == DamageSource.fall || "fall".equals(source.damageType);
@@ -58,10 +75,10 @@ public enum DamageType {
 
 		@Override
 		public int allowedArmorTypes() {
-			return 7;
+			return Modifier.ARMORTYPE_SHOES_ONLY;
 		}
 	},
-	anvil(DamageSource.anvil, 1, new ItemStack(Blocks.wool, 1, Short.MAX_VALUE), EnumChatFormatting.BLUE){
+	anvil(DamageSource.anvil, 3, Lists.newArrayList(Blocks.wool, "blockWool"), EnumChatFormatting.BLUE) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source == DamageSource.anvil || source == DamageSource.fallingBlock;
@@ -69,18 +86,17 @@ public enum DamageType {
 
 		@Override
 		public int allowedArmorTypes() {
-			return 14;
+			return Modifier.ARMORTYPE_HAT_ONLY;
 		}
-	}
-;
+	};
 	public final DamageSource damageSource;
 	public final int maxLevel;
-	public final ItemStack itemStack;
+	public final Object itemStack;
 	public final EnumChatFormatting color;
 	public final String name;
 
 
-	DamageType(DamageSource damageSource, int factor, ItemStack itemStack, EnumChatFormatting color) {
+	DamageType(DamageSource damageSource, int factor, Object itemStack, EnumChatFormatting color) {
 		this.damageSource = damageSource;
 		this.maxLevel = factor;
 		this.itemStack = itemStack;
@@ -88,14 +104,14 @@ public enum DamageType {
 		this.name = damageSource.damageType;
 	}
 
-	public String getUnlocalizedName(){
-		return "damage."+ name + ".name";
+	public String getUnlocalizedName() {
+		return "damage." + name + ".name";
 	}
 
-	public String getLocalizedName(){
-		if(StatCollector.canTranslate(getUnlocalizedName())){
+	public String getLocalizedName() {
+		if (StatCollector.canTranslate(getUnlocalizedName())) {
 			return StatCollector.translateToLocal(getUnlocalizedName());
-		}else{
+		} else {
 			return name.substring(0, 1).toUpperCase() + name.substring(1);
 		}
 	}
@@ -105,5 +121,11 @@ public enum DamageType {
 
 	public int allowedArmorTypes() {
 		return 0;
+	}
+
+	public OreIntMap getOreValues(){
+		OreIntMap map = new OreIntMap();
+		map.put(itemStack, 1);
+		return map;
 	}
 }
