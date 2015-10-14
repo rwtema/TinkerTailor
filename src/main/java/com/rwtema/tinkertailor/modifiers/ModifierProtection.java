@@ -4,6 +4,7 @@ import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.nbt.DamageType;
+import com.rwtema.tinkertailor.utils.Lang;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,7 +44,7 @@ public class ModifierProtection extends Modifier {
 	public void addInfo(List<String> list, EntityPlayer player, ItemStack item, int slot, int level) {
 		float resistance = (getBonusResistance(player, damageType.damageSource, 100, item, slot, this.level.get(item)));
 		int m = (int) (Math.ceil((double) level / modifierStep)) * modifierStep;
-		list.add(String.format(getColorString() + "%s%s: +%.1f%% (%s/%s)", damageType.getLocalizedName(), getLevelTooltip(level), resistance, level, m) + EnumChatFormatting.GRAY);
+		list.add(String.format(getColorString() + "%s%s: +%.1f%% (%s/%s)", getLocalizedName(), getLevelTooltip(level), resistance, level, m) + EnumChatFormatting.GRAY);
 	}
 
 
@@ -66,7 +67,7 @@ public class ModifierProtection extends Modifier {
 
 		float armor = r;
 		if (armor > 80) armor = 80;
-		list.add(getColorString() + String.format("%s: %.1f", damageType.getLocalizedName(), armor) + EnumChatFormatting.GRAY);
+		list.add(getColorString() + String.format("%s: %.1f", getLocalizedName(), armor) + EnumChatFormatting.GRAY);
 	}
 
 	@Override
@@ -77,9 +78,10 @@ public class ModifierProtection extends Modifier {
 	@Override
 	public String[] getDocLines() {
 		float res = getSimpleResistance(modifierStep);
+		String translate = Lang.translate("Protection per Level");
 		if (res % 1 == 0)
-			return new String[]{String.format("Protection per Level - %s%%", (int) res)};
-		return new String[]{String.format("Protection per Level - %.2f%%", res)};
+			return new String[]{String.format(translate + " - %s%%", (int) res)};
+		return new String[]{String.format(translate + " - %.2f%%", res)};
 	}
 
 	@Override

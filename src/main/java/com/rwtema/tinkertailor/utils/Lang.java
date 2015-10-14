@@ -1,0 +1,102 @@
+package com.rwtema.tinkertailor.utils;
+
+import com.google.common.base.Throwables;
+import com.rwtema.tinkertailor.TinkersTailor;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
+import net.minecraft.util.StringTranslate;
+
+public class Lang {
+	private final static TreeMap<String, String> lang = TinkersTailor.deobf ? new TreeMap<String, String>() : null;
+	private final static HashMap<String, String> textKey = new HashMap<String, String>();
+
+	static {
+		if (TinkersTailor.deobf) {
+			ResourceLocation resourceLocation = new ResourceLocation(TinkersTailorConstants.RESOURCE_FOLDER, "lang/en_US.lang");
+			try {
+				IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(resourceLocation);
+				InputStream stream = null;
+				try {
+					stream = resource.getInputStream();
+					HashMap<String, String> langMap = StringTranslate.parseLangFile(stream);
+					lang.putAll(langMap);
+				} finally {
+					if (stream != null)
+						stream.close();
+				}
+			} catch (IOException e) {
+				throw Throwables.propagate(e);
+			}
+		}
+	}
+
+	public static String translate(String text) {
+		return findTranslateKey(text, "text");
+	}
+
+	public static String findTranslateKey(String text, String prefix) {
+		String key = textKey.get(text);
+		if (key == null) {
+			key = "tinkersTailor." + prefix + "." + text.replaceAll("([^A-Za-z\\s])", "").replaceFirst("^\\s+", "").replaceFirst("\\s+$", "").replaceAll("\\s+", ".").toLowerCase();
+			textKey.put(text, key);
+		}
+		return translate(key, text);
+	}
+
+	public static String translate(String key, String _default) {
+		if (StatCollector.canTranslate(key))
+			return StatCollector.translateToLocal(key);
+		if (TinkersTailor.deobf) {
+			if (!lang.containsKey(key) || TinkersTailorConstants.RANDOM.nextInt(20) == 0) {
+				lang.put(key, _default);
+				PrintWriter out = null;
+				try {
+					try {
+						File file = new File(new File(new File("."), "untranslang"), "en_US.lang");
+						if (file.getParentFile() != null) {
+							file.getParentFile().mkdirs();
+						}
+
+						out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+						String t = null;
+						for (Map.Entry<String, String> entry : lang.entrySet()) {
+							int i = entry.getKey().indexOf('.');
+							if (i < 0) {
+								i = 1;
+							}
+
+							String s = entry.getKey().substring(0, i);
+							if (t != null) {
+								if (!t.equals(s)) {
+									out.println("");
+								}
+							}
+							t = s;
+
+							out.println(entry.getKey() + "=" + entry.getValue());
+
+						}
+					} finally {
+						if (out != null)
+							out.close();
+					}
+				} catch (Exception err) {
+					err.printStackTrace();
+				}
+			}
+		}
+		return _default;
+	}
+}

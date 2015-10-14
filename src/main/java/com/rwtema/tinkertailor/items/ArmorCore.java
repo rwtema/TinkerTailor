@@ -11,6 +11,7 @@ import com.rwtema.tinkertailor.render.ModelArmor;
 import com.rwtema.tinkertailor.render.RendererHandler;
 import com.rwtema.tinkertailor.render.font.CustomFontRenderer;
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
+import com.rwtema.tinkertailor.utils.Lang;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
@@ -94,7 +95,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 	@SideOnly(Side.CLIENT)
 	ModelArmor armor;
 
-	public static final boolean DEBUG_ALWAYS_RELOAD = false;
+	public static boolean DEBUG_ALWAYS_RELOAD = false;
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -168,8 +169,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 
 		toolTips.add("");
 
-///		toolTips.add(StatCollector.translateToLocalFormatted("tooltip.resistance", String.format("%.2f%s", getDamageResistance(stack) / 2, '⌔')));
-		toolTips.add(String.format("Armor Rating: %s⌔", String.format("%.2f", getDamageResistance(stack) / 2)));
+		toolTips.add(String.format(Lang.translate("Damage Resistance") + ": %s%%", String.format("%.1f", getDamageResistance(stack) * 4)));
 
 		List<ModifierInstance> modifiers = Caches.modifiers.get(stack);
 
@@ -193,7 +193,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 
 		toolTips.add("");
 		toolTips.add("----------------");
-		toolTips.add(EnumChatFormatting.WHITE + "Full Armor Stats" + EnumChatFormatting.GRAY);
+		toolTips.add(EnumChatFormatting.WHITE + Lang.translate("Full Armor Stats") + EnumChatFormatting.GRAY);
 
 		float dR = 0;
 
@@ -220,7 +220,8 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 			}
 		}
 
-		toolTips.add(String.format("Armor Rating: %s⌔", String.format("%.2f", dR / 2)));
+		toolTips.add(String.format(Lang.translate("Damage Resistance") + ": %s%%", String.format("%.1f", dR * 4)));
+
 
 		toolTips.add("");
 

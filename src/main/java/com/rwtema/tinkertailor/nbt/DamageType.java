@@ -7,7 +7,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
 
 public enum DamageType {
 	normal(new DamageSource("normal"), 12, "ingotIron", EnumChatFormatting.GRAY) {
@@ -102,18 +101,6 @@ public enum DamageType {
 		this.itemStack = itemStack;
 		this.color = color;
 		this.name = damageSource.damageType;
-	}
-
-	public String getUnlocalizedName() {
-		return "damage." + name + ".name";
-	}
-
-	public String getLocalizedName() {
-		if (StatCollector.canTranslate(getUnlocalizedName())) {
-			return StatCollector.translateToLocal(getUnlocalizedName());
-		} else {
-			return name.substring(0, 1).toUpperCase() + name.substring(1);
-		}
 	}
 
 

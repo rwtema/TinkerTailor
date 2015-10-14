@@ -5,6 +5,7 @@ import com.rwtema.tinkertailor.caches.WeakCache;
 import com.rwtema.tinkertailor.nbt.StringHelper;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.font.RenderCustomColor;
+import com.rwtema.tinkertailor.utils.Lang;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
 import tconstruct.library.modifier.ItemModifier;
 
 public abstract class Modifier implements Comparable<Modifier> {
@@ -77,9 +77,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 	}
 
 	public String getLocalizedName() {
-		String transKey = "modifier." + name;
-		if (!StatCollector.canTranslate(transKey)) return StringHelper.capFirst(name);
-		return StatCollector.translateToLocal(transKey);
+		return Lang.findTranslateKey(StringHelper.capFirst(name), "modifier");
 	}
 
 	public void addArmorSetInfo(List<String> list, EntityPlayer player) {

@@ -4,9 +4,11 @@ import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import com.rwtema.tinkertailor.utils.Lang;
 import java.io.IOException;
 import java.util.List;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
 
 public class PageModifier extends PageBase {
 
@@ -25,7 +27,7 @@ public class PageModifier extends PageBase {
 			ItemStack itemStack = (ItemStack) stacks.get(curTime() % stacks.size());
 			if (itemStack != null) {
 				if (modifier.itemModifier instanceof ModOreModifier) {
-					String s = "Value: " + ((ModOreModifier) modifier.itemModifier).getValue(itemStack);
+					String s = Lang.translate("Value") + ": " + ((ModOreModifier) modifier.itemModifier).getValue(itemStack);
 
 					int x = (178 - 18 - 2 - manual.fonts.getStringWidth(s)) / 2;
 					renderStack(itemStack, x, 20);
@@ -42,26 +44,26 @@ public class PageModifier extends PageBase {
 		for (String s : modifier.getDocLines()) {
 			yPos += drawTextBlock(s, 4, yPos);
 		}
-		yPos += drawTextLine("- Max Level: " + (modifier.getMaxLevel() / modifier.getModifierStep()), 4, yPos);
+		yPos += drawTextLine("- " + Lang.translate("Max Level") + ": " + (modifier.getMaxLevel() / modifier.getModifierStep()), 4, yPos);
 
-		yPos += drawTextLine("- Cost per Level: " + modifier.getModifierStep(), 4, yPos);
+		yPos += drawTextLine("- " + Lang.translate("Cost per Level") + ": " + modifier.getModifierStep(), 4, yPos);
 		yPos += drawBlankLine();
 		int allowedArmorTypes = modifier.allowedArmorTypes;
 		String restText;
 		if (allowedArmorTypes == 0) {
-			restText = "None";
+			restText = Lang.translate("None");
 		} else {
 			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i < 4; i++) {
 				if ((allowedArmorTypes & (1 << i)) == 0) {
-					builder.append(TinkersTailorConstants.NAMES[i]).append(' ');
+					builder.append(StatCollector.translateToLocal(TinkersTailorConstants.UNLOCAL_NAMES[i])).append(' ');
 				}
 			}
-			builder.append("Only");
+			builder.append(Lang.translate("Only"));
 			restText = builder.toString();
 		}
 
-		drawTextLine("- Restrictions: " + restText, 4, yPos);
+		drawTextLine("- " + Lang.translate("Item Restrictions") + ": " + restText, 4, yPos);
 
 	}
 
