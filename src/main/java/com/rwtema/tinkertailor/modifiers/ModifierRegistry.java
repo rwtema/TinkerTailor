@@ -41,7 +41,13 @@ public class ModifierRegistry {
 
 						ItemStack copy = itemStack.copy();
 						copy.stackSize = 1;
-						return ((IHealthAccessory) item).getHealthBoost(copy);
+						IHealthAccessory healthAccessory = (IHealthAccessory) item;
+
+						if (!(healthAccessory.canEquipAccessory(copy, 4) || healthAccessory.canEquipAccessory(copy, 5) || healthAccessory.canEquipAccessory(copy, 6)))
+							return 0;
+
+
+						return healthAccessory.getHealthBoost(copy);
 					}
 				};
 			}
