@@ -66,8 +66,8 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
     </page>
 
     <page type="tailorSection">
-        <section>Armor Resistance</section>
-        <text>Different types of armor are more effective at stopping attacks than others. This is measured by the number of 'shields' associated with them. Each shield gives an additional 8% of damage reduction against attacks. The theoretical maximum you can have is 12.5 shields, however no material will ever be strong enough to achieve this rating.</text>
+        <section>Damage Resistance</section>
+        <text>Different types of armor are more effective at stopping attacks than others. This is measured by the damage resistance of the armor,</text>
     </page>
 
     <page type="tailorSection">
@@ -147,6 +147,18 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
         <text>Night Vision</text>
         <modifier>nightvision</modifier>
         <desc>Enables you to see perfectly in dark areas.</desc>
+    </page>
+
+    <page type="tailorModifier">
+        <text>Haste</text>
+        <modifier>haste</modifier>
+        <desc>Zoom zoom zoom.</desc>
+    </page>
+
+    <page type="tailorModifier">
+        <text>Health Boost</text>
+        <modifier>health</modifier>
+        <desc>Boosts the players health while wearing it.</desc>
     </page>
 
     <page type="tailorSection">
