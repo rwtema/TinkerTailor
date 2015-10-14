@@ -1,11 +1,14 @@
 package com.rwtema.tinkertailor.utils.oremapping;
 
+import com.rwtema.tinkertailor.TinkersTailor;
+import com.rwtema.tinkertailor.utils.ISidedCallable;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectProcedure;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
@@ -79,8 +82,25 @@ public class OreIntMap {
 		if (genericItemStacks != null)
 			genericItemStacks.forEachKey(new TObjectProcedure<Item>() {
 				@Override
-				public boolean execute(Item object) {
-					return items.add(new ItemStack(object));
+				public boolean execute(final Item input) {
+					TinkersTailor.proxy.run(new ISidedCallable() {
+
+						@Override
+						public void runClient() {
+							CreativeTabs creativeTab = input.getCreativeTab();
+							ArrayList<ItemStack> list = new ArrayList<ItemStack>();
+							if (creativeTab != null) {
+								input.getSubItems(input, creativeTab, items);
+							} else
+								items.add(new ItemStack(input));
+						}
+
+						@Override
+						public void runServer() {
+							items.add(new ItemStack(input));
+						}
+					});
+					return true;
 				}
 			});
 
