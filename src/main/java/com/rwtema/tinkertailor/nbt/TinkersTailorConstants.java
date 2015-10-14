@@ -1,5 +1,6 @@
 package com.rwtema.tinkertailor.nbt;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.UUID;
 
@@ -23,6 +24,15 @@ public class TinkersTailorConstants {
 	public static final Random RANDOM = new Random();
 
 	public static final String[] NAMES = {"Helmet", "Chestplate", "Leggings", "Boots"};
+	public static final String[] UNLOCAL_NAMES = {
+			"item.TinkerTailor.Hat.name",
+			"item.TinkerTailor.Shirt.name",
+			"item.TinkerTailor.Trousers.name",
+			"item.TinkerTailor.Shoes.name"
+	};
 
 	public static final String[] EMPTY_STRING_ARRAY = {};
+
+	public static final DecimalFormat formatTwoDigits = new DecimalFormat("#.##");
+	public static final DecimalFormat formatTenDigits = new DecimalFormat("#.##########");
 }
