@@ -30,6 +30,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -250,4 +251,16 @@ public class TinkersTailor {
 
 	public static final Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
 
+	public static final boolean deobf;
+
+	static {
+		boolean _deObf;
+		try {
+			World.class.getDeclaredMethod("getBlock", int.class, int.class, int.class);
+			_deObf = true;
+		} catch (NoSuchMethodException e) {
+			_deObf = false;
+		}
+		deobf = _deObf;
+	}
 }

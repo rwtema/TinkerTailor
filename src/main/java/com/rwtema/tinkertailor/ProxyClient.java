@@ -4,12 +4,11 @@ import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
 import com.rwtema.tinkertailor.gui.GuiToolModifyStation;
 import com.rwtema.tinkertailor.manual.ManualHelper;
 import com.rwtema.tinkertailor.utils.ICallableClient;
+import com.rwtema.tinkertailor.utils.ISidedCallable;
 import com.rwtema.tinkertailor.utils.ISidedFunction;
 import com.rwtema.tinkertailor.utils.ItemHelper;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.block.Block;
@@ -30,7 +29,11 @@ public class ProxyClient extends Proxy {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
+	public void run(ISidedCallable callable){
+		callable.runClient();
+	}
+
+	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		if (ID == 0)
 			return new GuiToolModifyStation(player.inventory, (TileEntityToolModifyStation) world.getTileEntity(x, y, z), world, x, y, z);

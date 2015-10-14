@@ -1,6 +1,7 @@
 package com.rwtema.tinkertailor;
 
 import com.rwtema.tinkertailor.utils.ICallableClient;
+import com.rwtema.tinkertailor.utils.ISidedCallable;
 import com.rwtema.tinkertailor.utils.ISidedFunction;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -16,6 +17,10 @@ import tconstruct.library.TConstructRegistry;
 public class Proxy implements IGuiHandler {
 	public void run(ICallableClient ICallableClient) {
 
+	}
+
+	public void run(ISidedCallable callable){
+		callable.runServer();
 	}
 
 	@Override
