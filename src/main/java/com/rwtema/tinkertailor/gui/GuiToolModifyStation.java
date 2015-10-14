@@ -140,11 +140,7 @@ public class GuiToolModifyStation extends GuiContainer implements INEIGuiHandler
 
 	@Override
 	public VisiblityData modifyVisiblity(GuiContainer gui, VisiblityData currentVisibility) {
-		if (width - xSize < 107) {
-			currentVisibility.showWidgets = false;
-		} else {
-			currentVisibility.showWidgets = true;
-		}
+		currentVisibility.showWidgets = width - xSize >= 107;
 
 		if (guiLeft < 58) {
 			currentVisibility.showStateButtons = false;
@@ -173,9 +169,7 @@ public class GuiToolModifyStation extends GuiContainer implements INEIGuiHandler
 		if (y + h - 4 < guiTop || y + 4 > guiTop + ySize)
 			return false;
 
-		if (x + 4 > guiLeft + xSize + 126)
-			return false;
+		return x + 4 <= guiLeft + xSize + 126;
 
-		return true;
 	}
 }

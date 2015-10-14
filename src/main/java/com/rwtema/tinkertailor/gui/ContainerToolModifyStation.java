@@ -112,7 +112,7 @@ public class ContainerToolModifyStation extends ToolStationContainer {
 
 			if (slotStack.stackSize == 0)
 			{
-				slot.putStack((ItemStack) null);
+				slot.putStack(null);
 			}
 			else
 			{

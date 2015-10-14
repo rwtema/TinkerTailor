@@ -8,9 +8,9 @@ public class PageSectionText extends PageBase {
 	String section;
 
 	@Override
-	protected void render(int localWidth, int localHeight, boolean isTranslatable) {
-		drawCenteredString(EnumChatFormatting.UNDERLINE + section, 4, localWidth, localHeight);
-		drawTextBlock(text, 4, 16, localWidth, localHeight);
+	protected void render(boolean isTranslatable) {
+		drawCenteredString(EnumChatFormatting.UNDERLINE + section, 4);
+		drawTextBlock(text, 4, 16);
 	}
 
 	@Override

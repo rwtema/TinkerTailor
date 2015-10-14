@@ -5,5 +5,5 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public interface ICallableClient {
 	@SideOnly(Side.CLIENT)
-	public void run();
+	void run();
 }

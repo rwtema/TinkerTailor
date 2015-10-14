@@ -15,9 +15,9 @@ public class PageModifier extends PageBase {
 	String desc;
 
 	@Override
-	protected void render(int localWidth, int localHeight, boolean isTranslatable) {
+	protected void render(boolean isTranslatable) {
 
-		drawCenteredString("\u00a7n" + text, 4, localWidth, localHeight);
+		drawCenteredString("\u00a7n" + text, 4);
 
 		List stacks = modifier.itemModifier.stacks;
 		if (!stacks.isEmpty()) {
@@ -28,23 +28,23 @@ public class PageModifier extends PageBase {
 					String s = "Value: " + ((ModOreModifier) modifier.itemModifier).getValue(itemStack);
 
 					int x = (178 - 18 - 2 - manual.fonts.getStringWidth(s)) / 2;
-					renderStack(itemStack, x, 20, localWidth, localHeight);
-					manual.fonts.drawString(s, localWidth + x + 20, localHeight + 24, 0);
+					renderStack(itemStack, x, 20);
+					manual.fonts.drawString(s, x + 20, 24, 0);
 				} else
-					renderStack(itemStack, 81, 20, localWidth, localHeight);
+					renderStack(itemStack, 81, 20);
 			}
 			stopRenderingItem();
 		}
 
 		int yPos = 42;
-		yPos += drawTextBlock(desc, 4, yPos, localWidth, localHeight);
+		yPos += drawTextBlock(desc, 4, yPos);
 		yPos += drawBlankLine();
 		for (String s : modifier.getDocLines()) {
-			yPos += drawTextBlock(s, 4, yPos, localWidth, localHeight);
+			yPos += drawTextBlock(s, 4, yPos);
 		}
-		yPos += drawTextLine("- Max Level: " + (modifier.getMaxLevel() / modifier.getModifierStep()), 4, yPos, localWidth, localHeight);
+		yPos += drawTextLine("- Max Level: " + (modifier.getMaxLevel() / modifier.getModifierStep()), 4, yPos);
 
-		yPos += drawTextLine("- Cost per Level: " + modifier.getModifierStep(), 4, yPos, localWidth, localHeight);
+		yPos += drawTextLine("- Cost per Level: " + modifier.getModifierStep(), 4, yPos);
 		yPos += drawBlankLine();
 		int allowedArmorTypes = modifier.allowedArmorTypes;
 		String restText;
@@ -61,7 +61,7 @@ public class PageModifier extends PageBase {
 			restText = builder.toString();
 		}
 
-		drawTextLine("- Restrictions: " + restText, 4, yPos, localWidth, localHeight);
+		drawTextLine("- Restrictions: " + restText, 4, yPos);
 
 	}
 

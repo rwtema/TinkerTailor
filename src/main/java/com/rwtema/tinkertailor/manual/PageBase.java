@@ -36,25 +36,29 @@ public abstract class PageBase extends BookPage {
 		if (drawBlankPage) {
 			return;
 		}
+
 		if (exception != null) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			exception.printStackTrace(pw);
 
-			manual.fonts.drawSplitString(sw.toString(), localWidth, localHeight, PAGE_WIDTH, 0);
+			manual.fonts.drawSplitString(sw.toString(), localWidth + 4, localHeight + 4, PAGE_WIDTH - 8, 0);
 		} else {
+			GL11.glPushMatrix();
+			GL11.glTranslated(localWidth, localHeight, 0);
 			try {
-				render(localWidth, localHeight, isTranslatable);
-			}catch (Exception err){
+				render(isTranslatable);
+			} catch (Exception err) {
 				exception = err;
 			}
+			GL11.glPopMatrix();
 		}
 	}
 
-	protected abstract void render(int localWidth, int localHeight, boolean isTranslatable);
+	protected abstract void render(boolean isTranslatable);
 
-	protected void renderStack(ItemStack itemStack, int x, int y, int localWidth, int localHeight) {
-		manual.renderitem.renderItemAndEffectIntoGUI(manual.fonts, manual.getMC().renderEngine, itemStack, (localWidth + x), (localHeight + y));
+	protected void renderStack(ItemStack itemStack, int x, int y) {
+		manual.renderitem.renderItemAndEffectIntoGUI(manual.fonts, manual.getMC().renderEngine, itemStack, x, y);
 	}
 
 	protected void stopRenderingItem() {
@@ -69,18 +73,18 @@ public abstract class PageBase extends BookPage {
 		RenderHelper.enableGUIStandardItemLighting();
 	}
 
-	protected int drawCenteredString(String text, int height, int localWidth, int localHeight) {
+	protected int drawCenteredString(String text, int height) {
 		List<String> strings = manual.fonts.listFormattedStringToWidth(text, PAGE_WIDTH);
 		for (String string : strings) {
-			drawCenteredString(string, height, localWidth, localHeight, PAGE_WIDTH);
+			drawCenteredString(string, height, PAGE_WIDTH);
 			height += 9;
 		}
 
 		return strings.size();
 	}
 
-	protected int drawTextLine(String text, int x, int y, int localWidth, int localHeight) {
-		manual.fonts.drawString(text, localWidth + x, localHeight + y, 0);
+	protected int drawTextLine(String text, int x, int y) {
+		manual.fonts.drawString(text, x, y, 0);
 		return manual.fonts.FONT_HEIGHT;
 	}
 
@@ -88,17 +92,17 @@ public abstract class PageBase extends BookPage {
 		return manual.fonts.FONT_HEIGHT;
 	}
 
-	protected int drawTextBlock(String text, int x, int y, int localWidth, int localHeight) {
-		return drawTextBlock(text, x, y, localWidth, localHeight, PAGE_WIDTH - x);
+	protected int drawTextBlock(String text, int x, int y) {
+		return drawTextBlock(text, x, y, PAGE_WIDTH - x);
 	}
 
-	protected int drawTextBlock(String text, int x, int y, int localWidth, int localHeight, int maxWidth) {
-		manual.fonts.drawSplitString(text, localWidth + x, localHeight + y, maxWidth, 0);
+	protected int drawTextBlock(String text, int x, int y, int maxWidth) {
+		manual.fonts.drawSplitString(text, x, y, maxWidth, 0);
 		return manual.fonts.listFormattedStringToWidth(text, maxWidth).size() * manual.fonts.FONT_HEIGHT;
 	}
 
-	protected int drawCenteredString(String text, int height, int localWidth, int localHeight, int width) {
-		manual.fonts.drawString(text, localWidth + (width - manual.fonts.getStringWidth(text)) / 2, localHeight + height, 0);
+	protected int drawCenteredString(String text, int height, int width) {
+		manual.fonts.drawString(text, (width - manual.fonts.getStringWidth(text)) / 2, height, 0);
 		return manual.fonts.FONT_HEIGHT;
 	}
 

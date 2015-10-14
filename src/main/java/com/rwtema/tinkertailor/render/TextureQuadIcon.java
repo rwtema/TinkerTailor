@@ -99,9 +99,9 @@ public class TextureQuadIcon implements IRender {
 
 	public static Vec3[][] getBoxVecs(float ox, float oy, float oz, float w, float h, float d, float scale, boolean mirror) {
 		Vec3[][] quadList = new Vec3[6][];
-		float ux = ox + (float) w;
-		float uy = oy + (float) h;
-		float uz = oz + (float) d;
+		float ux = ox + w;
+		float uy = oy + h;
+		float uz = oz + d;
 		ox -= scale;
 		oy -= scale;
 		oz -= scale;
