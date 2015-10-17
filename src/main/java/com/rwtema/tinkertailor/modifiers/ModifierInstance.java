@@ -4,6 +4,11 @@ public final class ModifierInstance implements Comparable<ModifierInstance> {
 	public final Modifier modifier;
 	public final int level;
 
+	public ModifierInstance(Modifier modifier, int level) {
+		this.modifier = modifier;
+		this.level = level;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -17,11 +22,6 @@ public final class ModifierInstance implements Comparable<ModifierInstance> {
 	@Override
 	public int hashCode() {
 		return modifier.hashCode();
-	}
-
-	public ModifierInstance(Modifier modifier, int level) {
-		this.modifier = modifier;
-		this.level = level;
 	}
 
 	@Override

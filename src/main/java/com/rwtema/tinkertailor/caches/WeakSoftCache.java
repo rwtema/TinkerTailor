@@ -8,13 +8,11 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 public abstract class WeakSoftCache<K, V> {
+	private static final int OVERFULL_THRESHOLD = 32767;
 	private final HashMap<WeakReference<K>, SoftReference<V>> map = new HashMap<WeakReference<K>, SoftReference<V>>();
 	private final ReferenceQueue<K> refQueueWeak = new ReferenceQueue<K>();
 	private final ReferenceQueue<V> refQueueSoft = new ReferenceQueue<V>();
 	private final Lookup lookup = new Lookup();
-
-	private static final int OVERFULL_THRESHOLD = 32767;
-
 
 	@SuppressWarnings("SuspiciousMethodCalls")
 	public synchronized V get(final K key) {

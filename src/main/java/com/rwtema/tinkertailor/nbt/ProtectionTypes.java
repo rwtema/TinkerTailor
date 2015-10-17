@@ -8,7 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 
-public enum DamageType {
+public enum ProtectionTypes {
 	normal(new DamageSource("normal"), 12, "ingotIron", EnumChatFormatting.GRAY) {
 		@Override
 		public boolean handles(DamageSource source) {
@@ -28,10 +28,15 @@ public enum DamageType {
 		}
 	},
 
-	projectile((new DamageSource("projectile")).setProjectile(), 6, "slimeball", EnumChatFormatting.GREEN) {
+	projectile((new DamageSource("projectile")).setProjectile(), 6, "logWood", EnumChatFormatting.GREEN) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isProjectile();
+		}
+
+		@Override
+		public int modifierStep() {
+			return 64;
 		}
 	},
 
@@ -95,7 +100,7 @@ public enum DamageType {
 	public final String name;
 
 
-	DamageType(DamageSource damageSource, int factor, Object itemStack, EnumChatFormatting color) {
+	ProtectionTypes(DamageSource damageSource, int factor, Object itemStack, EnumChatFormatting color) {
 		this.damageSource = damageSource;
 		this.maxLevel = factor;
 		this.itemStack = itemStack;
@@ -110,9 +115,13 @@ public enum DamageType {
 		return 0;
 	}
 
-	public OreIntMap getOreValues(){
+	public OreIntMap getOreValues() {
 		OreIntMap map = new OreIntMap();
 		map.put(itemStack, 1);
 		return map;
+	}
+
+	public int modifierStep() {
+		return 16;
 	}
 }

@@ -13,6 +13,8 @@ import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
 public class ModelRendererCustom extends ModelRenderer {
+	public final List<IRender> staticIconList = new ArrayList<IRender>();
+	public final List<IRender> dynamicIconList = new ArrayList<IRender>();
 	private boolean compiled = false;
 	private int displayList = -1;
 
@@ -30,8 +32,7 @@ public class ModelRendererCustom extends ModelRenderer {
 		super(p_i1172_1_, p_i1172_2_);
 		RendererHandler.rendererCustoms.add(this);
 	}
-
-	public ModelRendererCustom(ModelBase parent, ModelRenderer copy){
+	public ModelRendererCustom(ModelBase parent, ModelRenderer copy) {
 		this(parent, copy.boxName);
 		textureWidth = copy.textureWidth;
 		textureHeight = copy.textureHeight;
@@ -39,9 +40,6 @@ public class ModelRendererCustom extends ModelRenderer {
 		setRotationPoint(copy.rotationPointX, copy.rotationPointY, copy.rotationPointZ);
 		mirror = copy.mirror;
 	}
-
-	public final List<IRender> staticIconList = new ArrayList<IRender>();
-	public final List<IRender> dynamicIconList = new ArrayList<IRender>();
 
 	@Override
 	public void render(float partialTicks) {

@@ -11,6 +11,7 @@ import java.util.Map;
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 public class CoreTinkerer extends DummyModContainer implements IFMLLoadingPlugin {
 	protected static final ModMetadata md;
+	public static boolean runtimeDeobfuscationEnabled;
 
 	static {
 		md = new ModMetadata();
@@ -24,8 +25,6 @@ public class CoreTinkerer extends DummyModContainer implements IFMLLoadingPlugin
 
 
 	}
-
-	public static boolean runtimeDeobfuscationEnabled;
 
 
 	public CoreTinkerer() {

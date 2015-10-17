@@ -3,6 +3,7 @@ package com.rwtema.tinkertailor;
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
+import com.rwtema.tinkertailor.utils.ICallableClient;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.map.hash.TIntDoubleHashMap;
@@ -16,45 +17,20 @@ import tconstruct.library.tools.ToolMaterial;
 
 public class DamageEventHandler {
 
-	private static final float MIN_REDUCTION = 0.2F;
-
 	public static final DamageEventHandler instance = new DamageEventHandler();
-
-	public void register() {
-		FMLCommonHandler.instance().bus().register(this);
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-
-	@SubscribeEvent
-	public void livingHurt(LivingHurtEvent event) {
-		float dR = 0;
-
-
-		float bonusResistance = 0;
-		for (ItemStack itemStack : event.entityLiving.getLastActiveItems()) {
-			if (itemStack != null && itemStack.getItem() instanceof ArmorCore) {
-				ArmorCore armorCore = (ArmorCore) itemStack.getItem();
-				dR += armorCore.getDamageResistance(itemStack);
-
-				for (ModifierInstance modifierInstance : Caches.modifiers.get(itemStack)) {
-					bonusResistance += modifierInstance.modifier.getBonusResistance(event.entityLiving, event.source, event.ammount, itemStack, armorCore.armorType, modifierInstance.level);
-				}
+	@SuppressWarnings("ExternalizableWithoutPublicNoArgConstructor")
+	public static final TObjectDoubleHashMap<ToolMaterial> materialDR = new TObjectDoubleHashMap<ToolMaterial>(10, 0.5F, -1) {
+		@Override
+		public double get(Object key) {
+			double v = super.get(key);
+			if (v == -1) {
+				v = getBaseDR((ToolMaterial) key);
+				put((ToolMaterial) key, v);
 			}
+
+			return v;
 		}
-
-		dR = MathHelper.clamp_float(dR / 100F, 0F, 0.8F);
-		bonusResistance = MathHelper.clamp_float(bonusResistance / 100F, 0, 0.8F);
-
-		float damage = event.ammount;
-		if (!event.source.isUnblockable()) {
-			damage = damage * (1 - dR);
-		}
-
-		damage = damage * (1 - bonusResistance);
-
-		event.ammount = damage;
-	}
-
+	};
 	@SuppressWarnings("ExternalizableWithoutPublicNoArgConstructor")
 	public static final TIntDoubleHashMap matDRcache = new TIntDoubleHashMap() {
 		@Override
@@ -76,26 +52,12 @@ public class DamageEventHandler {
 			return i;
 		}
 	};
-
-
-	@SuppressWarnings("ExternalizableWithoutPublicNoArgConstructor")
-	public static final TObjectDoubleHashMap<ToolMaterial> materialDR = new TObjectDoubleHashMap<ToolMaterial>(10, 0.5F, -1) {
-		@Override
-		public double get(Object key) {
-			double v = super.get(key);
-			if (v == -1) {
-				v = getBaseDR((ToolMaterial) key);
-				put((ToolMaterial) key, v);
-			}
-
-			return v;
-		}
-	};
+	private static final float MIN_REDUCTION = 0.2F;
 
 	private static double getBaseDR(ToolMaterial material) {
 		double q = getRawQ(material);
 
-		return 25 / (1 + Math.exp(-q));
+		return 23 / (1 + Math.exp(-q));
 	}
 
 	public static double getRawQ(ToolMaterial material) {
@@ -107,5 +69,84 @@ public class DamageEventHandler {
 				- 0.0036839928 * durability
 				+ 0.5798563938 * material.harvestLevel()
 				+ 1.3925798111 * Math.log(durability);
+	}
+
+	public void register() {
+		FMLCommonHandler.instance().bus().register(this);
+		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	@SubscribeEvent
+	public void livingHurt(final LivingHurtEvent event) {
+		if (event.ammount == 0) return;
+
+		float dR = 0;
+
+		float[] dRR = new float[4];
+		float[] bRR = new float[4];
+
+		float bR = 0;
+		for (ItemStack itemStack : event.entityLiving.getLastActiveItems()) {
+			if (itemStack != null && itemStack.getItem() instanceof ArmorCore) {
+				if (ArmorCore.isBroken(itemStack)) continue;
+				ArmorCore armorCore = (ArmorCore) itemStack.getItem();
+
+
+				float damageResistance = armorCore.getDamageResistance(itemStack);
+				dRR[armorCore.armorType] += damageResistance;
+				dR += damageResistance;
+
+				for (ModifierInstance modifierInstance : Caches.modifiers.get(itemStack)) {
+					float bonusResistance = modifierInstance.modifier.getBonusResistance(event.entityLiving, event.source, event.ammount, itemStack, armorCore.armorType, modifierInstance.level);
+					bRR[armorCore.armorType] += bonusResistance;
+					bR += bonusResistance;
+				}
+			}
+		}
+
+		float[] damageToDistribute = new float[4];
+
+		float damage = event.ammount;
+		float prevDamage;
+		if (dR > 0 && !event.source.isUnblockable()) {
+			prevDamage = damage;
+			damage = damage * (1 - MathHelper.clamp_float(dR / 100F, 0F, 0.95F));
+			assignDamage(dR, dRR, damageToDistribute, damage, prevDamage);
+		}
+
+		if (bR > 0) {
+			prevDamage = damage;
+			damage = damage * (1 - MathHelper.clamp_float(bR / 100F, 0, 0.8F));
+			assignDamage(bR, bRR, damageToDistribute, damage, prevDamage);
+		}
+
+		if (bR == 0 && dR == 0) return;
+
+
+		for (ItemStack itemStack : event.entityLiving.getLastActiveItems()) {
+			if (itemStack != null && itemStack.getItem() instanceof ArmorCore) {
+				ArmorCore item = (ArmorCore) itemStack.getItem();
+				final int slot = item.armorType;
+				int dmg = (int) Math.ceil(damageToDistribute[slot]);
+				item.damage(event.entityLiving, itemStack, event.source, dmg);
+
+				TinkersTailor.proxy.run(new ICallableClient() {
+					@Override
+					public void run() {
+						ArmorCore.armors[slot].getModelArmor().setInvisible(event.entityLiving, false);
+					}
+				});
+			}
+		}
+
+		event.ammount = damage;
+	}
+
+	private void assignDamage(float dR, float[] dRR, float[] damageToDistribute, float damage, float prevDamage) {
+		float r = (prevDamage - damage) / dR;
+
+		for (int i = 0; i < 4; i++) {
+			damageToDistribute[i] += r * dRR[i];
+		}
 	}
 }

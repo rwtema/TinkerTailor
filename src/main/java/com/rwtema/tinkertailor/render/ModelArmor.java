@@ -1,16 +1,23 @@
 package com.rwtema.tinkertailor.render;
 
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
+import java.util.WeakHashMap;
 import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import tconstruct.library.tools.DynamicToolPart;
 import tconstruct.tools.TinkerTools;
 
 public class ModelArmor extends ModelBiped {
+	public final ArmorTextureManager manager;
 	public int material;
 	public ResourceLocation location;
-	public final ArmorTextureManager manager;
+	double invis = 0;
+	private WeakHashMap<Entity, Double> invisCache = new WeakHashMap<Entity, Double>();
+
 
 	public ModelArmor(int armorSlot) {
 		super(0.5F, 0, 32, 32);
@@ -93,14 +100,66 @@ public class ModelArmor extends ModelBiped {
 
 	@Override
 	public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_) {
-		super.render(p_78088_1_, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_);
-	}
 
+		if (invis == 1) return;
+		if (invis != 0) {
+			GL11.glEnable(GL11.GL_BLEND);
+			OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+			GL11.glColor4d(1, 1, 1, 1 - invis);
+		}
+
+		super.render(p_78088_1_, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_);
+		if (invis != 0) {
+			GL11.glDisable(GL11.GL_BLEND);
+		}
+	}
 
 	public void setMaterial(int material) {
 		this.material = material;
 		location = manager.getArmorResource(material);
 	}
 
+	public void setInvisible(EntityLivingBase entityLiving, boolean invisible) {
+		if (invisible) {
+			invis = 1;
+			invisCache.put(entityLiving, 1.0);
+		} else {
+			invis = 0;
+			invisCache.put(entityLiving, 0.0);
+		}
+	}
 
+	public void stepInvisible(EntityLivingBase entityLiving, boolean invisible) {
+		if (!invisCache.containsKey(entityLiving)) {
+			if (invisible) {
+				invisCache.put(entityLiving, 1.0);
+			} else {
+				invisCache.put(entityLiving, 0.0);
+			}
+		}
+
+		double d = invisCache.get(entityLiving);
+		double step = 0.05;
+		if (invisible) {
+
+			if (d == 1) {
+				invis = 1;
+				return;
+			}
+			d = d + step;
+			if (d > 1) d = 1;
+			invisCache.put(entityLiving, d);
+		} else {
+			if (d == 0) {
+				invis = 0;
+				return;
+			}
+			d = d - step;
+			if (d <= 0) {
+				invisCache.put(entityLiving, 0.0);
+			} else
+				invisCache.put(entityLiving, d);
+		}
+		invis = d;
+	}
 }

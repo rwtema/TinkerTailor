@@ -14,6 +14,9 @@ import tconstruct.library.modifier.ItemModifier;
 import tconstruct.modifiers.tools.ModExtraModifier;
 
 public class ModInducedExtraModifier extends ItemModifier {
+	private HashMap<String, List<ItemStack>> items = null;
+	private int k = -1;
+
 	public ModInducedExtraModifier() {
 		super(new ItemStack[]{}, 0, "Modification");
 	}
@@ -33,9 +36,9 @@ public class ModInducedExtraModifier extends ItemModifier {
 		String key = getKey(recipe);
 		if (key == null) return;
 		tags.setBoolean(key, true);
-		int modifiers = tags.getInteger("Modifiers");
+		int modifiers = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS);
 		modifiers += 1;
-		tags.setInteger("Modifiers", modifiers);
+		tags.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, modifiers);
 	}
 
 	public void addMatchingEffect(ItemStack tool) {
@@ -53,9 +56,6 @@ public class ModInducedExtraModifier extends ItemModifier {
 		return false;
 
 	}
-
-	private HashMap<String, List<ItemStack>> items = null;
-	private int k = -1;
 
 	public HashMap<String, List<ItemStack>> getItemKeyMap() {
 		List<ItemModifier> modifiers = ModifyBuilder.instance.itemModifiers;

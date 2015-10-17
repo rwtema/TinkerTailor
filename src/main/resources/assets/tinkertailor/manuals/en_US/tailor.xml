@@ -7,6 +7,11 @@
         <text>Clothe yourself in the finest metals\n\nBy RWTema</text>
     </page>
 
+    <page type="tailorContents">
+        <title>The Tailors Choice</title>
+        <text>Clothe yourself in the finest metals\n\nBy RWTema</text>
+    </page>
+
     <page type="text">
         <text>
 A good tinkerer should know that the world is a dangerous and evil place with many things wishing to kill you. While tools and weapons are important, a good set of armor is vital to a tinkers continuous survival.
@@ -55,12 +60,22 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
         <text>Armor made from even moderately hard metals cannot be made in the part builder. You must use a smeltery in order to melt down the metals into a molten liquid form (see Mighty Smelting). The molten metal can then be cast into an armor using the appropriate block cast.</text>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
         <text>Cast Helmet</text>
         <recipe>castHelmet</recipe>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
+        <text>Metal Chestplate Cast</text>
+        <recipe>castChestplate</recipe>
+    </page>
+
+    <page type="tailorBlockCast">
+        <text>Metal Leggings Cast</text>
+        <recipe>castLeggings</recipe>
+    </page>
+
+    <page type="tailorBlockCast">
         <text>Metal Boots Cast</text>
         <recipe>castBoots</recipe>
     </page>
@@ -158,8 +173,27 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
     <page type="tailorModifier">
         <text>Health Boost</text>
         <modifier>health</modifier>
-        <desc>Boosts the players health while wearing it.</desc>
+        <desc>Boosts the players health while being worn.</desc>
     </page>
+
+    <page type="tailorModifier">
+        <text>Attack Boost</text>
+        <modifier>attack</modifier>
+        <desc>Arm servos boost base attack damage.</desc>
+    </page>
+
+    <page type="tailorModifier">
+        <text>Knockback Resistance</text>
+        <modifier>knockback</modifier>
+        <desc>Absorbs the velocity of an attack to prevent knockback.</desc>
+    </page>
+
+    <page type="tailorModifier">
+        <text>Invisibility</text>
+        <modifier>invisibility</modifier>
+        <desc>Armor becomes invisible.</desc>
+    </page>
+
 
     <page type="tailorSection">
         <section>Modification Station</section>
@@ -432,27 +466,27 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
     </recipe>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
     <text>Brownstone</text>
     <recipe>brownstone</recipe>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
     <text>Clear Glass</text>
     <recipe>clearglass</recipe>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
     <text>Seared Stone</text>
     <recipe>searedstone</recipe>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
     <text>Endstone</text>
     <recipe>endstone</recipe>
     </page>
 
-    <page type="blockcast">
+    <page type="tailorBlockCast">
     <text>Glueball</text>
     <recipe>glueball</recipe>
     </page>

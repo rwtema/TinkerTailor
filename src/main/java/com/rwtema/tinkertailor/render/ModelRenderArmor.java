@@ -5,7 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 public class ModelRenderArmor extends ModelRendererCustom {
 
 	public ModelRenderArmor(ModelArmor armor, ModelRenderer bipedHead) {
-        super(armor, bipedHead);
+		super(armor, bipedHead);
 	}
 
 	public ModelRenderArmor(ModelArmor armor, int i, int i1) {

@@ -25,6 +25,13 @@ public class RenderSprite implements ICharRenderer {
 		this.bw = (int) Math.ceil(w / h * 8 - 0.0002f);
 	}
 
+	public static char addRenderer(char c, ResourceLocation texture, int u, int v, int w, int h, CustomFontRenderer fontRenderer) {
+
+		RenderSprite renderSprite = new RenderSprite(c, texture, u, v, w, h);
+		fontRenderer.renderOverrides.put(c, renderSprite);
+		return c;
+	}
+
 	@Override
 	public float renderChar(char letter, boolean italicFlag, float x, float y, CustomFontRenderer fontRenderer) {
 
@@ -52,13 +59,6 @@ public class RenderSprite implements ICharRenderer {
 	public int getCharWidth(char letter, CustomFontRenderer fontRenderer) {
 
 		return bw;
-	}
-
-	public static char addRenderer(char c, ResourceLocation texture, int u, int v, int w, int h, CustomFontRenderer fontRenderer) {
-
-		RenderSprite renderSprite = new RenderSprite(c, texture, u, v, w, h);
-		fontRenderer.renderOverrides.put(c, renderSprite);
-		return c;
 	}
 
 }

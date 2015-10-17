@@ -23,13 +23,13 @@ import tconstruct.tools.inventory.ToolStationContainer;
 @SideOnly(Side.CLIENT)
 @Optional.Interface(iface = "codechicken.nei.api.INEIGuiHandler", modid = "NotEnoughItems")
 public class GuiToolModifyStation extends GuiContainer implements INEIGuiHandler {
+	private static final ResourceLocation background = new ResourceLocation(TinkersTailorConstants.RESOURCE_FOLDER, "textures/toolmodifystation.png");
+	private static final ResourceLocation icons = new ResourceLocation("tinker", "textures/gui/icons.png");
+	private static final ResourceLocation description = new ResourceLocation("tinker", "textures/gui/description.png");
 	public TileEntityToolModifyStation logic;
 	public ToolStationContainer toolSlots;
-
-
 	public int guiType;
 	public int[] slotX, slotY, iconX, iconY;
-
 	public String title, body = "";
 
 	public GuiToolModifyStation(InventoryPlayer inventoryplayer, TileEntityToolModifyStation stationlogic, World world, int x, int y, int z) {
@@ -82,7 +82,6 @@ public class GuiToolModifyStation extends GuiContainer implements INEIGuiHandler
 		toolSlots.resetSlots(slotX, slotY);
 	}
 
-
 	/**
 	 * Draw the foreground layer for the GuiContainer (everything in front of
 	 * the items)
@@ -105,10 +104,6 @@ public class GuiToolModifyStation extends GuiContainer implements INEIGuiHandler
 		this.drawCenteredString(fontRendererObj, title, 349, 8, 0xffffff);
 		fontRendererObj.drawSplitString(body, 294, 24, 115, 0xffffff);
 	}
-
-	private static final ResourceLocation background = new ResourceLocation(TinkersTailorConstants.RESOURCE_FOLDER, "textures/toolmodifystation.png");
-	private static final ResourceLocation icons = new ResourceLocation("tinker", "textures/gui/icons.png");
-	private static final ResourceLocation description = new ResourceLocation("tinker", "textures/gui/description.png");
 
 	/**
 	 * Draw the background layer for the GuiContainer (everything behind the

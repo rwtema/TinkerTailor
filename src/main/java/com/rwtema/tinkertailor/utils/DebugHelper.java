@@ -5,8 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class DebugHelper {
-	static long timer;
 	public static Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
+	static long timer;
 
 	public static void resetTimer() {
 		timer = System.nanoTime();

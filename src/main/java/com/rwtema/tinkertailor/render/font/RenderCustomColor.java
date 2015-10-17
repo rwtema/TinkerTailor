@@ -11,23 +11,6 @@ public class RenderCustomColor implements ICharRenderer {
 
 	public static RenderCustomColor instance = new RenderCustomColor();
 
-	@Override
-	public float renderChar(char letter, boolean italicFlag, float x, float y, CustomFontRenderer fontRenderer) {
-		Integer col = colors.get(letter);
-		if (col != null) {
-			if (fontRenderer.dropShadow)
-				fontRenderer.setColor(ColorHelper.getR(col) / 2, ColorHelper.getG(col) / 2, ColorHelper.getB(col) / 2, 1);
-			else
-				fontRenderer.setColor(ColorHelper.getR(col), ColorHelper.getG(col), ColorHelper.getB(col), 1);
-		}
-		return 0;
-	}
-
-	@Override
-	public int getCharWidth(char letter, CustomFontRenderer fontRenderer) {
-		return 0;
-	}
-
 	static {
 		int[] regularCols = ObfuscationReflectionHelper.getPrivateValue(FontRenderer.class, CustomFontRenderer.instance, "colorCode", "field_78285_g");
 		for (int i = 0; i < 16; i++) {
@@ -57,6 +40,23 @@ public class RenderCustomColor implements ICharRenderer {
 
 	private static int makeColorKey(int c) {
 		return c & 0xfcfcfcfc;
+	}
+
+	@Override
+	public float renderChar(char letter, boolean italicFlag, float x, float y, CustomFontRenderer fontRenderer) {
+		Integer col = colors.get(letter);
+		if (col != null) {
+			if (fontRenderer.dropShadow)
+				fontRenderer.setColor(ColorHelper.getR(col) / 2, ColorHelper.getG(col) / 2, ColorHelper.getB(col) / 2, 1);
+			else
+				fontRenderer.setColor(ColorHelper.getR(col), ColorHelper.getG(col), ColorHelper.getB(col), 1);
+		}
+		return 0;
+	}
+
+	@Override
+	public int getCharWidth(char letter, CustomFontRenderer fontRenderer) {
+		return 0;
 	}
 
 }

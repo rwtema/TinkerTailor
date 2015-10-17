@@ -21,6 +21,7 @@ import net.minecraft.util.StringTranslate;
 public class Lang {
 	private final static TreeMap<String, String> lang = TinkersTailor.deobf ? new TreeMap<String, String>() : null;
 	private final static HashMap<String, String> textKey = new HashMap<String, String>();
+	private static final int MAX_KEY_LEN = 32;
 
 	static {
 		if (TinkersTailor.deobf) {
@@ -47,12 +48,37 @@ public class Lang {
 	}
 
 	public static String findTranslateKey(String text, String prefix) {
+		String key = getKey(text, prefix);
+		return translate(key, text);
+	}
+
+	public static String getKey(String text) {
+		return getKey(text, "text");
+	}
+
+	public static String getKey(String text, String prefix) {
 		String key = textKey.get(text);
 		if (key == null) {
-			key = "tinkersTailor." + prefix + "." + text.replaceAll("([^A-Za-z\\s])", "").replaceFirst("^\\s+", "").replaceFirst("\\s+$", "").replaceAll("\\s+", ".").toLowerCase();
+			key = makeKey(text, prefix);
 			textKey.put(text, key);
+			if (TinkersTailor.deobf) {
+				translate(key, text);
+			}
 		}
-		return translate(key, text);
+		return key;
+	}
+
+	private static String makeKey(String text, String prefix) {
+		String key;
+		String t = text.replaceAll("([^A-Za-z\\s])", "").trim();
+		t = t.replaceAll("\\s+", ".").toLowerCase();
+		if (t.length() > MAX_KEY_LEN) {
+			int n = t.indexOf('.', MAX_KEY_LEN);
+			if (n != -1)
+				t = t.substring(0, n);
+		}
+		key = "tinkersTailor." + prefix + "." + t;
+		return key;
 	}
 
 	public static String translate(String key, String _default) {
@@ -64,7 +90,7 @@ public class Lang {
 				PrintWriter out = null;
 				try {
 					try {
-						File file = new File(new File(new File("."), "untranslang"), "en_US.lang");
+						File file = new File(new File(new File("."), "untranslang"), "missed_en_US.lang");
 						if (file.getParentFile() != null) {
 							file.getParentFile().mkdirs();
 						}

@@ -1,22 +1,27 @@
 package com.rwtema.tinkertailor.items;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
-import com.rwtema.tinkertailor.DamageEventHandler;
 import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
+import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
+import com.rwtema.tinkertailor.nbt.ConfigKeys;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.ModelArmor;
 import com.rwtema.tinkertailor.render.RendererHandler;
 import com.rwtema.tinkertailor.render.font.CustomFontRenderer;
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
+import com.rwtema.tinkertailor.utils.ItemHelper;
 import com.rwtema.tinkertailor.utils.Lang;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import javax.annotation.Nonnull;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.creativetab.CreativeTabs;
@@ -33,20 +38,38 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
+import net.minecraftforge.oredict.OreDictionary;
 import tconstruct.library.TConstructRegistry;
 import tconstruct.library.modifier.IModifyable;
 
 public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 
-	public static final ArmorProperties broken = new ArmorProperties(0, 0, 0);
+	public static final ArmorProperties ZERO_ARMORP_ROPERTIES = new ArmorProperties(0, 0, 0);
 	public static final float[] ratings = new float[]{0.15F, 0.40F, 0.30F, 0.15F};
 
 	public static final ArmorCore[] armors = new ArmorCore[4];
+	public static final String[] traits = new String[0];
+	public static final boolean weaponInvis = ConfigKeys.WeaponInvis.getBool(false);
+	public static boolean DEBUG_ALWAYS_RELOAD = false;
+	@SideOnly(Side.CLIENT)
+	ModelArmor armor;
 
 	public ArmorCore(int slot) {
 		super(ArmorMaterial.IRON, 0, slot);
 		setCreativeTab(TinkersTailor.creativeTabArmor);
 		armors[slot] = this;
+	}
+
+	public static List<ModifierInstance> getModifiersIfUnbroken(@Nonnull ItemStack stack) {
+		if (isBroken(stack))
+			return ImmutableList.of();
+		else
+			return Caches.modifiers.get(stack);
+	}
+
+	public static boolean isBroken(@Nonnull ItemStack stack) {
+		NBTTagCompound tag = stack.getTagCompound();
+		return tag == null || tag.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG).getBoolean(TinkersTailorConstants.NBT_MAINTAG_BROKEN);
 	}
 
 	@Override
@@ -77,7 +100,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 		tag.setTag(TinkersTailorConstants.NBT_MAINTAG, infiTool);
 		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_RENDERID, i);
 		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MATERIAL, i);
-		infiTool.setInteger("Modifiers", 3);
+		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 3);
 		stack.setTagCompound(tag);
 		stack.setStackDisplayName(defaultToolName(TConstructRegistry.toolMaterials.get(i)));
 		return stack;
@@ -93,14 +116,15 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 	}
 
 	@SideOnly(Side.CLIENT)
-	ModelArmor armor;
-
-	public static boolean DEBUG_ALWAYS_RELOAD = false;
+	public ModelArmor getModelArmor() {
+		if (armor == null) armor = new ModelArmor(armorType);
+		return armor;
+	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, int armorSlot) {
-		if (armor == null) armor = new ModelArmor(armorSlot);
+		if (armor == null) armor = new ModelArmor(armorType);
 		if (DEBUG_ALWAYS_RELOAD) {
 			RendererHandler.instance.reloadRenderers();
 			RendererHandler.rendererCustoms.clear();
@@ -108,8 +132,20 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 		}
 
 		loadAnimation(entityLiving);
-		armor.setMaterial(Caches.material.get(itemStack));
+		loadArmorData(entityLiving, itemStack);
+
 		return armor;
+	}
+
+	@SideOnly(Side.CLIENT)
+	private void loadArmorData(EntityLivingBase entityLiving, ItemStack itemStack) {
+		armor.setMaterial(Caches.material.get(itemStack));
+		if (entityLiving.hurtTime > 0)
+			armor.setInvisible(entityLiving, false);
+		else {
+			boolean invis = ModifierRegistry.invisibility.hasEffect(itemStack) && !entityLiving.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer) && (!ItemHelper.isPlayerHoldingWeapon() || !weaponInvis);
+			armor.stepInvisible(entityLiving, invis);
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -131,25 +167,30 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 
 	@Override
 	public ArmorProperties getProperties(EntityLivingBase player, ItemStack armor, DamageSource source, double damage, int slot) {
-		return broken;
+		return ZERO_ARMORP_ROPERTIES;
 	}
 
 	public float getDamageResistance(ItemStack armor) {
+		if (isBroken(armor)) return 0;
 		return Caches.damageResistance.get(armor);
 	}
 
 	@Override
 	public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot) {
-		if (!armor.hasTagCompound())
+		if (isBroken(armor))
 			return 0;
-		int i = Caches.material.get(armor);
-		return (int) (DamageEventHandler.matDRcache.get(i) * ratings[armorType] + 0.5F);
+		double a = Caches.damageResistance.get(armor).doubleValue() / 100.0 * 25;
+		return (int) Math.round(a);
 	}
 
 	@Override
 	public void damageArmor(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int slot) {
+
+	}
+
+	public void damage(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage) {
 		int originalDamage = damage;
-		for (ModifierInstance modifierInstance : Caches.modifiers.get(stack)) {
+		for (ModifierInstance modifierInstance : getModifiersIfUnbroken(stack)) {
 			damage = modifierInstance.modifier.reduceArmorDamage(entity, stack, source, damage, originalDamage, armorType, modifierInstance.level);
 		}
 
@@ -167,18 +208,19 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 		tconstruct.library.tools.ToolMaterial toolMaterial = TConstructRegistry.toolMaterials.get(i);
 		if (toolMaterial == null) return;
 
-		toolTips.add("");
-
-		toolTips.add(String.format(Lang.translate("Damage Resistance") + ": %s%%", String.format("%.1f", getDamageResistance(stack) * 4)));
+		String ability = toolMaterial.ability();
+		if (!ability.equals(""))
+			toolTips.add(toolMaterial.style() + ability);
 
 		List<ModifierInstance> modifiers = Caches.modifiers.get(stack);
-
-		if (!modifiers.isEmpty())
-			toolTips.add("");
 
 		for (ModifierInstance modifier : modifiers) {
 			modifier.modifier.addInfo(toolTips, player, stack, armorType, modifier.level);
 		}
+
+		toolTips.add("");
+		toolTips.add("Durability: " + Caches.maxDurability.get(stack));
+		toolTips.add(String.format(EnumChatFormatting.BLUE + Lang.translate("Damage Resistance") + ": +%s%%" + EnumChatFormatting.RESET, String.format("%.1f", getDamageResistance(stack))));
 
 		if (player == null) return;
 		boolean found = false;
@@ -207,7 +249,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 			Item itm = itemStack.getItem();
 			if (itm instanceof ArmorCore) {
 				ArmorCore item = (ArmorCore) itm;
-				dR += item.getDamageResistance(itemStack);
+				dR += item.getDamageResistance(itemStack) / 4;
 
 				for (ModifierInstance modifier : Caches.modifiers.get(itemStack)) {
 					modifierSet.add(modifier.modifier);
@@ -220,14 +262,12 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 			}
 		}
 
-		toolTips.add(String.format(Lang.translate("Damage Resistance") + ": %s%%", String.format("%.1f", dR * 4)));
-
-
-		toolTips.add("");
-
 		for (Modifier modifier : modifierSet) {
 			modifier.addArmorSetInfo(toolTips, player);
 		}
+		toolTips.add(String.format(Lang.translate("Damage Resistance") + ": %s%%", String.format("%.1f", dR * 4)));
+
+
 	}
 
 	@Override
@@ -245,8 +285,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 	public String getModifyType() {
 		return TinkersTailorConstants.MODIFY_TYPE;
 	}
-
-	public static final String[] traits = new String[0];
 
 	@Override
 	public String[] getTraits() {
@@ -272,7 +310,28 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 		super.onArmorTick(world, player, itemStack);
 	}
 
-	public boolean isBroken(ItemStack stack) {
-		return false;
+	@Override
+	public int getMaxDamage() {
+		return 0;
+	}
+
+	@Override
+	public int getMaxDamage(ItemStack stack) {
+		return Caches.maxDurability.get(stack);
+	}
+
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		if (damage != OreDictionary.WILDCARD_VALUE) {
+			int maxDamage = getMaxDamage(stack);
+			if (damage > maxDamage) {
+				NBTTagCompound tag = stack.getTagCompound();
+				if (tag != null) {
+					tag.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG).setBoolean(TinkersTailorConstants.NBT_MAINTAG_BROKEN, true);
+					damage = maxDamage;
+				}
+			}
+		}
+		super.setDamage(stack, damage);
 	}
 }

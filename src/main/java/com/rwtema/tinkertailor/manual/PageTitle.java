@@ -4,6 +4,8 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL11;
 
 public class PageTitle extends PageBase {
+	String title, text;
+
 	@Override
 	protected void render(boolean isTranslatable) {
 		GL11.glPushMatrix();
@@ -13,8 +15,6 @@ public class PageTitle extends PageBase {
 
 		drawCenteredString(text, 76);
 	}
-
-	String title, text;
 
 	@Override
 	protected void loadData() throws IOException {

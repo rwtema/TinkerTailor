@@ -48,34 +48,12 @@ import tconstruct.tools.TinkerTools;
 @Mod(name = TinkersTailorConstants.MOD_ID, modid = TinkersTailorConstants.MOD_ID, dependencies = "required-after:TConstruct")
 public class TinkersTailor {
 
+	public static final Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
+	public static final boolean deobf;
 	@Mod.Instance(TinkersTailorConstants.MOD_ID)
 	public static TinkersTailor instance;
-
 	public static ArmorCore hat;
-	public static ArmorCore shirt;
-	public static ArmorCore trousers;
-	public static ArmorCore shoes;
-	public static Block toolModifyStation;
-
-	public static BlockArmorCast armorCast;
-	public static ItemArmorPattern armorPattern;
-
-	public static ItemTailorsBook book;
-
-	public static final CreativeTabs creativeTabItems = new CreativeTabs("tinkertailor.items") {
-		@Override
-		public Item getTabIconItem() {
-			return Item.getItemFromBlock(armorCast);
-		}
-	};
-
 	public static final CreativeTabs creativeTabArmor = new CreativeTabs("tinkertailor.armors") {
-		@Override
-		@SideOnly(Side.CLIENT)
-		public Item getTabIconItem() {
-			return hat;
-		}
-
 		@SideOnly(Side.CLIENT)
 		private ItemStack icon;
 		@SideOnly(Side.CLIENT)
@@ -84,6 +62,12 @@ public class TinkersTailor {
 		private Random rand;
 		@SideOnly(Side.CLIENT)
 		private int materials[];
+
+		@Override
+		@SideOnly(Side.CLIENT)
+		public Item getTabIconItem() {
+			return hat;
+		}
 
 		@SideOnly(Side.CLIENT)
 		public ItemStack getIconItemStack() {
@@ -114,11 +98,33 @@ public class TinkersTailor {
 			}
 		}
 	};
-
+	public static ArmorCore shirt;
+	public static ArmorCore trousers;
+	public static ArmorCore shoes;
+	public static Block toolModifyStation;
+	public static BlockArmorCast armorCast;
+	public static final CreativeTabs creativeTabItems = new CreativeTabs("tinkertailor.items") {
+		@Override
+		public Item getTabIconItem() {
+			return Item.getItemFromBlock(armorCast);
+		}
+	};
+	public static ItemArmorPattern armorPattern;
+	public static ItemTailorsBook book;
 	@SidedProxy(serverSide = "com.rwtema.tinkertailor.Proxy", clientSide = "com.rwtema.tinkertailor.ProxyClient")
 	public static Proxy proxy;
-
 	public static Configuration config;
+
+	static {
+		boolean _deObf;
+		try {
+			World.class.getDeclaredMethod("getBlock", int.class, int.class, int.class);
+			_deObf = true;
+		} catch (NoSuchMethodException e) {
+			_deObf = false;
+		}
+		deobf = _deObf;
+	}
 
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
@@ -246,21 +252,5 @@ public class TinkersTailor {
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
 		config.save();
-	}
-
-
-	public static final Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
-
-	public static final boolean deobf;
-
-	static {
-		boolean _deObf;
-		try {
-			World.class.getDeclaredMethod("getBlock", int.class, int.class, int.class);
-			_deObf = true;
-		} catch (NoSuchMethodException e) {
-			_deObf = false;
-		}
-		deobf = _deObf;
 	}
 }

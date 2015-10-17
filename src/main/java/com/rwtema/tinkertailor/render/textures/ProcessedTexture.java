@@ -18,7 +18,8 @@ import org.apache.logging.log4j.Logger;
 public abstract class ProcessedTexture extends SimpleTexture {
 	static final ColorModel rgb = ColorModel.getRGBdefault();
 	private static final Logger logger = LogManager.getLogger();
-	protected final ResourceLocation fallback;ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_CIEXYZ);
+	protected final ResourceLocation fallback;
+	ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_CIEXYZ);
 
 	public ProcessedTexture(ResourceLocation p_i1275_1_, ResourceLocation fallback) {
 		super(p_i1275_1_);
@@ -44,7 +45,7 @@ public abstract class ProcessedTexture extends SimpleTexture {
 
 	protected static int mixColor(int color, int c) {
 		int alpha = rgb.getAlpha(color);
-		if(alpha <= 10) return color;
+		if (alpha <= 10) return color;
 
 		float[] col_base = getColor(c);
 		float[] col = getColor(color);
@@ -62,7 +63,7 @@ public abstract class ProcessedTexture extends SimpleTexture {
 		float lum = col[0] * 0.1769F + col[1] * 0.8124F + 0.0106F * col[2];
 
 		for (int i = 0; i < col.length; i++) {
-			col[i] = (lum * col_base[i] * p + col2[i] * (1-p));
+			col[i] = (lum * col_base[i] * p + col2[i] * (1 - p));
 		}
 
 		return getColor(col, alpha);

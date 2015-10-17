@@ -20,9 +20,9 @@ public class ModCreativeArmorModifier extends ItemModifier {
 	@Override
 	public void modify(ItemStack[] input, ItemStack tool) {
 		NBTTagCompound tags = tool.getTagCompound().getCompoundTag("InfiTool");
-		int modifiers = tags.getInteger("Modifiers");
+		int modifiers = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS);
 		modifiers += 1;
-		tags.setInteger("Modifiers", modifiers);
+		tags.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, modifiers);
 	}
 
 	public void addMatchingEffect(ItemStack tool) {

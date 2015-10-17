@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 public class ClassTransformerHandler implements IClassTransformer {
 	public static Logger logger = LogManager.getLogger("TinkerTailorCoreMod");
 	IClassTransformer[] transformers = new IClassTransformer[]{
-		new PotionTransformer()
+			new PotionTransformer()
 	};
 
 	@Override
@@ -16,13 +16,13 @@ public class ClassTransformerHandler implements IClassTransformer {
 		StringBuilder builder = null;
 		for (IClassTransformer transformer : transformers) {
 			byte[] b = bytes;
-			bytes = transformer.transform(s,s2,bytes);
-			if(b != bytes){
-				if(builder == null) builder = new StringBuilder("Transformed: ").append(s);
+			bytes = transformer.transform(s, s2, bytes);
+			if (b != bytes) {
+				if (builder == null) builder = new StringBuilder("Transformed: ").append(s);
 				builder.append(transformer.toString());
 			}
 		}
-		if(builder != null){
+		if (builder != null) {
 			logger.info(builder.toString());
 		}
 		return bytes;

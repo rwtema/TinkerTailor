@@ -2,12 +2,14 @@ package com.rwtema.tinkertailor.modifiers;
 
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.caches.WeakCache;
+import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.nbt.StringHelper;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.font.RenderCustomColor;
 import com.rwtema.tinkertailor.utils.Lang;
 import java.util.List;
 import java.util.Random;
+import javax.annotation.Nonnull;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
@@ -16,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
-import tconstruct.library.modifier.ItemModifier;
 
 public abstract class Modifier implements Comparable<Modifier> {
 	public static final int ARMORTYPE_HAT_ONLY = 14;
@@ -25,25 +26,14 @@ public abstract class Modifier implements Comparable<Modifier> {
 	public static final int ARMORTYPE_SHOES_ONLY = 7;
 
 	public int effect = 0;
-	protected int maxLevel;
 	public ItemStack[] itemStacks;
-	protected int modifierStep = 1;
 	public int allowedArmorTypes;
 	public int color = 0;
-	public ItemModifier itemModifier;
-
-	protected Modifier(String name, int maxLevel, ItemStack... itemStacks) {
-		this.name = name;
-		this.maxLevel = maxLevel;
-		this.itemStacks = itemStacks;
-
-	}
-
+	public ModArmorModifier itemModifier;
 	public String name;
-
 	public WeakCache<ItemStack, Integer> level = new WeakCache<ItemStack, Integer>() {
 		@Override
-		protected Integer calc(ItemStack stack) {
+		protected Integer calc(@Nonnull ItemStack stack) {
 			NBTTagCompound tag = stack.getTagCompound();
 			if (tag == null)
 				return 0;
@@ -51,6 +41,16 @@ public abstract class Modifier implements Comparable<Modifier> {
 			return tag.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG).getInteger(Modifier.this.name);
 		}
 	};
+	protected int maxLevel;
+	protected int modifierStep = 1;
+	String colorString = null;
+
+	protected Modifier(String name, int maxLevel, ItemStack... itemStacks) {
+		this.name = name;
+		this.maxLevel = maxLevel;
+		this.itemStacks = itemStacks;
+
+	}
 
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
 		return 0;
@@ -69,7 +69,12 @@ public abstract class Modifier implements Comparable<Modifier> {
 	}
 
 	public void addInfo(List<String> list, EntityPlayer player, ItemStack item, int slot, int level) {
-		list.add(getColorString() + getLocalizedName() + getLevelTooltip(level - 1) + resetColorString());
+
+		if (modifierStep > 1) {
+			int m = (int) (Math.ceil((double) level / modifierStep)) * modifierStep;
+			list.add(getColorString() + getLocalizedName() + getLevelTooltip(level - 1) + String.format(" (%s/%s)", level, m) + resetColorString());
+		} else
+			list.add(getColorString() + getLocalizedName() + getLevelTooltip(level - 1) + resetColorString());
 	}
 
 	public String resetColorString() {
@@ -84,14 +89,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	}
 
-	public void register() {
-		if (ModifierRegistry.modifiers.containsKey(name)) {
-			throw new IllegalStateException("Modifier '" + name + "' is already taken");
-		}
-		ModifierRegistry.modifiers.put(name, this);
-	}
-
-	public abstract ItemModifier createItemModifier();
+	public abstract ModArmorModifier createItemModifier();
 
 	public boolean doesTick(ItemStack item, int level) {
 		return false;
@@ -124,9 +122,6 @@ public abstract class Modifier implements Comparable<Modifier> {
 		return this;
 	}
 
-	String colorString = null;
-
-
 	public String getColorString() {
 		if (colorString == null) {
 			if (color == 0) {
@@ -153,5 +148,14 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	public String[] getDocLines() {
 		return TinkersTailorConstants.EMPTY_STRING_ARRAY;
+	}
+
+	public boolean shouldHaveDocEntry() {
+		return true;
+	}
+
+
+	public int durabilityBoost(ItemStack stack, int level) {
+		return 0;
 	}
 }

@@ -19,7 +19,7 @@ public class Proxy implements IGuiHandler {
 
 	}
 
-	public void run(ISidedCallable callable){
+	public void run(ISidedCallable callable) {
 		callable.runServer();
 	}
 

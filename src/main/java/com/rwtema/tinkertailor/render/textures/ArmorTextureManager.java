@@ -11,13 +11,33 @@ import tconstruct.library.tools.ToolMaterial;
 
 public class ArmorTextureManager {
 
+	public static final String prefix = TinkersTailorConstants.RESOURCE_FOLDER + ":textures/items/armor/";
+	static final ArmorTextureManager helmet = new ArmorTextureManager(
+			"tinkers:textures/items/armor/helmet_%s.png",
+			prefix + "helmet.png"
+	);
+	static final ArmorTextureManager chestplate = new ArmorTextureManager(
+			prefix + "chestplate_%s.png",
+			prefix + "chestplate.png"
+	);
+	static final ArmorTextureManager leggings = new ArmorTextureManager(
+			prefix + "leggings_%s.png",
+			prefix + "leggings.png"
+	);
+	static final ArmorTextureManager boots = new ArmorTextureManager(
+			prefix + "boots_%s.png",
+			prefix + "boots.png"
+	);
 	ResourceLocation base;
-
 	TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-
 	TIntObjectHashMap<String> textureStringMap = new TIntObjectHashMap<String>();
 	TIntObjectHashMap<ResourceLocation> textureLocationMap = new TIntObjectHashMap<ResourceLocation>();
 	String armorString;
+
+	public ArmorTextureManager(String armorString, String defaultString) {
+		base = new ResourceLocation(defaultString);
+		this.armorString = armorString;
+	}
 
 	public static ArmorTextureManager getManager(int i) {
 		if (i == 0)
@@ -28,33 +48,6 @@ public class ArmorTextureManager {
 			return leggings;
 		else
 			return boots;
-	}
-
-	public static final String prefix = TinkersTailorConstants.RESOURCE_FOLDER + ":textures/items/armor/";
-
-	static final ArmorTextureManager helmet = new ArmorTextureManager(
-			"tinkers:textures/items/armor/helmet_%s.png",
-			prefix + "helmet.png"
-	);
-
-	static final ArmorTextureManager chestplate = new ArmorTextureManager(
-			prefix + "chestplate_%s.png",
-			prefix + "chestplate.png"
-	);
-
-	static final ArmorTextureManager leggings = new ArmorTextureManager(
-			prefix + "leggings_%s.png",
-			prefix + "leggings.png"
-	);
-
-	static final ArmorTextureManager boots = new ArmorTextureManager(
-			prefix + "boots_%s.png",
-			prefix + "boots.png"
-	);
-
-	public ArmorTextureManager(String armorString, String defaultString) {
-		base = new ResourceLocation(defaultString);
-		this.armorString = armorString;
 	}
 
 	public String getArmorName(int matid) {

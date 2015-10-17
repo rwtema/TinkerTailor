@@ -5,14 +5,13 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import javax.annotation.Nonnull;
 
 public abstract class WeakCache<K, V> {
+	private static final int OVERFULL_THRESHOLD = 32767;
 	private final HashMap<WeakReference<K>, V> map = new HashMap<WeakReference<K>, V>();
 	private final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
 	private final Lookup lookup = new Lookup();
-
-	private static final int OVERFULL_THRESHOLD = 32767;
-
 
 	@SuppressWarnings("SuspiciousMethodCalls")
 	public synchronized V get(final K key) {
@@ -45,9 +44,9 @@ public abstract class WeakCache<K, V> {
 		return v;
 	}
 
-	protected abstract V calc(K key);
+	protected abstract V calc(@Nonnull K key);
 
-	protected V getNullValue(){
+	protected V getNullValue() {
 		throw new NullPointerException();
 	}
 

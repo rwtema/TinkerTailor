@@ -22,7 +22,7 @@ public class TextureHeavyPlate extends TextureQuadIcon {
 	public void render(float partialTicks) {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationItemsTexture);
 		ItemStack item = new ItemStack(part, 1, armor.material);
-		color = part.getColorFromItemStack(item,0);
+		color = part.getColorFromItemStack(item, 0);
 		icon = part.getIconFromDamage(armor.material);
 		super.render(partialTicks);
 		Minecraft.getMinecraft().getTextureManager().bindTexture(armor.location);

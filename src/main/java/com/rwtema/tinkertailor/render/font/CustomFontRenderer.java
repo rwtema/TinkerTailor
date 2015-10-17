@@ -10,38 +10,48 @@ import org.lwjgl.opengl.GL11;
 
 public class CustomFontRenderer extends FontRenderer {
 
-	public HashMap<Character, ICharRenderer> renderOverrides = new HashMap<Character, ICharRenderer>();
-
-	{
-		RenderSprite.addRenderer('♡', Gui.icons, 52, 0, 9, 9, this); // heart
-		RenderSprite.addRenderer('♥', Gui.icons, 124, 0, 9, 9, this); // wither heart
-		RenderSprite.addRenderer('⌔', Gui.icons, 34, 9, 9, 9, this); // shield
-		RenderSprite.addRenderer('○', Gui.icons, 16, 18, 9, 9, this); // bubble
-		RenderSprite.addRenderer('◌', Gui.icons, 25, 18, 9, 9, this); // bubble broken
-		RenderSprite.addRenderer('⧰', Gui.icons, 52, 27, 9, 9, this); // hunger
-		RenderSprite.addRenderer('❣', Gui.icons, 52, 45, 9, 9, this); // hardcore heart
-
-		ResourceLocation beacon = new ResourceLocation("textures/gui/container/beacon.png");
-		RenderSprite.addRenderer('✕', beacon, 113, 222, 15, 15, this); // cross mark
-		RenderSprite.addRenderer('✔', beacon, 90, 223, 16, 14, this); // check mark
-	}
-
-	@Override
-	public void bindTexture(ResourceLocation location) {
-		super.bindTexture(location);
-	}
-
 	public static final CustomFontRenderer instance = new CustomFontRenderer();
+	public HashMap<Character, ICharRenderer> renderOverrides = new HashMap<Character, ICharRenderer>();
+	public boolean dropShadow;
 	private float r;
 	private float g;
 	private float b;
 	private float a;
+	private char n = '\u0378';
+	private int baseColor = 0;
+	private float col_r;
+	private float col_g;
+	private float col_b;
+	private float col_a;
+	private float ds_r;
+	private float ds_g;
+	private float ds_b;
+	private float ds_a;
+
+	{
+		RenderSprite.addRenderer('\u2661', Gui.icons, 52, 0, 9, 9, this); // heart
+		RenderSprite.addRenderer('\u2665', Gui.icons, 124, 0, 9, 9, this); // wither heart
+		RenderSprite.addRenderer('\u2314', Gui.icons, 34, 9, 9, 9, this); // shield
+		RenderSprite.addRenderer('\u25cb', Gui.icons, 16, 18, 9, 9, this); // bubble
+		RenderSprite.addRenderer('\u25cc', Gui.icons, 25, 18, 9, 9, this); // bubble broken
+		RenderSprite.addRenderer('\u29f0', Gui.icons, 52, 27, 9, 9, this); // hunger
+		RenderSprite.addRenderer('\u2763', Gui.icons, 52, 45, 9, 9, this); // hardcore heart
+
+		ResourceLocation beacon = new ResourceLocation("textures/gui/container/beacon.png");
+		RenderSprite.addRenderer('\u2715', beacon, 113, 222, 15, 15, this); // cross mark
+		RenderSprite.addRenderer('\u2714', beacon, 90, 223, 16, 14, this); // check mark
+	}
 
 
 	public CustomFontRenderer() {
 		super(Minecraft.getMinecraft().gameSettings, new ResourceLocation("textures/font/ascii.png"), Minecraft.getMinecraft().renderEngine, false);
 		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(this);
 		onResourceManagerReload(Minecraft.getMinecraft().getResourceManager());
+	}
+
+	@Override
+	public void bindTexture(ResourceLocation location) {
+		super.bindTexture(location);
 	}
 
 	@Override
@@ -62,13 +72,9 @@ public class CustomFontRenderer extends FontRenderer {
 			return super.renderUnicodeChar(chr, italic);
 	}
 
-
 	public void resetColor() {
 		GL11.glColor4f(r, g, b, a);
 	}
-
-
-	private char n = '\u0378';
 
 	public char getNextBlankChar() {
 		do {
@@ -123,16 +129,4 @@ public class CustomFontRenderer extends FontRenderer {
 		this.a = a;
 		super.setColor(r, g, b, a);
 	}
-
-
-	public boolean dropShadow;
-	private int baseColor = 0;
-	private float col_r;
-	private float col_g;
-	private float col_b;
-	private float col_a;
-	private float ds_r;
-	private float ds_g;
-	private float ds_b;
-	private float ds_a;
 }

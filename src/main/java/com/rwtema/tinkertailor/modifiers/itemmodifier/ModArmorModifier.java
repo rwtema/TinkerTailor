@@ -12,9 +12,10 @@ import tconstruct.library.modifier.ItemModifier;
 
 public class ModArmorModifier extends ItemModifier {
 
-	int modifierStep = 1;
-	int maxLevel = -1;
-	int armorAllowMask = 0;
+	public int modifierStep = 1;
+	public int maxLevel = -1;
+	public int armorAllowMask = 0;
+	public boolean useModifiers = true;
 
 	public ModArmorModifier(Modifier modifier, ItemStack[] recipe) {
 		super(recipe, modifier.effect, modifier.name);
@@ -46,8 +47,11 @@ public class ModArmorModifier extends ItemModifier {
 			if ((curValue + val) > nextMax) return false;
 		}
 
-		int modifiers = tags.getInteger("Modifiers");
+		if (!useModifiers) return true;
+
+		int modifiers = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS);
 		if (modifiers > 0) return true;
+
 		if (modifierStep == 1 || curValue % modifierStep == 0) return false;
 		return curValue == 0 || ((curValue) / modifierStep) == ((curValue + val) / modifierStep);
 	}
@@ -74,10 +78,10 @@ public class ModArmorModifier extends ItemModifier {
 			tags.setInteger(key, val);
 		}
 
-		if (curValue % modifierStep == 0) {
-			int modifiers = tags.getInteger("Modifiers");
+		if (curValue % modifierStep == 0 && useModifiers) {
+			int modifiers = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS);
 			modifiers -= 1;
-			tags.setInteger("Modifiers", modifiers);
+			tags.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, modifiers);
 		}
 
 //		addToolTip(tool, color + tooltipName, color + key);

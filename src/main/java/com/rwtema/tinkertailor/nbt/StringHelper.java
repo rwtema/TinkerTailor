@@ -4,15 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StringHelper {
-	public static String capFirst(String s) {
-		if (s == null) return null;
-		int n = s.length();
-		if (n == 0) return s;
-		if (n == 1) return s.toUpperCase();
-
-		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
-	}
-
 	private final static LinkedHashMap<String, Integer> roman_numerals;
 
 	static {
@@ -31,6 +22,15 @@ public class StringHelper {
 		roman_numerals.put("V", 5);
 		roman_numerals.put("IV", 4);
 		roman_numerals.put("I", 1);
+	}
+
+	public static String capFirst(String s) {
+		if (s == null) return null;
+		int n = s.length();
+		if (n == 0) return s;
+		if (n == 1) return s.toUpperCase();
+
+		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 	}
 
 	public static String toRomanNumeral(int num) {

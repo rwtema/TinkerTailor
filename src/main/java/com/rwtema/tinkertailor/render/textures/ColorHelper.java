@@ -13,11 +13,10 @@ public class ColorHelper {
 			hue = (hue < 1.0f) ? hue * 6.0f : 0.0f;
 			float q = lightness + saturation * ((lightness > 0.5f) ? 1.0f - lightness : lightness);
 			float p = 2.0f * lightness - q;
-			rgb[0]= normalize(q, p, (hue < 4.0f) ? (hue + 2.0f) : (hue - 4.0f));
-			rgb[1]= normalize(q, p, hue);
-			rgb[2]= normalize(q, p, (hue < 2.0f) ? (hue + 4.0f) : (hue - 2.0f));
-		}
-		else {
+			rgb[0] = normalize(q, p, (hue < 4.0f) ? (hue + 2.0f) : (hue - 4.0f));
+			rgb[1] = normalize(q, p, hue);
+			rgb[2] = normalize(q, p, (hue < 2.0f) ? (hue + 4.0f) : (hue - 2.0f));
+		} else {
 			rgb[0] = lightness;
 			rgb[1] = lightness;
 			rgb[2] = lightness;
@@ -63,11 +62,9 @@ public class ColorHelper {
 				if (hue < 0.0f) {
 					hue += 6.0f;
 				}
-			}
-			else if (max == green) {
+			} else if (max == green) {
 				hue = 2.0f + (blue - red) / hue;
-			}
-			else /*max == blue*/ {
+			} else /*max == blue*/ {
 				hue = 4.0f + (red - green) / hue;
 			}
 			hue /= 6.0f;
@@ -88,15 +85,15 @@ public class ColorHelper {
 		return p;
 	}
 
-	public static float getR(int col){
-		return ((col >> 16) & 255)/255.0F;
+	public static float getR(int col) {
+		return ((col >> 16) & 255) / 255.0F;
 	}
 
-	public static float getG(int col){
-		return ((col >> 8) & 255)/255.0F;
+	public static float getG(int col) {
+		return ((col >> 8) & 255) / 255.0F;
 	}
 
-	public static float getB(int col){
-		return ((col) & 255)/255.0F;
+	public static float getB(int col) {
+		return ((col) & 255) / 255.0F;
 	}
 }

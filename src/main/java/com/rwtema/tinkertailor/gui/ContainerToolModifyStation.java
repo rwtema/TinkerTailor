@@ -76,8 +76,7 @@ public class ContainerToolModifyStation extends ToolStationContainer {
 	}
 
 	@Override
-	public boolean canInteractWith (EntityPlayer entityplayer)
-	{
+	public boolean canInteractWith(EntityPlayer entityplayer) {
 		Block block = logic.getWorldObj().getBlock(logic.xCoord, logic.yCoord, logic.zCoord);
 		return block == TinkersTailor.toolModifyStation && logic.isUseableByPlayer(entityplayer);
 	}
@@ -87,35 +86,24 @@ public class ContainerToolModifyStation extends ToolStationContainer {
 		ItemStack stack = null;
 		Slot slot = (Slot) this.inventorySlots.get(slotID);
 
-		if (slot != null && slot.getHasStack())
-		{
+		if (slot != null && slot.getHasStack()) {
 			ItemStack slotStack = slot.getStack();
 			stack = slotStack.copy();
-			if (slotID < logic.getSizeInventory())
-			{
-				if (slotID == 0)
-				{
-					if (!this.mergeCraftedStack(slotStack, logic.getSizeInventory(), this.inventorySlots.size(), true, player))
-					{
+			if (slotID < logic.getSizeInventory()) {
+				if (slotID == 0) {
+					if (!this.mergeCraftedStack(slotStack, logic.getSizeInventory(), this.inventorySlots.size(), true, player)) {
 						return null;
 					}
-				}
-				else if (!this.mergeItemStack(slotStack, logic.getSizeInventory(), this.inventorySlots.size(), true))
-				{
+				} else if (!this.mergeItemStack(slotStack, logic.getSizeInventory(), this.inventorySlots.size(), true)) {
 					return null;
 				}
-			}
-			else if (!this.mergeItemStack(slotStack, 1, logic.getSizeInventory(), false))
-			{
+			} else if (!this.mergeItemStack(slotStack, 1, logic.getSizeInventory(), false)) {
 				return null;
 			}
 
-			if (slotStack.stackSize == 0)
-			{
+			if (slotStack.stackSize == 0) {
 				slot.putStack(null);
-			}
-			else
-			{
+			} else {
 				slot.onSlotChanged();
 			}
 		}

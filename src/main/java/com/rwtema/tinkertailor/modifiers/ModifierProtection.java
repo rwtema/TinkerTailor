@@ -2,8 +2,9 @@ package com.rwtema.tinkertailor.modifiers;
 
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
+import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
-import com.rwtema.tinkertailor.nbt.DamageType;
+import com.rwtema.tinkertailor.nbt.ProtectionTypes;
 import com.rwtema.tinkertailor.utils.Lang;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,37 +13,36 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
-import tconstruct.library.modifier.ItemModifier;
 
 public class ModifierProtection extends Modifier {
-	DamageType damageType;
+	ProtectionTypes protectionTypes;
 
-	public ModifierProtection(DamageType damageType) {
-		super(damageType.name, 0);
-		this.damageType = damageType;
+	public ModifierProtection(ProtectionTypes protectionTypes) {
+		super(protectionTypes.name, 0);
+		this.protectionTypes = protectionTypes;
 		this.modifierStep = 16;
-		allowedArmorTypes = damageType.allowedArmorTypes();
+		allowedArmorTypes = protectionTypes.allowedArmorTypes();
 
-		maxLevel = damageType.maxLevel * modifierStep;
+		maxLevel = protectionTypes.maxLevel * modifierStep;
 
 	}
 
 	@Override
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
-		if (!damageType.handles(source))
+		if (!protectionTypes.handles(source))
 			return 0;
 
 		return getSimpleResistance(level);
 	}
 
 	private float getSimpleResistance(int level) {
-		float levelFactor = (float) level / (damageType.maxLevel * modifierStep);
+		float levelFactor = (float) level / (protectionTypes.maxLevel * modifierStep);
 		return levelFactor * 80;
 	}
 
 	@Override
 	public void addInfo(List<String> list, EntityPlayer player, ItemStack item, int slot, int level) {
-		float resistance = (getBonusResistance(player, damageType.damageSource, 100, item, slot, this.level.get(item)));
+		float resistance = (getBonusResistance(player, protectionTypes.damageSource, 100, item, slot, this.level.get(item)));
 		int m = (int) (Math.ceil((double) level / modifierStep)) * modifierStep;
 		list.add(String.format(getColorString() + "%s%s: +%.1f%% (%s/%s)", getLocalizedName(), getLevelTooltip(level), resistance, level, m) + EnumChatFormatting.GRAY);
 	}
@@ -60,7 +60,7 @@ public class ModifierProtection extends Modifier {
 
 			if (itm instanceof ArmorCore) {
 				for (ModifierInstance modifierInstance : Caches.modifiers.get(armor)) {
-					r += modifierInstance.modifier.getBonusResistance(player, damageType.damageSource, 100, armor, i, modifierInstance.level);
+					r += modifierInstance.modifier.getBonusResistance(player, protectionTypes.damageSource, 100, armor, i, modifierInstance.level);
 				}
 			}
 		}
@@ -71,8 +71,8 @@ public class ModifierProtection extends Modifier {
 	}
 
 	@Override
-	public ItemModifier createItemModifier() {
-		return new ModOreModifier(this, damageType.getOreValues());
+	public ModArmorModifier createItemModifier() {
+		return new ModOreModifier(this, protectionTypes.getOreValues());
 	}
 
 	@Override

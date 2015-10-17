@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import tconstruct.library.modifier.ItemModifier;
 
 public class ModifierPotion extends Modifier {
 	public final Potion potion;
@@ -26,7 +25,7 @@ public class ModifierPotion extends Modifier {
 	}
 
 	@Override
-	public ItemModifier createItemModifier() {
+	public ModArmorModifier createItemModifier() {
 		return new ModArmorModifier(this, items);
 	}
 

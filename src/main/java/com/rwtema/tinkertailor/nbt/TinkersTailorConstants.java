@@ -8,6 +8,10 @@ public class TinkersTailorConstants {
 	public final static String NBT_MAINTAG = "InfiTool";
 	public final static String NBT_MAINTAG_MATERIAL = "Material";
 	public final static String NBT_MAINTAG_RENDERID = "RenderID";
+	public final static String NBT_MAINTAG_BROKEN = "Broken";
+
+	public final static String NBT_MAINTAG_MODIFIERS = "Modifiers";
+	public final static String NBT_MAINTAG_REPAIRCOUNT = "RepairCount";
 
 
 	public final static String MODIFY_TYPE = "TH_Armor";
@@ -35,4 +39,6 @@ public class TinkersTailorConstants {
 
 	public static final DecimalFormat formatTwoDigits = new DecimalFormat("#.##");
 	public static final DecimalFormat formatTenDigits = new DecimalFormat("#.##########");
+
+
 }

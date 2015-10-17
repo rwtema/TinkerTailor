@@ -29,7 +29,7 @@ public class ProxyClient extends Proxy {
 	}
 
 	@Override
-	public void run(ISidedCallable callable){
+	public void run(ISidedCallable callable) {
 		callable.runClient();
 	}
 

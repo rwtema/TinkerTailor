@@ -3,8 +3,8 @@ package com.rwtema.tinkertailor.utils.oremapping;
 import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.utils.ISidedCallable;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.strategy.IdentityHashingStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.Block;
@@ -15,8 +15,29 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class OreIntMap {
 
-	public TObjectIntHashMap<Item> genericItemStacks = null;
+	public TObjectIntCustomHashMap<Item> genericItemStacks = null;
 	public TObjectIntCustomHashMap<ItemStack> specificItemStacks = null;
+
+	public static OreIntMap newMap(Object... param) {
+		OreIntMap map = new OreIntMap();
+		for (int i = 0; i < param.length; i += 2) {
+			int k;
+			k = (i + 1) < param.length ? (Integer) param[i + 1] : 1;
+			map.put(param[i], k);
+		}
+		return map;
+	}
+
+	public static OreIntMap woodValues() {
+		OreIntMap oreIntMap = new OreIntMap();
+
+		oreIntMap.put("stickWood", 1);
+		oreIntMap.put("plankWood", 2);
+		oreIntMap.put("logWood", 4);
+		oreIntMap.put("slabWood", 1);
+
+		return oreIntMap;
+	}
 
 	public OreIntMap put(Object s, int value) {
 		if (s instanceof String)
@@ -58,7 +79,7 @@ public class OreIntMap {
 
 	public OreIntMap putItem(Item item, int value) {
 		if (genericItemStacks == null)
-			genericItemStacks = new TObjectIntHashMap<Item>(10, 0.5F, 0);
+			genericItemStacks = new TObjectIntCustomHashMap<Item>(IdentityHashingStrategy.INSTANCE, 10, 0.5F, 0);
 
 		genericItemStacks.put(item, value);
 		return this;
@@ -115,13 +136,5 @@ public class OreIntMap {
 		return items.toArray(new ItemStack[items.size()]);
 	}
 
-	public static OreIntMap newMap(Object... param) {
-		OreIntMap map = new OreIntMap();
-		for (int i = 0; i < param.length; i += 2) {
-			int k;
-			k = (i + 1) < param.length ? (Integer) param[i + 1] : 1;
-			map.put(param[i], k);
-		}
-		return map;
-	}
+
 }

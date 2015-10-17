@@ -15,17 +15,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
 public class BlockArmorCast extends MantleBlock {
+	IIcon[] topIcons = new IIcon[4];
+	IIcon sideIcon;
+	IIcon edgeIcon;
 	public BlockArmorCast() {
 		super(Material.iron);
 		setHardness(1);
 		this.setCreativeTab(TinkersTailor.creativeTabItems);
 		this.setBlockName("TinkerTailor.ArmorCast");
 	}
-
-	IIcon[] topIcons = new IIcon[4];
-
-	IIcon sideIcon;
-	IIcon edgeIcon;
 
 	@Override
 	@SideOnly(Side.CLIENT)
