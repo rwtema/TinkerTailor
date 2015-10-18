@@ -119,13 +119,13 @@ public class Caches {
 			return durability;
 		}
 	};
+
 	public static WeakCache<ItemStack, Float> damageResistance = new WeakCache<ItemStack, Float>() {
 		@Override
 		protected Float calc(@Nonnull ItemStack stack) {
 			return (float) (DamageEventHandler.matDRcache.get(Caches.material.get(stack)) * ArmorCore.ratings[slot.get(stack)]) * 4;
 		}
 	};
-
 
 	public static WeakCache<ItemStack, Multimap<String, AttributeModifier>> attributes = new WeakCache<ItemStack, Multimap<String, AttributeModifier>>() {
 		@Override

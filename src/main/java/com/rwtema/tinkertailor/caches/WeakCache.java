@@ -8,15 +8,15 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 public abstract class WeakCache<K, V> {
-	private static final int OVERFULL_THRESHOLD = 32767;
-	private final HashMap<WeakReference<K>, V> map = new HashMap<WeakReference<K>, V>();
+	private static final int OVERFULL_THRESHOLD = 32760;
+	private final HashMap<WeakReference<K>, V> map = new HashMap<WeakReference<K>, V>(16, 0.5F);
 	private final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
 	private final Lookup lookup = new Lookup();
 
 	@SuppressWarnings("SuspiciousMethodCalls")
 	public synchronized V get(final K key) {
 		expungeStaleEntries();
-		if (map.size() > OVERFULL_THRESHOLD) {
+		if (map.size() >= OVERFULL_THRESHOLD) {
 			map.clear();
 		}
 
