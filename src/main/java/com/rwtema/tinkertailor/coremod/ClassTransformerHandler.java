@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 public class ClassTransformerHandler implements IClassTransformer {
 	public static Logger logger = LogManager.getLogger("TinkerTailorCoreMod");
 	IClassTransformer[] transformers = new IClassTransformer[]{
-			new PotionTransformer()
+			new AltPotionTransformer()
 	};
 
 	@Override
