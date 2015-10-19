@@ -2,20 +2,24 @@ package com.rwtema.tinkertailor;
 
 import com.rwtema.tinkertailor.blocks.BlockToolModifyStation;
 import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
+import com.rwtema.tinkertailor.coremod.CoreTinkerTailor;
 import com.rwtema.tinkertailor.crafting.BlockArmorCast;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.items.ItemArmorCast;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
-import com.rwtema.tinkertailor.items.ItemTailorsBook;
+import com.rwtema.tinkertailor.items.ItemTailorsManual;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.ConfigKeys;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.RendererHandler;
 import com.rwtema.tinkertailor.utils.ICallableClient;
+import com.rwtema.tinkertailor.utils.ModCompat;
+import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -45,7 +49,7 @@ import tconstruct.library.crafting.Smeltery;
 import tconstruct.smeltery.TinkerSmeltery;
 import tconstruct.tools.TinkerTools;
 
-@Mod(name = TinkersTailorConstants.MOD_ID, modid = TinkersTailorConstants.MOD_ID, dependencies = "required-after:TConstruct")
+@Mod(name = TinkersTailorConstants.MOD_ID, modid = TinkersTailorConstants.MOD_ID, dependencies = "required-after:TConstruct;after:Natura")
 public class TinkersTailor {
 
 	public static final Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
@@ -110,7 +114,7 @@ public class TinkersTailor {
 		}
 	};
 	public static ItemArmorPattern armorPattern;
-	public static ItemTailorsBook book;
+	public static ItemTailorsManual manual;
 	@SidedProxy(serverSide = "com.rwtema.tinkertailor.Proxy", clientSide = "com.rwtema.tinkertailor.ProxyClient")
 	public static Proxy proxy;
 	public static Configuration config;
@@ -124,10 +128,21 @@ public class TinkersTailor {
 			_deObf = false;
 		}
 		deobf = _deObf;
+
+		if (!CoreTinkerTailor.loaded) {
+			String message = "TinkersTailor CoreMod Failed To Load";
+			if (deobf) {
+				message = message + ": Add to VM Options:  \"-Dfml.coreMods.load=" + CoreTinkerTailor.class.getName() + "\"";
+			}
+			throw new LoaderException(message);
+		}
 	}
+
+	public static List<ModCompat> modCompats;
 
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
+		modCompats = ModCompat.loadMods(event.getAsmData());
 
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
@@ -162,40 +177,28 @@ public class TinkersTailor {
 		GameRegistry.registerBlock(toolModifyStation, "ToolModifyStation");
 		GameRegistry.registerTileEntity(TileEntityToolModifyStation.class, "ToolModifyStation");
 
-		book = new ItemTailorsBook();
-		GameRegistry.registerItem(book, "Book");
+		manual = new ItemTailorsManual();
+		GameRegistry.registerItem(manual, "Book");
 
-		ModifierRegistry.init();
 		proxy.preInit();
+
+		for (ModCompat modCompat : modCompats) {
+			modCompat.preInit();
+		}
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-
+		ModifierRegistry.init();
 		PatternBuilder.instance.addToolPattern(armorPattern);
-
-//		stencilIndex = ConfigKeys.StencilIndex.getInt(28);
-//
-//		if(stencilIndex != -1) {
-//			for (int meta = 0; meta < 4; meta++) {
-//				StencilBuilder.registerStencil(stencilIndex + meta, armorPattern, meta);
-//			}
-//
-//			proxy.run(new ICallableClient() {
-//				@Override
-//				@SideOnly(Side.CLIENT)
-//				public void run() {
-//					for (int meta = 0; meta < 4; meta++)
-//						TConstructClientRegistry.addStencilButton2(meta, 0, stencilIndex + meta, TinkerTailorConstants.RESOURCE_FOLDER, "textures/icons.png");
-//				}
-//			});
-//		}
-		// I HATE THIS BUT IT'LL DO FOR NOW
 
 		proxy.addShapedRecipe("armorPatternHelmet", new ItemStack(armorPattern, 1, 0), "SSS", "S S", 'S', TinkerTools.blankPattern);
 		proxy.addShapedRecipe("armorPatternChestplate", new ItemStack(armorPattern, 1, 1), "S S", "SSS", "SSS", 'S', TinkerTools.blankPattern);
 		proxy.addShapedRecipe("armorPatternLeggings", new ItemStack(armorPattern, 1, 2), "SSS", "S S", "S S", 'S', TinkerTools.blankPattern);
 		proxy.addShapedRecipe("armorPatternBoots", new ItemStack(armorPattern, 1, 3), "S S", "S S", 'S', TinkerTools.blankPattern);
+
+
+		proxy.addShapelessRecipe("manual", new ItemStack(manual), TinkerTools.manualBook, TinkerTools.blankPattern);
 
 
 		LiquidCasting basinCasting = TConstructRegistry.getBasinCasting();
@@ -247,10 +250,27 @@ public class TinkersTailor {
 
 
 		proxy.init();
+
+		for (ModCompat modCompat : modCompats) {
+			modCompat.init();
+		}
 	}
 
 	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		for (ModCompat modCompat : modCompats) {
+			modCompat.postInit();
+		}
+	}
+
+
+	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
-		config.save();
+		for (ModCompat modCompat : modCompats) {
+			modCompat.loadComplete();
+		}
+
+		if (config.hasChanged())
+			config.save();
 	}
 }
