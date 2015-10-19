@@ -25,7 +25,7 @@ public class PageModifier extends PageBase {
 	@Override
 	protected void render(boolean isTranslatable) {
 
-		drawCenteredString("\u00a7n" + text, 4);
+		drawCenteredString("\u00a7n" + modifier.getLocalizedName(), 4);
 
 		if (modifier.itemModifier instanceof ModOreModifier) {
 			if (!modifier.itemModifier.stacks.isEmpty()) {
