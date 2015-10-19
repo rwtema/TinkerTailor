@@ -215,7 +215,7 @@ public abstract class PageBase extends BookPage {
 	}
 
 	protected int curTime() {
-		return offset + ((int) System.currentTimeMillis() / 1000);
+		return Math.abs(offset + ((int) System.currentTimeMillis() / 1000));
 	}
 
 	protected int getStringWidth(String s) {
