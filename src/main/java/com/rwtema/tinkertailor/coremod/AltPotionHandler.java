@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 
+@SuppressWarnings("unused")
 public class AltPotionHandler {
 	public static int isPotionActive(EntityLivingBase base, int potionID) {
 		if (getActivePotionEffect(base, potionID) != null)

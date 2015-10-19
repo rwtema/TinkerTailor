@@ -9,9 +9,12 @@ import java.util.Map;
 
 @IFMLLoadingPlugin.TransformerExclusions(value = {"com.rwtema.tinkershats.coremod.", "com.rwtema.tinkershats.coremod.CoreTinkerer"})
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
-public class CoreTinkerer extends DummyModContainer implements IFMLLoadingPlugin {
+@IFMLLoadingPlugin.MCVersion(value = "1.7.10")
+public class CoreTinkerTailor extends DummyModContainer implements IFMLLoadingPlugin {
 	protected static final ModMetadata md;
 	public static boolean runtimeDeobfuscationEnabled;
+
+	public static  boolean loaded = false;
 
 	static {
 		md = new ModMetadata();
@@ -22,13 +25,11 @@ public class CoreTinkerer extends DummyModContainer implements IFMLLoadingPlugin
 		md.version = "Whatever";
 		md.name = "CoreTinkerTailor";
 		md.description = "Core mod for tinker tailor";
-
-
 	}
 
-
-	public CoreTinkerer() {
+	public CoreTinkerTailor() {
 		super(md);
+		loaded = true;
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class CoreTinkerer extends DummyModContainer implements IFMLLoadingPlugin
 
 	@Override
 	public String getModContainerClass() {
-		return CoreTinkerer.class.getName();
+		return CoreTinkerTailor.class.getName();
 	}
 
 	@Override
