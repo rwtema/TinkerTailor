@@ -10,15 +10,19 @@ import com.rwtema.tinkertailor.utils.ItemHelper;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.registry.GameRegistry;
 import java.util.ArrayList;
+import java.util.List;
 import mantle.lib.client.MantleClientRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import tconstruct.library.TConstructRegistry;
 import tconstruct.library.client.TConstructClientRegistry;
 
@@ -58,6 +62,17 @@ public class ProxyClient extends Proxy {
 
 		ItemStack[] recipeItems = new ItemStack[k * k];
 		Object[] input = recipe.getInput();
+		fillRecipe(w, k, recipeItems, input);
+
+
+		if (is3x3)
+			MantleClientRegistry.registerManualLargeRecipe(name, output.copy(), recipeItems);
+		else
+			MantleClientRegistry.registerManualSmallRecipe(name, output.copy(), recipeItems);
+
+	}
+
+	private void fillRecipe(int w, int k, ItemStack[] recipeItems, Object[] input) {
 		for (int i = 0; i < input.length; i++) {
 			int j = (i % w) + k * (i / w);
 
@@ -70,36 +85,49 @@ public class ProxyClient extends Proxy {
 
 				recipeItems[j] = null;
 
-				int v = 0;
 				for (ItemStack itemStack : list) {
 					if (itemStack == null || itemStack.getItem() == null) continue;
 
 					String modName = ItemHelper.getModName(itemStack.getItem());
 
-					if (v < 2 && "minecraft".equals(modName)) {
+					if ("minecraft".equals(modName)) {
 						recipeItems[j] = itemStack.copy();
-						v = 2;
+						break;
 					}
-					if (v < 1 && "tinkers".equals(modName)) {
+					if (recipeItems[j] == null || "tinkers".equals(modName)) {
 						recipeItems[j] = itemStack.copy();
-						v = 1;
 					}
-					if (recipeItems[j] == null)
-						recipeItems[j] = itemStack.copy();
 				}
 
 
 			}
 		}
-
-
-		if (is3x3)
-			MantleClientRegistry.registerManualLargeRecipe(name, output.copy(), recipeItems);
-		else
-			MantleClientRegistry.registerManualSmallRecipe(name, output.copy(), recipeItems);
-
 	}
 
+	@Override
+	public void addShapelessRecipe(String name, ItemStack output, Object... params) {
+		ShapelessOreRecipe recipe = new ShapelessOreRecipe(output, params);
+		GameRegistry.addRecipe(recipe);
+		ItemStack[] recipeItems = new ItemStack[9];
+		ArrayList<Object> inputList = recipe.getInput();
+		Object[] input = inputList.toArray(new Object[inputList.size()]);
+		fillRecipe(3, 3, recipeItems, input);
+		MantleClientRegistry.registerManualLargeRecipe(name, output.copy(), recipeItems);
+	}
+
+	@Override
+	public List<ItemStack> addVariants(Item item, List<ItemStack> list) {
+		CreativeTabs creativeTab = item.getCreativeTab();
+		if (creativeTab != null) {
+			try {
+				item.getSubItems(item, creativeTab, list);
+			} catch (Throwable throwable) {
+				list.add(new ItemStack(item));
+			}
+		} else
+			list.add(new ItemStack(item));
+		return list;
+	}
 
 	@Override
 	public void addCastingRecipe(String s, ItemStack output, FluidStack fluid, ItemStack input, boolean consumeCast, int i) {

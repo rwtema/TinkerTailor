@@ -5,13 +5,16 @@ import com.rwtema.tinkertailor.utils.ISidedCallable;
 import com.rwtema.tinkertailor.utils.ISidedFunction;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
+import java.util.List;
 import mantle.blocks.abstracts.InventoryLogic;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import tconstruct.library.TConstructRegistry;
 
 public class Proxy implements IGuiHandler {
@@ -56,5 +59,14 @@ public class Proxy implements IGuiHandler {
 
 	public void addCastingRecipe(String s, ItemStack output, FluidStack fluid, ItemStack input, boolean consumeCast, int i) {
 		TConstructRegistry.getBasinCasting().addCastingRecipe(output, fluid, input, consumeCast, i);
+	}
+
+	public List<ItemStack>  addVariants(Item item, List<ItemStack> list){
+		list.add(new ItemStack(item));
+		return list;
+	}
+
+	public void addShapelessRecipe(String name, ItemStack output, Object... params) {
+		GameRegistry.addRecipe(new ShapelessOreRecipe(output, params));
 	}
 }
