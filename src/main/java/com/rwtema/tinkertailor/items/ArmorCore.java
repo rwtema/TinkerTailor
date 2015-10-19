@@ -219,7 +219,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 		}
 
 		toolTips.add("");
-		toolTips.add("Durability: " + Caches.maxDurability.get(stack));
 		toolTips.add(String.format(EnumChatFormatting.BLUE + "+%s%% " + Lang.translate("Damage Resistance") + EnumChatFormatting.RESET, String.format("%.1f", getDamageResistance(stack))));
 
 		if (player == null) return;

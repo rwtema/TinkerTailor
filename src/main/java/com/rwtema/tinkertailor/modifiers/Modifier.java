@@ -49,7 +49,6 @@ public abstract class Modifier implements Comparable<Modifier> {
 		this.name = name;
 		this.maxLevel = maxLevel;
 		this.itemStacks = itemStacks;
-
 	}
 
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
