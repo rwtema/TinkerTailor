@@ -1,11 +1,13 @@
 package com.rwtema.tinkertailor.modifiers;
 
+import com.rwtema.tinkertailor.crafting.Ingredients;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorRepair;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModCreativeArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModInducedExtraModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.nbt.ProtectionTypes;
+import com.rwtema.tinkertailor.utils.ItemHelper;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +39,7 @@ public class ModifierRegistry {
 		registerModifier(new ModifierPotion("nightvision", 1, Potion.nightVision, new ItemStack(Items.golden_carrot)).setDuration(205).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
 		registerModifier(new ModifierPotion("jump", 3, Potion.jump, new ItemStack(TinkerWorld.slimePad)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
 
-		registerModifier(new ModifierAttributes("attack", 40, 4, new ItemStack[]{new ItemStack(Blocks.piston), new ItemStack(Blocks.quartz_block, 1, OreDictionary.WILDCARD_VALUE)}, SharedMonsterAttributes.attackDamage, 0, 0, 4).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
+		registerModifier(new ModifierAttributes("attack", 40, 4, new ItemStack[]{new ItemStack(Blocks.piston), new ItemStack(Blocks.quartz_block, 1, OreDictionary.WILDCARD_VALUE)}, SharedMonsterAttributes.attackDamage, 0, 0, 8).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
 		registerModifier(new ModifierAttributes("knockback", 20, 4, OreIntMap.newMap(Blocks.obsidian), SharedMonsterAttributes.knockbackResistance, 0, 0, 0.8));
 		registerModifier(new ModifierAttributes("haste", 50, 4, OreIntMap.newMap("dustGlowstone", 1, "glowstone", 4), SharedMonsterAttributes.movementSpeed, 1, 0, 2).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
 		registerModifier(new ModifierAttributes("health", 1, 8, OreIntMap.newMap(TinkerArmor.heartCanister), SharedMonsterAttributes.maxHealth, 0, 0, 4) {
@@ -64,6 +66,9 @@ public class ModifierRegistry {
 			}
 		});
 
+		registerModifier(new ModifierPotion("digspeed", 3, Potion.digSpeed, ItemHelper.makeStackArray(Items.glowstone_dust, Ingredients.netherBerry)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
+
+		registerModifier(new ModifierPotion("waterbreathing", 1, Potion.waterBreathing, ItemHelper.makeStackArray(Items.reeds, Ingredients.cloud)).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
 
 		registerModifier(invisibility = new ModifierSimple("invisibility", 1,
 				OreIntMap.newMap(

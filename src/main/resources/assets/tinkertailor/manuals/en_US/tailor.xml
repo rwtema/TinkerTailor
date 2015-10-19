@@ -191,9 +191,20 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
     <page type="tailorModifier">
         <text>Invisibility</text>
         <modifier>invisibility</modifier>
-        <desc>Armor becomes invisible.</desc>
+        <desc>Armor becomes invisible (you don't).</desc>
     </page>
 
+    <page type="tailorModifier">
+        <text>Dig Speed</text>
+        <modifier>digspeed</modifier>
+        <desc>Arms move like lightning.</desc>
+    </page>
+
+    <page type="tailorModifier">
+        <text>Water Breathing</text>
+        <modifier>waterbreathing</modifier>
+        <desc>Advanced Internal Rebreather.</desc>
+    </page>
 
     <page type="tailorSection">
         <section>Modification Station</section>
