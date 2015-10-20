@@ -4,7 +4,8 @@ import com.rwtema.tinkertailor.TinkersTailor;
 
 public enum ConfigKeys {
 	SoftMetal("SoftMetalPartsCrafting", "Enable 'simple' iron/copper tool parts being buildable in the part builder."),
-	WeaponInvis("WeaponOverridesInvis", "Holding a weapon or bow cancels armor invisibility on other players.")
+	WeaponInvis("WeaponOverridesInvis", "Holding a weapon or bow cancels armor invisibility on other players."),
+	DisableAdvancedCache("DisableAdvancedCaching", "Disables advanced caching of item properties (decreases performance)"),
 //	StencilIndex("StencilIndex", "Initial index value for TTail stencil range. Requires 4 free indexes."),;
 	;
 

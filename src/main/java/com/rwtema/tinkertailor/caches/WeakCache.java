@@ -1,6 +1,7 @@
 package com.rwtema.tinkertailor.caches;
 
 import com.google.common.base.Throwables;
+import com.rwtema.tinkertailor.nbt.ConfigKeys;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 public abstract class WeakCache<K, V> {
+	private static final boolean disableCache = ConfigKeys.DisableAdvancedCache.getBool(false);
 	private static final int OVERFULL_THRESHOLD = 32760;
 	private final HashMap<WeakReference<K>, V> map = new HashMap<WeakReference<K>, V>(16, 0.5F);
 	private final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
@@ -15,6 +17,8 @@ public abstract class WeakCache<K, V> {
 
 	@SuppressWarnings("SuspiciousMethodCalls")
 	public synchronized V get(final K key) {
+		if (disableCache) return key == null ? getNullValue() : calc(key);
+
 		expungeStaleEntries();
 		if (map.size() >= OVERFULL_THRESHOLD) {
 			map.clear();
