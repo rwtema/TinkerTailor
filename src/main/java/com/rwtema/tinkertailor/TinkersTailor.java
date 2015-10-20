@@ -13,7 +13,7 @@ import com.rwtema.tinkertailor.nbt.ConfigKeys;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.RendererHandler;
 import com.rwtema.tinkertailor.utils.ICallableClient;
-import com.rwtema.tinkertailor.utils.ModCompat;
+import com.rwtema.tinkertailor.utils.ModCompatibilityModule;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -138,11 +138,14 @@ public class TinkersTailor {
 		}
 	}
 
-	public static List<ModCompat> modCompats;
+	public static List<ModCompatibilityModule> modCompatabilities;
 
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
-		modCompats = ModCompat.loadMods(event.getAsmData());
+		modCompatabilities = ModCompatibilityModule.loadModCompatibilityModules(event);
+		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
+			modCompatibilityModule.onCreated();
+		}
 
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
@@ -182,13 +185,18 @@ public class TinkersTailor {
 
 		proxy.preInit();
 
-		for (ModCompat modCompat : modCompats) {
-			modCompat.preInit();
+		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
+			modCompatibilityModule.preInit();
 		}
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+
+		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
+			modCompatibilityModule.initStart();
+		}
+
 		ModifierRegistry.init();
 		PatternBuilder.instance.addToolPattern(armorPattern);
 
@@ -251,23 +259,25 @@ public class TinkersTailor {
 
 		proxy.init();
 
-		for (ModCompat modCompat : modCompats) {
-			modCompat.init();
+		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
+			modCompatibilityModule.initEnd();
 		}
 	}
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		for (ModCompat modCompat : modCompats) {
-			modCompat.postInit();
+		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
+			modCompatibilityModule.postInit();
 		}
+
+
 	}
 
 
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
-		for (ModCompat modCompat : modCompats) {
-			modCompat.loadComplete();
+		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
+			modCompatibilityModule.loadComplete();
 		}
 
 		if (config.hasChanged())
