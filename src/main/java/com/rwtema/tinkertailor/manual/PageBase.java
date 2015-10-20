@@ -21,7 +21,7 @@ import org.w3c.dom.NodeList;
 public abstract class PageBase extends BookPage {
 
 	public static final int PAGE_WIDTH = 178;
-	protected final int offset = TinkersTailorConstants.RANDOM.nextInt(100);
+	protected final int offset = TinkersTailorConstants.RANDOM.nextInt(10000);
 	protected int localWidth;
 	protected int localHeight;
 	Exception exception = null;

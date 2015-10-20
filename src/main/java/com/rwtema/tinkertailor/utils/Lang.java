@@ -85,7 +85,7 @@ public class Lang {
 		if (StatCollector.canTranslate(key))
 			return StatCollector.translateToLocal(key);
 		if (TinkersTailor.deobf) {
-			if (!lang.containsKey(key) || TinkersTailorConstants.RANDOM.nextInt(20) == 0) {
+			if (!_default.equals(lang.get(key))) {
 				lang.put(key, _default);
 				PrintWriter out = null;
 				try {

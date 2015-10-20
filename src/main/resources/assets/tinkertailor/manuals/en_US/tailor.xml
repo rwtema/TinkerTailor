@@ -102,109 +102,111 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
 
 
     <page type="tailorModifier">
-        <text>Normal Protection</text>
         <modifier>normal</modifier>
         <desc>Protection against 'normal' damage. This will protect against fire, explosion, projectiles and any physical based attacks. It won't protect against non-physical damage such as magical, poison or wither attacks.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Fire Protection</text>
         <modifier>fire</modifier>
         <desc>Protects against fire damage.</desc>
     </page>
 
 
     <page type="tailorModifier">
-        <text>Explosion Protection</text>
         <modifier>explosion</modifier>
         <desc>Protects against shock waves caused by explosions.</desc>
     </page>
 
 
     <page type="tailorModifier">
-        <text>Projectile Protection</text>
         <modifier>projectile</modifier>
         <desc>Protection against damage caused by ranged projectiles..</desc>
     </page>
 
 
     <page type="tailorModifier">
-        <text>Magical Protection</text>
         <modifier>magic</modifier>
         <desc>Protection against magical or non-physical attacks. Such as poison, potions of harming, wither attacks, etc.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Wither Protection</text>
         <modifier>wither</modifier>
         <desc>Protection against the withering effect. This will not protect against the direct wither attack.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Fall Protection</text>
         <modifier>fall</modifier>
         <desc>Protection against falling.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Anvil Protection</text>
         <modifier>anvil</modifier>
         <desc>Protection against falling anvils.</desc>
     </page>
 
     <page type="tailorSection">
-        <section>Other Modifiers</section>
+        <section>Additional Modifiers</section>
         <text>These modifiers do not absorb damage but give special properties.</text>
     </page>
 
 
     <page type="tailorModifier">
-        <text>Night Vision</text>
         <modifier>nightvision</modifier>
         <desc>Enables you to see perfectly in dark areas.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Haste</text>
         <modifier>haste</modifier>
         <desc>Zoom zoom zoom.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Health Boost</text>
         <modifier>health</modifier>
         <desc>Boosts the players health while being worn.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Attack Boost</text>
         <modifier>attack</modifier>
         <desc>Arm servos boost base attack damage.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Knockback Resistance</text>
         <modifier>knockback</modifier>
         <desc>Absorbs the velocity of an attack to prevent knockback.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Invisibility</text>
         <modifier>invisibility</modifier>
         <desc>Armor becomes invisible (you don't).</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Dig Speed</text>
         <modifier>digspeed</modifier>
         <desc>Arms move like lightning.</desc>
     </page>
 
     <page type="tailorModifier">
-        <text>Water Breathing</text>
         <modifier>waterbreathing</modifier>
         <desc>Advanced Internal Rebreather.</desc>
     </page>
+
+
+    <page type="tailorSection">
+        <section>Modded Modifiers</section>
+        <text>These modifiers require other mods to be installed.</text>
+    </page>
+
+    <page type="tailorModifier">
+        <modifier>gogglesRevealing</modifier>
+        <desc>Install Goggles of Revealing</desc>
+    </page>
+
+    <page type="tailorModifier">
+        <modifier>visBoost</modifier>
+        <desc>Lining the interior of armor to boost wand performance.</desc>
+    </page>
+
+
 
     <page type="tailorSection">
         <section>Modification Station</section>
