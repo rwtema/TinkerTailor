@@ -24,6 +24,7 @@ public class TinkersTailorConstants {
 	public final static UUID UUID_ITEMS = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
 
 	public static final String CONFIG_MAIN_CATEGORY = "TinkersTailor";
+	public static final String CONFIG_ADVANCED_CATEGORY = "Advanced";
 
 	public static final Random RANDOM = new Random();
 
