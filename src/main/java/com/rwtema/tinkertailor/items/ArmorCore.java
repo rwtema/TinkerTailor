@@ -15,6 +15,7 @@ import com.rwtema.tinkertailor.render.font.CustomFontRenderer;
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
 import com.rwtema.tinkertailor.utils.ItemHelper;
 import com.rwtema.tinkertailor.utils.Lang;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
@@ -41,8 +42,19 @@ import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.oredict.OreDictionary;
 import tconstruct.library.TConstructRegistry;
 import tconstruct.library.modifier.IModifyable;
+import thaumcraft.api.IGoggles;
+import thaumcraft.api.IVisDiscountGear;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.nodes.IRevealer;
 
-public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
+@Optional.InterfaceList({
+		@Optional.Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyContainerItem"),
+		@Optional.Interface(modid = "CoFHCore", iface = "cofh.core.item.IEqualityOverrideItem"),
+		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.IGoggles"),
+		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.IVisDiscountGear"),
+		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.nodes.IRevealer")
+})
+public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, IGoggles, IRevealer, IVisDiscountGear {
 
 	public static final ArmorProperties ZERO_ARMORP_ROPERTIES = new ArmorProperties(0, 0, 0);
 	public static final float[] ratings = new float[]{0.15F, 0.40F, 0.30F, 0.15F};
@@ -221,6 +233,10 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 		toolTips.add("");
 		toolTips.add(String.format(EnumChatFormatting.BLUE + "+%s%% " + Lang.translate("Damage Resistance") + EnumChatFormatting.RESET, String.format("%.1f", getDamageResistance(stack))));
 
+		int visBoost = Caches.visBoost.get(stack);
+		if (visBoost > 0)
+			toolTips.add(EnumChatFormatting.DARK_PURPLE + Lang.translate("Vis Discount") + ": " + visBoost + "%" + EnumChatFormatting.RESET);
+
 		if (player == null) return;
 		boolean found = false;
 		for (ItemStack itemStack : player.inventory.armorInventory) {
@@ -230,7 +246,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 			}
 		}
 		if (!found) return;
-
 
 		toolTips.add("");
 		toolTips.add("----------------");
@@ -253,7 +268,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 				for (ModifierInstance modifier : Caches.modifiers.get(itemStack)) {
 					modifierSet.add(modifier.modifier);
 				}
-
 			} else if (itm instanceof ISpecialArmor) {
 				dR += ((ISpecialArmor) itm).getArmorDisplay(player, itemStack, slot) * 2 / 25.0;
 			} else if (itm instanceof ItemArmor) {
@@ -332,5 +346,23 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable {
 			}
 		}
 		super.setDamage(stack, damage);
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft|API")
+	public boolean showIngamePopups(ItemStack itemstack, EntityLivingBase player) {
+		return ModifierRegistry.gogglesRevealing.level.get(itemstack) > 0;
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft|API")
+	public boolean showNodes(ItemStack itemstack, EntityLivingBase player) {
+		return ModifierRegistry.gogglesRevealing.level.get(itemstack) > 0;
+	}
+
+	@Override
+	@Optional.Method(modid = "Thaumcraft|API")
+	public int getVisDiscount(ItemStack itemstack, EntityPlayer player, Aspect aspect) {
+		return Caches.visBoost.get(itemstack);
 	}
 }
