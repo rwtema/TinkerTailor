@@ -105,7 +105,7 @@ public enum ProtectionTypes {
 		this.maxLevel = factor;
 		this.itemStack = itemStack;
 		this.color = color;
-		this.name = damageSource.damageType;
+		this.name = toString();
 	}
 
 

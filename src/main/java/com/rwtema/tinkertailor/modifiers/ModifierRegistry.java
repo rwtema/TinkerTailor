@@ -5,20 +5,20 @@ import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorRepair;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModCreativeArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModInducedExtraModifier;
-import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.nbt.ProtectionTypes;
 import com.rwtema.tinkertailor.utils.ItemHelper;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
+import cpw.mods.fml.common.registry.GameRegistry;
 import java.util.HashMap;
 import java.util.List;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.oredict.OreDictionary;
 import tconstruct.armor.TinkerArmor;
 import tconstruct.library.accessory.IHealthAccessory;
 import tconstruct.library.crafting.ModifyBuilder;
@@ -28,6 +28,8 @@ import tconstruct.world.TinkerWorld;
 public class ModifierRegistry {
 	public static HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
 	public static ModifierSimple invisibility;
+	public static Modifier gogglesRevealing;
+	public static Modifier visBoost;
 
 	public static void init() {
 		ModifyBuilder.registerModifier(new ModArmorRepair());
@@ -36,16 +38,16 @@ public class ModifierRegistry {
 			registerModifier(new ModifierProtection(protectionTypes));
 		}
 
-		registerModifier(new ModifierPotion("nightvision", 1, Potion.nightVision, new ItemStack(Items.golden_carrot)).setDuration(205).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
-		registerModifier(new ModifierPotion("jump", 3, Potion.jump, new ItemStack(TinkerWorld.slimePad)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
+		registerModifier(new ModifierPotion("nightvision", 1, Potion.nightVision, OreIntMap.newMap(Items.golden_carrot)).setDuration(205).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
+		registerModifier(new ModifierPotion("jump", 3, Potion.jump, OreIntMap.newMap(TinkerWorld.slimePad)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
 
-		registerModifier(new ModifierAttributes("attack", 40, 4, new ItemStack[]{new ItemStack(Blocks.piston), new ItemStack(Blocks.quartz_block, 1, OreDictionary.WILDCARD_VALUE)}, SharedMonsterAttributes.attackDamage, 0, 0, 8).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
-		registerModifier(new ModifierAttributes("knockback", 20, 4, OreIntMap.newMap(Blocks.obsidian), SharedMonsterAttributes.knockbackResistance, 0, 0, 0.8));
-		registerModifier(new ModifierAttributes("haste", 50, 4, OreIntMap.newMap("dustGlowstone", 1, "glowstone", 4), SharedMonsterAttributes.movementSpeed, 1, 0, 2).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
-		registerModifier(new ModifierAttributes("health", 1, 8, OreIntMap.newMap(TinkerArmor.heartCanister), SharedMonsterAttributes.maxHealth, 0, 0, 4) {
+		registerModifier(new ModifierAttributes("attack", 40, 4, SharedMonsterAttributes.attackDamage, 0, 0, 8, OreIntMap.newMap(Blocks.piston), OreIntMap.newMap(Blocks.quartz_block, "blockQuartz")).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
+		registerModifier(new ModifierAttributes("knockback", 20, 4, SharedMonsterAttributes.knockbackResistance, 0, 0, 0.8, OreIntMap.newMap(Blocks.obsidian,"blockObsidian")));
+		registerModifier(new ModifierAttributes("haste", 50, 4, SharedMonsterAttributes.movementSpeed, 1, 0, 2, OreIntMap.newMap("dustGlowstone", 1, "glowstone", 4)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
+		registerModifier(new ModifierAttributes("health", 2, 8, SharedMonsterAttributes.maxHealth, 0, 0, 4, OreIntMap.newMap(TinkerArmor.heartCanister)) {
 			@Override
 			public ModArmorModifier createItemModifier() {
-				return new ModOreModifier(this, map) {
+				return new ModArmorModifier(this, map) {
 					@Override
 					public int getValue(ItemStack itemStack) {
 						Item item = itemStack.getItem();
@@ -66,9 +68,9 @@ public class ModifierRegistry {
 			}
 		});
 
-		registerModifier(new ModifierPotion("digspeed", 3, Potion.digSpeed, ItemHelper.makeStackArray(Items.glowstone_dust, Ingredients.netherBerry)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
+		registerModifier(new ModifierPotion("digspeed", 3, Potion.digSpeed, ItemHelper.makeOreIntArray(OreIntMap.newMap("dustGlowstone"), Ingredients.netherBerry)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
 
-		registerModifier(new ModifierPotion("waterbreathing", 1, Potion.waterBreathing, ItemHelper.makeStackArray(Items.reeds, Ingredients.cloud)).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
+		registerModifier(new ModifierPotion("waterbreathing", 1, Potion.waterBreathing, ItemHelper.makeOreIntArray(Items.reeds, Ingredients.cloud)).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
 
 		registerModifier(invisibility = new ModifierSimple("invisibility", 1,
 				OreIntMap.newMap(
@@ -79,7 +81,7 @@ public class ModifierRegistry {
 				)) {
 			@Override
 			public ModArmorModifier createItemModifier() {
-				return new ModOreModifier(this, map) {
+				return new ModArmorModifier(this, recipe) {
 					{
 						this.useModifiers = false;
 					}
@@ -102,6 +104,38 @@ public class ModifierRegistry {
 				};
 			}
 		});
+
+		Item goggles = GameRegistry.findItem("Thaumcraft", "ItemGoggles");
+		gogglesRevealing = new ModifierSimple("gogglesRevealing", 1, ItemHelper.makeOreIntArray(goggles)) {
+			@Override
+			public ModArmorModifier createItemModifier() {
+				return new ModArmorModifier(this, recipe) {
+					{
+						this.useModifiers = false;
+					}
+				};
+			}
+		}.setRequiredMods("Thaumcraft");
+		registerModifier(gogglesRevealing);
+
+
+		Item thaumcraftResource = GameRegistry.findItem("Thaumcraft", "ItemResource");
+		visBoost = new ModifierSimple("visBoost", 150, ItemHelper.makeOreIntArray(thaumcraftResource, 7 /*Enchanted Fabric*/)) {
+			{
+				modifierStep = maxLevel;
+			}
+
+			@Override
+			public void addInfo(List<String> list, EntityPlayer player, ItemStack item, int slot, int level) {
+				super.addInfo(list, player, item, slot, level);
+			}
+
+			@Override
+			public void addArmorSetInfo(List<String> list, EntityPlayer player) {
+				super.addArmorSetInfo(list, player);
+			}
+		}.setRequiredMods("Thaumcraft");
+		registerModifier(visBoost);
 
 		ModifyBuilder.registerModifier(new ModCreativeArmorModifier(new ItemStack[]{new ItemStack(TinkerTools.creativeModifier)}));
 		ModifyBuilder.registerModifier(new ModInducedExtraModifier());

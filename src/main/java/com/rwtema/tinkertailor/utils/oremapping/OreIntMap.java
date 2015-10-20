@@ -95,9 +95,15 @@ public class OreIntMap {
 		return i;
 	}
 
-	public ItemStack[] makeItemStackList() {
+	public ItemStack[] makeItemStackArray() {
 		final ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 
+		addItemsToList(items);
+
+		return items.toArray(new ItemStack[items.size()]);
+	}
+
+	public void addItemsToList(final List<ItemStack> items) {
 		if (genericItemStacks != null)
 			genericItemStacks.forEachKey(new TObjectProcedure<Item>() {
 				@Override
@@ -114,9 +120,25 @@ public class OreIntMap {
 					return items.add(object.copy());
 				}
 			});
-
-		return items.toArray(new ItemStack[items.size()]);
 	}
 
 
+	public ItemStack makeItemStack() {
+		if (genericItemStacks != null && !genericItemStacks.isEmpty()) {
+			for (Item item : genericItemStacks.keySet()) {
+				List<ItemStack> itemStacks = TinkersTailor.proxy.addVariants(item, new ArrayList<ItemStack>());
+				if (!itemStacks.isEmpty())
+					return itemStacks.get(0);
+			}
+		}
+
+		if (specificItemStacks != null) {
+			for (ItemStack itemStack : specificItemStacks.keySet()) {
+				if (itemStack != null)
+					return itemStack.copy();
+			}
+		}
+
+		return null;
+	}
 }

@@ -1,5 +1,6 @@
 package com.rwtema.tinkertailor.utils;
 
+import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -41,26 +42,55 @@ public class ItemHelper {
 
 	public static ItemStack[] makeStackArray(Object... items) {
 		ArrayList<ItemStack> list = makeStackList(items);
-
 		return list.toArray(new ItemStack[list.size()]);
+	}
+
+	public static OreIntMap[] makeOreIntArray(Object... items) {
+		List<OreIntMap> maps = makeOreIntList(items);
+		return maps.toArray(new OreIntMap[maps.size()]);
 	}
 
 	public static ArrayList<ItemStack> makeStackList(Object... items) {
 		ArrayList<ItemStack> list = new ArrayList<ItemStack>(items.length);
 		for (int i = 0; i < items.length; i++) {
 			Object o = items[i];
-			if(o == null) continue;
+			if (o == null) continue;
 
 			if ((i + 1) < items.length && items[i + 1] instanceof Integer) {
 				if (items[i] instanceof Item)
 					list.add(new ItemStack((Item) o, 1, (Integer) items[i + 1]));
 				else if (items[i] instanceof Block)
 					list.add(new ItemStack((Block) o, 1, (Integer) items[i + 1]));
-			} else {
+				i++;
+			} else if (!(o instanceof Integer)) {
 				ItemStack item = makeStack(o);
 				if (item != null) {
 					list.add(item);
 				}
+			}
+		}
+		return list;
+	}
+
+
+	public static List<OreIntMap> makeOreIntList(Object... items) {
+		ArrayList<OreIntMap> list = new ArrayList<OreIntMap>(items.length);
+		for (int i = 0; i < items.length; i++) {
+			Object o = items[i];
+			if (o == null) continue;
+
+			if ((i + 1) < items.length && items[i + 1] instanceof Integer) {
+				if (items[i] instanceof Item)
+					list.add(OreIntMap.newMap(new ItemStack((Item) o, 1, (Integer) items[i + 1])));
+				else if (items[i] instanceof Block)
+					list.add(OreIntMap.newMap(new ItemStack((Block) o, 1, (Integer) items[i + 1])));
+				i++;
+			} else if (o instanceof OreIntMap) {
+				list.add((OreIntMap) o);
+			} else if (!(o instanceof Integer)) {
+				OreIntMap map = new OreIntMap();
+				map.put(o, 1);
+				list.add(map);
 			}
 		}
 		return list;

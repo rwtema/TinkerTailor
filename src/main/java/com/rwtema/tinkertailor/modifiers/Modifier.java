@@ -7,6 +7,7 @@ import com.rwtema.tinkertailor.nbt.StringHelper;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.font.RenderCustomColor;
 import com.rwtema.tinkertailor.utils.Lang;
+import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nonnull;
@@ -26,7 +27,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 	public static final int ARMORTYPE_SHOES_ONLY = 7;
 
 	public int effect = 0;
-	public ItemStack[] itemStacks;
+	public OreIntMap[] recipe;
 	public int allowedArmorTypes;
 	public int color = 0;
 	public ModArmorModifier itemModifier;
@@ -45,10 +46,12 @@ public abstract class Modifier implements Comparable<Modifier> {
 	protected int modifierStep = 1;
 	String colorString = null;
 
-	protected Modifier(String name, int maxLevel, ItemStack... itemStacks) {
+	public String[] requiredMods = null;
+
+	protected Modifier(String name, int maxLevel, OreIntMap... recipe) {
 		this.name = name;
 		this.maxLevel = maxLevel;
-		this.itemStacks = itemStacks;
+		this.recipe = recipe;
 	}
 
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
@@ -88,7 +91,9 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	}
 
-	public abstract ModArmorModifier createItemModifier();
+	public ModArmorModifier createItemModifier(){
+		return  new ModArmorModifier(this, recipe);
+	}
 
 	public boolean doesTick(ItemStack item, int level) {
 		return false;
@@ -156,5 +161,10 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	public int durabilityBoost(ItemStack stack, int level) {
 		return 0;
+	}
+
+	public Modifier setRequiredMods(String... requiredMods) {
+		this.requiredMods = requiredMods;
+		return this;
 	}
 }

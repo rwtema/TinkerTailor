@@ -2,8 +2,6 @@ package com.rwtema.tinkertailor.modifiers;
 
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
-import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
-import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.nbt.ProtectionTypes;
 import com.rwtema.tinkertailor.utils.Lang;
 import java.util.List;
@@ -18,7 +16,7 @@ public class ModifierProtection extends Modifier {
 	ProtectionTypes protectionTypes;
 
 	public ModifierProtection(ProtectionTypes protectionTypes) {
-		super(protectionTypes.name, 0);
+		super(protectionTypes.name, 0, protectionTypes.getOreValues());
 		this.protectionTypes = protectionTypes;
 		this.modifierStep = 16;
 		allowedArmorTypes = protectionTypes.allowedArmorTypes();
@@ -68,11 +66,6 @@ public class ModifierProtection extends Modifier {
 		float armor = r;
 		if (armor > 80) armor = 80;
 		list.add(getColorString() + String.format("%s: %.1f", getLocalizedName(), armor) + EnumChatFormatting.GRAY);
-	}
-
-	@Override
-	public ModArmorModifier createItemModifier() {
-		return new ModOreModifier(this, protectionTypes.getOreValues());
 	}
 
 	@Override

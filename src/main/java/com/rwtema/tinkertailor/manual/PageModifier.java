@@ -1,22 +1,27 @@
 package com.rwtema.tinkertailor.manual;
 
+import com.google.common.collect.Ordering;
+import com.google.common.collect.TreeMultimap;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
-import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.Lang;
+import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
+import cpw.mods.fml.common.Loader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Random;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class PageModifier extends PageBase {
 
-	String text;
+
 	Modifier modifier;
 	String desc;
 
@@ -27,55 +32,75 @@ public class PageModifier extends PageBase {
 
 		drawCenteredString("\u00a7n" + modifier.getLocalizedName(), 4);
 
-		if (modifier.itemModifier instanceof ModOreModifier) {
-			if (!modifier.itemModifier.stacks.isEmpty()) {
+		rand.setSeed(curTime());
 
-				ModOreModifier itemModifier = (ModOreModifier) modifier.itemModifier;
+		OreIntMap[] recipe = modifier.itemModifier.recipe;
+		if (recipe.length == 0) {
 
-				List<ItemStack> stacks = new ArrayList<ItemStack>(modifier.itemModifier.stacks);
-				for (Iterator<ItemStack> iterator = stacks.iterator(); iterator.hasNext(); ) {
-					ItemStack stack = iterator.next();
-					if (itemModifier.getValue(stack) <= 0) iterator.remove();
+		} else if (recipe.length == 1) {
+
+			List<ItemStack> stacks = new ArrayList<ItemStack>();
+			for (OreIntMap map : recipe) {
+				map.addItemsToList(stacks);
+			}
+
+			TreeMultimap<Integer, ItemStack> maps = TreeMultimap.create(Ordering.natural(), new Comparator<ItemStack>() {
+				@Override
+				public int compare(ItemStack o1, ItemStack o2) {
+					int compare = Double.compare(o1.getItem().hashCode(), o2.getItem().hashCode());
+					if (compare != 0) return compare;
+					return -Double.compare(o1.getItemDamage(), o2.getItemDamage());
 				}
+			});
 
-				if (!stacks.isEmpty()) {
-					startRenderingItem();
-
-					ItemStack itemStack = stacks.get(curTime() % stacks.size());
-
-					String s = Lang.translate("Value") + ": " + itemModifier.getValue(itemStack);
-
-					int x = (178 - 18 - 2 - manual.fonts.getStringWidth(s)) / 2;
-					renderStack(itemStack, x, 20);
-					manual.fonts.drawString(s, x + 20, 24, 0);
-
-					stopRenderingItem();
+			for (Iterator<ItemStack> iterator = stacks.iterator(); iterator.hasNext(); ) {
+				ItemStack stack = iterator.next();
+				int value = modifier.itemModifier.getValue(stack);
+				if (value <= 0) iterator.remove();
+				else {
+					maps.put(value, stack);
 				}
 			}
-		} else {
-			List stacks = modifier.itemModifier.stacks;
-			if (!stacks.isEmpty()) {
+
+
+			Integer[] keys = maps.keySet().toArray(new Integer[maps.keySet().size()]);
+
+			if (keys.length != 0) {
+				Integer i = keys[curTime() % keys.length];
+
+				NavigableSet<ItemStack> collection = maps.get(i);
+				ItemStack[] itemStacks = collection.toArray(new ItemStack[collection.size()]);
+				ItemStack item = itemStacks[(curTime() / keys.length) % itemStacks.length];
+
 				startRenderingItem();
 
-				rand.setSeed(curTime());
-				int x = (PAGE_WIDTH - stacks.size() * 18) / 2;
-				for (int i = 0; i < stacks.size(); i++) {
-					ItemStack item = (ItemStack) stacks.get(i);
-					if (item == null || item.getItem() == null) continue;
+				String s = Lang.translate("Value") + ": " + i;
 
-					if (item.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-						ArrayList<ItemStack> list = new ArrayList<ItemStack>();
-						item.getItem().getSubItems(item.getItem(), item.getItem().getCreativeTab(), list);
-						if (!list.isEmpty()) {
-							item = list.get(rand.nextInt(list.size()));
-						}
-					}
-
-					renderStack(item, x + i * 18, 20);
-				}
+				int x = (178 - 18 - 2 - manual.fonts.getStringWidth(s)) / 2;
+				renderStack(item, x, 20);
+				manual.fonts.drawString(s, x + 20, 24, 0);
 
 				stopRenderingItem();
+
 			}
+
+		} else {
+
+			startRenderingItem();
+
+			int x = (PAGE_WIDTH - recipe.length * 18) / 2;
+			for (int i = 0; i < recipe.length; i++) {
+				OreIntMap map = recipe[i];
+				if (map == null) continue;
+
+				ItemStack[] itemStacks = map.makeItemStackArray();
+				if (itemStacks.length == 0) continue;
+				ItemStack item = itemStacks[rand.nextInt(itemStacks.length)];
+				renderStack(item, x + i * 18, 20);
+			}
+
+			stopRenderingItem();
+
 		}
 
 		int yPos = 42;
@@ -105,14 +130,35 @@ public class PageModifier extends PageBase {
 			restText = builder.toString();
 		}
 
-		drawTextLine("- " + Lang.translate("Item Restrictions") + ": " + restText, 4, yPos);
+		yPos += drawTextLine("- " + Lang.translate("Item Restrictions") + ": " + restText, 4, yPos);
+
+		if (modifier.requiredMods != null) {
+			StringBuilder builder = new StringBuilder().append("- ").append(Lang.translate("Requires Mods")).append(": ");
+			boolean flag = false;
+			for (String requiredMod : modifier.requiredMods) {
+				boolean missing = !Loader.isModLoaded(requiredMod);
+				if (flag) builder.append(", ");
+				else flag = true;
+
+				if (missing)
+					builder.append(EnumChatFormatting.RED);
+
+				builder.append(requiredMod);
+
+				if (missing) {
+					builder.append(" (").append(Lang.translate("Missing")).append(")").append(EnumChatFormatting.BLACK);
+				}
+
+
+			}
+			yPos += drawTextLine(builder.toString(), 4, yPos);
+		}
 
 	}
 
 
 	@Override
 	protected void loadData() throws IOException {
-		text = loadText("text");
 		String modifierName = loadText("modifier");
 		modifier = ModifierRegistry.modifiers.get(modifierName);
 		assert modifier != null;

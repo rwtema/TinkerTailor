@@ -1,7 +1,6 @@
 package com.rwtema.tinkertailor.modifiers;
 
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
-import com.rwtema.tinkertailor.modifiers.itemmodifier.ModOreModifier;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.List;
@@ -13,23 +12,14 @@ import net.minecraft.potion.PotionEffect;
 
 public class ModifierPotion extends Modifier {
 	public final Potion potion;
-	private final OreIntMap map;
-	private final ItemStack[] items;
+
+	private final OreIntMap[] items;
 	public int duration = 5;
 
-	protected ModifierPotion(String name, int maxLevel, Potion potion, ItemStack... items) {
+	protected ModifierPotion(String name, int maxLevel, Potion potion, OreIntMap... items) {
 		super(name, maxLevel, items);
 		this.potion = potion;
 		this.items = items;
-		this.map = null;
-		modifiers[potion.id] = this;
-	}
-
-	protected ModifierPotion(String name, int maxLevel, Potion potion, OreIntMap map) {
-		super(name, maxLevel, map.makeItemStackList());
-		this.potion = potion;
-		this.map = map;
-		this.items = null;
 		modifiers[potion.id] = this;
 	}
 
@@ -40,10 +30,7 @@ public class ModifierPotion extends Modifier {
 
 	@Override
 	public ModArmorModifier createItemModifier() {
-		if (map != null)
-			return new ModOreModifier(this, map);
-		else
-			return new ModArmorModifier(this, items);
+		return new ModArmorModifier(this, items);
 	}
 
 	@Override
