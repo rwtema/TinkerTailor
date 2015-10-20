@@ -13,6 +13,7 @@ public class ModifierAttributes extends Modifier {
 	int priority;
 	double defaultVal = 0;
 	double maxVal;
+
 	public ModifierAttributes(String name, int modifierStep, int maxLevel, IAttribute attribute, int priority, double defaultVal, double maxVal, OreIntMap... map) {
 		super(name, maxLevel * modifierStep, map);
 		this.map = map;

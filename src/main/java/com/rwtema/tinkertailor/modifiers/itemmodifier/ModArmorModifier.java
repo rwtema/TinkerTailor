@@ -15,12 +15,21 @@ import tconstruct.library.modifier.ItemModifier;
 
 public class ModArmorModifier extends ItemModifier {
 
-	private final Modifier modifier;
 	public final OreIntMap[] recipe;
+	private final Modifier modifier;
 	public int modifierStep = 1;
 	public int maxLevel = -1;
 	public int armorAllowMask = 0;
 	public boolean useModifiers = true;
+
+	public ModArmorModifier(Modifier modifier, OreIntMap... recipe) {
+		super(convertRecipe(recipe), modifier.effect, modifier.name);
+		this.modifier = modifier;
+		this.recipe = recipe;
+		modifierStep = modifier.getModifierStep();
+		maxLevel = modifier.getMaxLevel();
+		armorAllowMask = modifier.getAllowedArmorTypes();
+	}
 
 	public static ItemStack[] convertRecipe(OreIntMap[] recipe) {
 		List<ItemStack> list = new ArrayList<ItemStack>();
@@ -30,15 +39,6 @@ public class ModArmorModifier extends ItemModifier {
 				list.add(stack);
 		}
 		return list.toArray(new ItemStack[list.size()]);
-	}
-
-	public ModArmorModifier(Modifier modifier, OreIntMap... recipe) {
-		super(convertRecipe(recipe), modifier.effect, modifier.name);
-		this.modifier = modifier;
-		this.recipe = recipe;
-		modifierStep = modifier.getModifierStep();
-		maxLevel = modifier.getMaxLevel();
-		armorAllowMask = modifier.getAllowedArmorTypes();
 	}
 
 	@Override

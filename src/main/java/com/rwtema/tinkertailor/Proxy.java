@@ -61,7 +61,7 @@ public class Proxy implements IGuiHandler {
 		TConstructRegistry.getBasinCasting().addCastingRecipe(output, fluid, input, consumeCast, i);
 	}
 
-	public List<ItemStack>  addVariants(Item item, List<ItemStack> list){
+	public List<ItemStack> addVariants(Item item, List<ItemStack> list) {
 		list.add(new ItemStack(item));
 		return list;
 	}

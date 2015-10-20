@@ -118,6 +118,7 @@ public class TinkersTailor {
 	@SidedProxy(serverSide = "com.rwtema.tinkertailor.Proxy", clientSide = "com.rwtema.tinkertailor.ProxyClient")
 	public static Proxy proxy;
 	public static Configuration config;
+	public static List<ModCompatibilityModule> modCompatabilities;
 
 	static {
 		boolean _deObf;
@@ -137,8 +138,6 @@ public class TinkersTailor {
 			throw new LoaderException(message);
 		}
 	}
-
-	public static List<ModCompatibilityModule> modCompatabilities;
 
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent event) {

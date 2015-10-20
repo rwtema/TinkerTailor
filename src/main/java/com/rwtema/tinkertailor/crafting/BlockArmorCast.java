@@ -18,6 +18,7 @@ public class BlockArmorCast extends MantleBlock {
 	IIcon[] topIcons = new IIcon[4];
 	IIcon sideIcon;
 	IIcon edgeIcon;
+
 	public BlockArmorCast() {
 		super(Material.iron);
 		setHardness(1);

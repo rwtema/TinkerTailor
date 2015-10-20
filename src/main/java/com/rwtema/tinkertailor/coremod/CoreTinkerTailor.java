@@ -14,7 +14,7 @@ public class CoreTinkerTailor extends DummyModContainer implements IFMLLoadingPl
 	protected static final ModMetadata md;
 	public static boolean runtimeDeobfuscationEnabled;
 
-	public static  boolean loaded = false;
+	public static boolean loaded = false;
 
 	static {
 		md = new ModMetadata();

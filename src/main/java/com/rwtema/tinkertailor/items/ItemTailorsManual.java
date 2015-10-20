@@ -60,21 +60,16 @@ public class ItemTailorsManual extends CraftingItem {
 	}
 
 	@SubscribeEvent
-	public void onCrafting (PlayerEvent.ItemCraftedEvent event)
-	{
+	public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
 		Item item = event.crafting.getItem();
-		if (!event.player.worldObj.isRemote)
-		{
-			if (item == Item.getItemFromBlock(TinkerTools.toolStationWood))
-			{
-				if (!PHConstruct.beginnerBook)
-				{
+		if (!event.player.worldObj.isRemote) {
+			if (item == Item.getItemFromBlock(TinkerTools.toolStationWood)) {
+				if (!PHConstruct.beginnerBook) {
 					return;
 				}
 
 				NBTTagCompound tag = event.player.getEntityData().getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
-				if (!tag.getBoolean("TinkersTailorManual"))
-				{
+				if (!tag.getBoolean("TinkersTailorManual")) {
 					tag.setBoolean("TinkersTailorManual", true);
 					AbilityHelper.spawnItemAtPlayer(event.player, new ItemStack(TinkersTailor.manual));
 				}

@@ -32,6 +32,7 @@ public class ModelRendererCustom extends ModelRenderer {
 		super(p_i1172_1_, p_i1172_2_);
 		RendererHandler.rendererCustoms.add(this);
 	}
+
 	public ModelRendererCustom(ModelBase parent, ModelRenderer copy) {
 		this(parent, copy.boxName);
 		textureWidth = copy.textureWidth;

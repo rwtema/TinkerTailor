@@ -42,11 +42,10 @@ public abstract class Modifier implements Comparable<Modifier> {
 			return tag.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG).getInteger(Modifier.this.name);
 		}
 	};
+	public String[] requiredMods = null;
 	protected int maxLevel;
 	protected int modifierStep = 1;
 	String colorString = null;
-
-	public String[] requiredMods = null;
 
 	protected Modifier(String name, int maxLevel, OreIntMap... recipe) {
 		this.name = name;
@@ -91,8 +90,8 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	}
 
-	public ModArmorModifier createItemModifier(){
-		return  new ModArmorModifier(this, recipe);
+	public ModArmorModifier createItemModifier() {
+		return new ModArmorModifier(this, recipe);
 	}
 
 	public boolean doesTick(ItemStack item, int level) {

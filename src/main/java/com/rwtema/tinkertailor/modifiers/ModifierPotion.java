@@ -11,10 +11,11 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 
 public class ModifierPotion extends Modifier {
+	public static final ModifierPotion[] modifiers = new ModifierPotion[256];
 	public final Potion potion;
-
 	private final OreIntMap[] items;
 	public int duration = 5;
+	private TIntObjectHashMap<PotionEffect> effectCache;
 
 	protected ModifierPotion(String name, int maxLevel, Potion potion, OreIntMap... items) {
 		super(name, maxLevel, items);
@@ -47,16 +48,10 @@ public class ModifierPotion extends Modifier {
 		return new PotionEffect(potion.getId(), duration, level - 1, true);
 	}
 
-
 	public ModifierPotion setDuration(int duration) {
 		this.duration = duration;
 		return this;
 	}
-
-
-	public static final ModifierPotion[] modifiers = new ModifierPotion[256];
-
-	private TIntObjectHashMap<PotionEffect> effectCache;
 
 	public PotionEffect getCachedEffect(int level) {
 		if (modifierStep != 1)

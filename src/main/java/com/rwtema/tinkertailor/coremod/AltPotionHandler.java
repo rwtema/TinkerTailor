@@ -28,7 +28,7 @@ public class AltPotionHandler {
 				level = Math.max(level, modifier.level.get(itemStack));
 			}
 		}
-		if(level == 0) return null;
+		if (level == 0) return null;
 
 		return modifier.getCachedEffect(level);
 	}
