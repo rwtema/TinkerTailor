@@ -15,7 +15,8 @@ import org.apache.logging.log4j.core.helpers.Strings;
 public abstract class ModCompatibilityModule {
 	@SuppressWarnings("unchecked")
 	public static ArrayList<ModCompatibilityModule> loadModCompatibilityModules(FMLPreInitializationEvent event) {
-		Set<ASMDataTable.ASMData> set = event.getAsmData().getAll(InitialiseMe.class.getName());
+		ASMDataTable asmDataTable = event.getAsmData();
+		Set<ASMDataTable.ASMData> set = asmDataTable.getAll(InitialiseMe.class.getName());
 
 		ArrayList<ModCompatibilityModule> modCompatibilityModules = new ArrayList<ModCompatibilityModule>(set.size());
 

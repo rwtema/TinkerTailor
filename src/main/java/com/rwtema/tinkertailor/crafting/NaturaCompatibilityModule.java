@@ -10,5 +10,9 @@ public class NaturaCompatibilityModule extends ModCompatibilityModule {
 	public void initStart() {
 		Ingredients.cloud = NContent.cloud;
 		Ingredients.netherBerry = NContent.netherBerryItem;
+		Ingredients.cotten = NContent.plantItem;
+		Ingredients.berry = NContent.berryItem;
+		Ingredients.glowShroom = NContent.glowshroom;
+		Ingredients.potashApple = NContent.potashApple;
 	}
 }
