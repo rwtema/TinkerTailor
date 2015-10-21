@@ -41,7 +41,13 @@ public class ModifierPotion extends Modifier {
 
 	@Override
 	public void onArmorTick(EntityLivingBase entity, ItemStack item, int slot, int level) {
-//		entity.addPotionEffect(makePotionEffect(level));
+		PotionEffect cachedEffect = getCachedEffect(level);
+		int i = 1200 + (int) entity.worldObj.getTotalWorldTime() % 1000;
+
+		if (Potion.potionTypes[potion.id].isReady(i, cachedEffect.getAmplifier())) {
+			cachedEffect.performEffect(entity);
+		}
+
 	}
 
 	public PotionEffect makePotionEffect(int level) {
@@ -69,4 +75,6 @@ public class ModifierPotion extends Modifier {
 
 		return potionEffect;
 	}
+
+
 }
