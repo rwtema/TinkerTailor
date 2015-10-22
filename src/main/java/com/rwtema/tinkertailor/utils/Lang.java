@@ -5,6 +5,8 @@ import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,12 +21,29 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.util.StringTranslate;
 
 public class Lang {
-	private final static TreeMap<String, String> lang = TinkersTailor.deobf ? new TreeMap<String, String>() : null;
+	private final static TreeMap<String, String> lang = TinkersTailor.deobf_folder ? new TreeMap<String, String>() : null;
 	private final static HashMap<String, String> textKey = new HashMap<String, String>();
 	private static final int MAX_KEY_LEN = 32;
 
 	static {
-		if (TinkersTailor.deobf) {
+		if (TinkersTailor.deobf_folder) {
+			try {
+				FileInputStream fis = null;
+				try {
+					File file = getFile();
+					fis = new FileInputStream(file);
+					HashMap<String, String> langMap = StringTranslate.parseLangFile(fis);
+					lang.putAll(langMap);
+				} finally {
+					if (fis != null)
+						fis.close();
+				}
+			} catch (FileNotFoundException ignore) {
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			ResourceLocation resourceLocation = new ResourceLocation(TinkersTailorConstants.RESOURCE_FOLDER, "lang/en_US.lang");
 			try {
 				IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(resourceLocation);
@@ -40,6 +59,8 @@ public class Lang {
 			} catch (IOException e) {
 				throw Throwables.propagate(e);
 			}
+
+
 		}
 	}
 
@@ -61,7 +82,7 @@ public class Lang {
 		if (key == null) {
 			key = makeKey(text, prefix);
 			textKey.put(text, key);
-			if (TinkersTailor.deobf) {
+			if (TinkersTailor.deobf_folder) {
 				translate(key, text);
 			}
 		}
@@ -84,13 +105,13 @@ public class Lang {
 	public static String translate(String key, String _default) {
 		if (StatCollector.canTranslate(key))
 			return StatCollector.translateToLocal(key);
-		if (TinkersTailor.deobf) {
+		if (TinkersTailor.deobf_folder) {
 			if (!_default.equals(lang.get(key))) {
 				lang.put(key, _default);
 				PrintWriter out = null;
 				try {
 					try {
-						File file = new File(new File(new File("."), "untranslang"), "missed_en_US.lang");
+						File file = getFile();
 						if (file.getParentFile() != null) {
 							file.getParentFile().mkdirs();
 						}
@@ -124,5 +145,9 @@ public class Lang {
 			}
 		}
 		return _default;
+	}
+
+	private static File getFile() {
+		return new File(new File(new File("."), "untranslang"), "missed_en_US.lang");
 	}
 }

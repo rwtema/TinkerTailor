@@ -25,6 +25,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.block.Block;
@@ -54,6 +55,7 @@ public class TinkersTailor {
 
 	public static final Logger logger = LogManager.getLogger(TinkersTailorConstants.MOD_ID);
 	public static final boolean deobf;
+	public static final boolean deobf_folder;
 	@Mod.Instance(TinkersTailorConstants.MOD_ID)
 	public static TinkersTailor instance;
 	public static ArmorCore hat;
@@ -129,6 +131,13 @@ public class TinkersTailor {
 			_deObf = false;
 		}
 		deobf = _deObf;
+
+
+		if (deobf) {
+			URL resource = TinkersTailor.class.getClassLoader().getResource(TinkersTailor.class.getName().replace('.', '/').concat(".class"));
+			deobf_folder = resource != null && "file".equals(resource.getProtocol());
+		} else
+			deobf_folder = false;
 
 		if (!CoreTinkerTailor.loaded) {
 			String message = "TinkersTailor CoreMod Failed To Load";
