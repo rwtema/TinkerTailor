@@ -6,9 +6,13 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import static org.objectweb.asm.Opcodes.F_SAME;
+import static org.objectweb.asm.Opcodes.F_SAME1;
+import static org.objectweb.asm.Opcodes.INTEGER;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -54,9 +58,11 @@ public class AltPotionTransformer implements IClassTransformer {
 				m.instructions.insert(n, n = new InsnNode(Opcodes.ICONST_1));
 				m.instructions.insert(n, n = new InsnNode(Opcodes.IRETURN));
 				m.instructions.insert(n, n = out);
+				m.instructions.insert(n, n = new FrameNode(F_SAME, 0, null, 0, null));
 				m.instructions.insert(n, n = new InsnNode(Opcodes.ICONST_0));
 				m.instructions.insert(n, n = new InsnNode(Opcodes.IRETURN));
 				m.instructions.insert(n, n = end);
+				m.instructions.insert(n, n = new FrameNode(F_SAME1, 0, null, 0, new Object[] { INTEGER }));
 				m.instructions.insert(n, n = new InsnNode(Opcodes.POP));
 			}
 
@@ -75,12 +81,13 @@ public class AltPotionTransformer implements IClassTransformer {
 				m.instructions.insert(n, n = new JumpInsnNode(Opcodes.IFNULL, end));
 				m.instructions.insert(n, n = new InsnNode(Opcodes.ARETURN));
 				m.instructions.insert(n, n = end);
+				m.instructions.insert(n, n = new FrameNode(F_SAME1, 0, null, 1, new Object[] { "net/minecraft/potion/PotionEffect" }));
 				m.instructions.insert(n, n = new InsnNode(Opcodes.POP));
 			}
 		}
 
 
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		ClassWriter writer = new ClassWriter(0);
 		classNode.accept(writer);
 		return writer.toByteArray();
 	}
