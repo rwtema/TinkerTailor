@@ -32,7 +32,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 	public int color = 0;
 	public ModArmorModifier itemModifier;
 	public String name;
-	public WeakCache<ItemStack, Integer> level = new WeakCache<ItemStack, Integer>() {
+	public final WeakCache<ItemStack, Integer> level = new WeakCache<ItemStack, Integer>() {
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
 			NBTTagCompound tag = stack.getTagCompound();

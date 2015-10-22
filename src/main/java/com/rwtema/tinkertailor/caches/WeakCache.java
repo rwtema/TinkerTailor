@@ -7,16 +7,21 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class WeakCache<K, V> {
 	private static final boolean disableCache = ConfigKeys.DisableAdvancedCache.getBool(false);
 	private static final int OVERFULL_THRESHOLD = 32760;
-	private final HashMap<WeakReference<K>, V> map = new HashMap<WeakReference<K>, V>(16, 0.5F);
-	private final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
+	private final HashMap<WeakReference<K>, V> map = createMap();
+	private final ReferenceQueue<Object> refQueue = new ReferenceQueue<Object>();
 	private final Lookup lookup = new Lookup();
 
+	protected HashMap<WeakReference<K>, V> createMap() {
+		return new HashMap<WeakReference<K>, V>(16, 0.5F);
+	}
+
 	@SuppressWarnings("SuspiciousMethodCalls")
-	public synchronized V get(final K key) {
+	public synchronized V get(@Nullable final K key) {
 		if (disableCache) return key == null ? getNullValue() : calc(key);
 
 		expungeStaleEntries();
@@ -56,13 +61,13 @@ public abstract class WeakCache<K, V> {
 
 	@SuppressWarnings("SuspiciousMethodCalls")
 	private void expungeStaleEntries() {
-		Reference<? extends K> ref;
+		Reference ref;
 		while ((ref = refQueue.poll()) != null) {
 			map.remove(ref);
 		}
 	}
 
-	private final class WeakIdentityRef<T extends K> extends WeakReference<K> {
+	private final class WeakIdentityRef<T> extends WeakReference<K> {
 		private final int hashCode;
 
 		public WeakIdentityRef(K referent, int hashCode) {

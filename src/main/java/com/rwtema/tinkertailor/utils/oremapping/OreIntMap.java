@@ -1,6 +1,7 @@
 package com.rwtema.tinkertailor.utils.oremapping;
 
 import com.rwtema.tinkertailor.TinkersTailor;
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.procedure.TObjectProcedure;
 import gnu.trove.strategy.IdentityHashingStrategy;
@@ -18,10 +19,18 @@ public class OreIntMap {
 
 	public static OreIntMap newMap(Object... param) {
 		OreIntMap map = new OreIntMap();
-		for (int i = 0; i < param.length; i += 2) {
+		for (int i = 0; i < param.length; i += 1) {
+			Object obj = param[i];
+
+			if (obj == null || obj instanceof Integer) continue;
+
 			int k;
-			k = (i + 1) < param.length ? (Integer) param[i + 1] : 1;
-			map.put(param[i], k);
+			if ((i + 1) < param.length && param[i + 1] instanceof Integer) {
+				k = (Integer) param[i + 1];
+				i++;
+			} else k = 1;
+
+			map.put(obj, k);
 		}
 		return map;
 	}
@@ -38,36 +47,40 @@ public class OreIntMap {
 	}
 
 	public OreIntMap put(Object s, int value) {
-		if (s instanceof String)
-			return putOres((String) s, value);
-		if (s instanceof ItemStack)
-			return putItemStack((ItemStack) s, value);
-		if (s instanceof Item)
-			return putItem((Item) s, value);
-		if (s instanceof Block)
-			return putBlock((Block) s, value);
-		if (s instanceof List) {
-			List list = (List) s;
-			for (Object o : list) {
-				put(o, value);
+		synchronized (this) {
+			if (s instanceof String)
+				return putOres((String) s, value);
+			if (s instanceof ItemStack)
+				return putItemStack((ItemStack) s, value);
+			if (s instanceof Item)
+				return putItem((Item) s, value);
+			if (s instanceof Block)
+				return putBlock((Block) s, value);
+			if (s instanceof List) {
+				List list = (List) s;
+				for (Object o : list) {
+					put(o, value);
+				}
+				return this;
 			}
-			return this;
 		}
-
 		throw new IllegalArgumentException(String.valueOf(s));
 	}
 
-	public OreIntMap putOres(String s, int value) {
+	private OreIntMap putOres(String s, int value) {
 		for (ItemStack itemStack : OreDictionary.getOres(s, false)) {
 			putItemStack(itemStack, value);
 		}
 		return this;
 	}
 
-	public OreIntMap putItemStack(ItemStack itemStack, int value) {
+	private OreIntMap putItemStack(ItemStack itemStack, int value) {
 		if (itemStack.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
 			putItem(itemStack.getItem(), value);
 		} else {
+			if (genericItemStacks != null && genericItemStacks.get(itemStack.getItem()) == value)
+				return this;
+
 			if (specificItemStacks == null)
 				specificItemStacks = new TObjectIntCustomHashMap<ItemStack>(OreHashStrategy.INSTANCE, 10, 0.5F, 0);
 			specificItemStacks.put(itemStack.copy(), value);
@@ -75,24 +88,34 @@ public class OreIntMap {
 		return this;
 	}
 
-	public OreIntMap putItem(Item item, int value) {
+	private OreIntMap putItem(Item item, int value) {
 		if (genericItemStacks == null)
 			genericItemStacks = new TObjectIntCustomHashMap<Item>(IdentityHashingStrategy.INSTANCE, 10, 0.5F, 0);
 
 		genericItemStacks.put(item, value);
+
+		if (specificItemStacks != null) {
+			TObjectIntIterator<ItemStack> iterator = specificItemStacks.iterator();
+			while (iterator.hasNext()) {
+				iterator.advance();
+				if (iterator.key().getItem() == item && iterator.value() == value)
+					iterator.remove();
+			}
+			if (specificItemStacks.isEmpty()) specificItemStacks = null;
+		}
 		return this;
 	}
 
-	public OreIntMap putBlock(Block block, int value) {
+	private OreIntMap putBlock(Block block, int value) {
 		putItem(Item.getItemFromBlock(block), value);
 		return this;
 	}
 
 	public int get(ItemStack itemStack) {
-		int i = 0;
-		if (genericItemStacks != null) i = genericItemStacks.get(itemStack.getItem());
-		if (i == 0 && specificItemStacks != null) i = specificItemStacks.get(itemStack);
-		return i;
+		int i;
+		if (specificItemStacks != null && (i = specificItemStacks.get(itemStack)) > 0) return i;
+		if (genericItemStacks != null) return genericItemStacks.get(itemStack.getItem());
+		return 0;
 	}
 
 	public ItemStack[] makeItemStackArray() {
