@@ -11,8 +11,6 @@ import com.rwtema.tinkertailor.items.ItemTailorsManual;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.ConfigKeys;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
-import com.rwtema.tinkertailor.render.RendererHandler;
-import com.rwtema.tinkertailor.utils.ICallableClient;
 import com.rwtema.tinkertailor.utils.ModCompatibilityModule;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.Mod;
@@ -158,13 +156,7 @@ public class TinkersTailor {
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 
-		proxy.run(new ICallableClient() {
-			@Override
-			@SideOnly(Side.CLIENT)
-			public void run() {
-				RendererHandler.init();
-			}
-		});
+		proxy.initSided();
 
 		DamageEventHandler.instance.register();
 
@@ -263,7 +255,6 @@ public class TinkersTailor {
 		ItemStack smelteryStack = TinkerSmeltery.smeltery != null ? new ItemStack(TinkerSmeltery.smeltery, 1, 2) : new ItemStack(Blocks.obsidian, 1, 0);
 		ItemStack searedbrick = TinkerSmeltery.smeltery != null ? new ItemStack(TinkerTools.materials, 1, 2) : new ItemStack(Items.brick);
 		proxy.addShapedRecipe("modifyStation", new ItemStack(toolModifyStation, 1), "bbb", "msm", "m m", 'b', smelteryStack, 's', new ItemStack(TinkerTools.toolStationWood, 1, 0), 'm', searedbrick);
-
 
 		proxy.init();
 

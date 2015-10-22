@@ -69,4 +69,9 @@ public class Proxy implements IGuiHandler {
 	public void addShapelessRecipe(String name, ItemStack output, Object... params) {
 		GameRegistry.addRecipe(new ShapelessOreRecipe(output, params));
 	}
+
+
+	public void initSided(){
+
+	}
 }

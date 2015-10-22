@@ -3,6 +3,7 @@ package com.rwtema.tinkertailor;
 import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
 import com.rwtema.tinkertailor.gui.GuiToolModifyStation;
 import com.rwtema.tinkertailor.manual.ManualHelper;
+import com.rwtema.tinkertailor.render.RendererHandler;
 import com.rwtema.tinkertailor.utils.ICallableClient;
 import com.rwtema.tinkertailor.utils.ISidedCallable;
 import com.rwtema.tinkertailor.utils.ISidedFunction;
@@ -30,6 +31,11 @@ public class ProxyClient extends Proxy {
 	@Override
 	public void run(ICallableClient callable) {
 		callable.run();
+	}
+
+	@Override
+	public void initSided() {
+		RendererHandler.init();
 	}
 
 	@Override
