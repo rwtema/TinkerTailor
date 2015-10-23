@@ -8,8 +8,12 @@
     </page>
 
     <page type="tailorContents">
-        <title>The Tailors Choice</title>
-        <text>Clothe yourself in the finest metals\n\nBy RWTema</text>
+
+    </page>
+
+    <page type="tailorSection">
+        <section>!BETA Disclaimer!</section>
+        <text>This mod is currently in early beta. No balancing has yet been attempted. Bugs will happen.</text>
     </page>
 
     <page type="text">
