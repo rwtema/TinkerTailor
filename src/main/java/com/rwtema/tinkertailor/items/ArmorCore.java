@@ -69,6 +69,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	public ArmorCore(int slot) {
 		super(ArmorMaterial.IRON, 0, slot);
 		setCreativeTab(TinkersTailor.creativeTabArmor);
+		setTextureName(TinkersTailorConstants.RESOURCE_FOLDER + ":armor_" + TinkersTailorConstants.NAMES[slot].toLowerCase());
 		armors[slot] = this;
 	}
 
@@ -110,7 +111,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		NBTTagCompound tag = new NBTTagCompound();
 		NBTTagCompound infiTool = new NBTTagCompound();
 		tag.setTag(TinkersTailorConstants.NBT_MAINTAG, infiTool);
-		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_RENDERID, i);
 		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MATERIAL, i);
 		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 3);
 		stack.setTagCompound(tag);

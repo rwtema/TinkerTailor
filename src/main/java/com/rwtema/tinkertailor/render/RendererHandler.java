@@ -52,8 +52,14 @@ public class RendererHandler implements IResourceManagerReloadListener {
 		}
 	}
 
+	public static TextureMap blocks;
+	public static TextureMap items;
+
 	@SubscribeEvent
 	public void texturePre(TextureStitchEvent.Pre event) {
+		if(event.map.getTextureType() == 0) blocks = event.map;
+		if(event.map.getTextureType() == 1) items = event.map;
+
 		if (event.map.getTextureType() != 1) return;
 		itemMap = event.map;
 		for (Map.Entry<String, IIcon> entry : iconHashMap.entrySet()) {

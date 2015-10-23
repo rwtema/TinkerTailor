@@ -162,13 +162,13 @@ public class TinkersTailor {
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
-		hat = (ArmorCore) new ArmorCore(0).setUnlocalizedName("TinkerTailor.Hat").setTextureName("iron_helmet");
+		hat = (ArmorCore) new ArmorCore(0).setUnlocalizedName("TinkerTailor.Hat");
 		GameRegistry.registerItem(hat, "helmet");
-		shirt = (ArmorCore) new ArmorCore(1).setUnlocalizedName("TinkerTailor.Shirt").setTextureName("iron_chestplate");
+		shirt = (ArmorCore) new ArmorCore(1).setUnlocalizedName("TinkerTailor.Shirt");
 		GameRegistry.registerItem(shirt, "chestplate");
-		trousers = (ArmorCore) new ArmorCore(2).setUnlocalizedName("TinkerTailor.Trousers").setTextureName("iron_leggings");
+		trousers = (ArmorCore) new ArmorCore(2).setUnlocalizedName("TinkerTailor.Trousers");
 		GameRegistry.registerItem(trousers, "leggings");
-		shoes = (ArmorCore) new ArmorCore(3).setUnlocalizedName("TinkerTailor.Shoes").setTextureName("iron_boots");
+		shoes = (ArmorCore) new ArmorCore(3).setUnlocalizedName("TinkerTailor.Shoes");
 		GameRegistry.registerItem(shoes, "boots");
 
 		armorCast = new BlockArmorCast();
@@ -206,7 +206,7 @@ public class TinkersTailor {
 		proxy.addShapedRecipe("armorPatternBoots", new ItemStack(armorPattern, 1, 3), "S S", "S S", 'S', TinkerTools.blankPattern);
 
 
-		proxy.addShapelessRecipe("manual", new ItemStack(manual), TinkerTools.manualBook, TinkerTools.blankPattern);
+		proxy.addShapelessRecipe("manual", new ItemStack(manual), TinkerTools.manualBook, TinkerTools.blankPattern, Items.iron_ingot);
 
 
 		LiquidCasting basinCasting = TConstructRegistry.getBasinCasting();

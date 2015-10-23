@@ -2,6 +2,8 @@ package com.rwtema.tinkertailor.render.textures;
 
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -58,7 +60,15 @@ public class ArmorTextureManager {
 			ToolMaterial material = TConstructRegistry.getMaterial(matid);
 			string = String.format(armorString, material.name());
 			ResourceLocation resourceLocation = new ResourceLocation(string);
-			textureManager.loadTexture(resourceLocation, new ColoredTexture(resourceLocation, base, material.primaryColor));
+
+			String[] textures = ArmorTextures.getTextures(matid);
+			ProcessedTexture texture;
+			if (textures != null)
+				texture = new IconColorTexture(resourceLocation, base, material.primaryColor, textures);
+			else
+				texture = new ColoredTexture(resourceLocation, base, material.primaryColor);
+
+			textureManager.loadTexture(resourceLocation, texture);
 			textureStringMap.put(matid, string);
 
 		}
@@ -75,4 +85,26 @@ public class ArmorTextureManager {
 		return resourceLocation;
 	}
 
+
+	static TIntIntHashMap materialColors = new TIntIntHashMap();
+
+	public static int getColor(int matid) {
+		if (materialColors.containsKey(matid))
+			return materialColors.get(matid);
+
+		ToolMaterial material = TConstructRegistry.getMaterial(matid);
+		int col;
+		if (material == null) col = 0xffffffff;
+		else {
+			String[] textures = ArmorTextures.getTextures(matid);
+			if (textures != null) {
+				col = ProcessedTexture.avgColors(IconColorTexture.addColors(new TIntArrayList(), textures, Minecraft.getMinecraft().getResourceManager()).toArray());
+			} else {
+				col = material.primaryColor | 0xFF000000;
+			}
+		}
+		materialColors.put(matid, col);
+
+		return col;
+	}
 }

@@ -11,15 +11,17 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.TextureMetadataSection;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class ProcessedTexture extends SimpleTexture {
-	static final ColorModel rgb = ColorModel.getRGBdefault();
+	public static final ColorModel rgb = ColorModel.getRGBdefault();
 	private static final Logger logger = LogManager.getLogger();
 	protected final ResourceLocation fallback;
 	ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_CIEXYZ);
+	public int width, height;
 
 	public ProcessedTexture(ResourceLocation p_i1275_1_, ResourceLocation fallback) {
 		super(p_i1275_1_);
@@ -41,6 +43,27 @@ public abstract class ProcessedTexture extends SimpleTexture {
 		int b = (int) (col[2] * 255.0F);
 
 		return (alpha << 24) | (r << 16) | (g << 8) | (b);
+	}
+
+	protected static int avgColors(int... cols) {
+		if (cols.length == 1) return cols[0];
+
+		long r_total = 0, g_total = 0, b_total = 0;
+		for (int col : cols) {
+			r_total += rgb.getRed(col);
+			g_total += rgb.getGreen(col);
+			b_total += rgb.getBlue(col);
+		}
+
+		int r = MathHelper.clamp_int((int) (r_total / cols.length), 0, 255);
+		int g = MathHelper.clamp_int((int) (g_total / cols.length), 0, 255);
+		int b = MathHelper.clamp_int((int) (b_total / cols.length), 0, 255);
+
+		return 0xFF000000 | (r << 16) | (g << 8) | (b);
+	}
+
+	protected static int makeSolidAlpha(int color) {
+		return color | 0xFF000000;
 	}
 
 	protected static int mixColor(int color, int c) {
@@ -91,7 +114,7 @@ public abstract class ProcessedTexture extends SimpleTexture {
 				boolean flag = false;
 				boolean flag1 = false;
 
-				BufferedImage destImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				BufferedImage destImage = new BufferedImage(width = baseImage.getWidth(), height = baseImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
 
 				if (iresource.hasMetadata()) {

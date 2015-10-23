@@ -7,7 +7,6 @@ import java.util.UUID;
 public class TinkersTailorConstants {
 	public final static String NBT_MAINTAG = "InfiTool";
 	public final static String NBT_MAINTAG_MATERIAL = "Material";
-	public final static String NBT_MAINTAG_RENDERID = "RenderID";
 	public final static String NBT_MAINTAG_BROKEN = "Broken";
 
 	public final static String NBT_MAINTAG_MODIFIERS = "Modifiers";

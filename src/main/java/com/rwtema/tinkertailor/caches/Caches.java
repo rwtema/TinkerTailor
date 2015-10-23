@@ -10,6 +10,7 @@ import com.rwtema.tinkertailor.modifiers.ModifierInstance;
 import com.rwtema.tinkertailor.modifiers.ModifierPotion;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,9 +34,8 @@ public class Caches {
 
 			if (tags != null) {
 				tags = stack.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
-				tconstruct.library.tools.ToolMaterial material = TConstructRegistry.toolMaterials.get(tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_RENDERID));
-				if (material != null)
-					return material.primaryColor;
+				int matid = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MATERIAL);
+				return ArmorTextureManager.getColor(matid);
 			}
 			return 16777215;
 		}
