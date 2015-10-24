@@ -5,17 +5,18 @@ import gnu.trove.list.array.TIntArrayList;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import javax.imageio.ImageIO;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 public class IconColorTexture extends ColoredTexture {
-	protected final String[] icons;
+	protected final List<String> icons;
 
 	protected TIntArrayList cols = new TIntArrayList();
 
-	public IconColorTexture(ResourceLocation location, ResourceLocation fallback, int color, String[] icons) {
+	public IconColorTexture(ResourceLocation location, ResourceLocation fallback, int color, List<String> icons) {
 		super(location, fallback, color);
 		this.icons = icons;
 	}
@@ -28,7 +29,7 @@ public class IconColorTexture extends ColoredTexture {
 		super.processTexture(destImage, baseImage, mgr);
 	}
 
-	public static TIntArrayList addColors(TIntArrayList cols, String[] icons, IResourceManager mgr) {
+	public static TIntArrayList addColors(TIntArrayList cols, List<String> icons, IResourceManager mgr) {
 		cols.clear();
 
 		for (String icon : icons) {

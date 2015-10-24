@@ -5,6 +5,7 @@ import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
@@ -61,7 +62,7 @@ public class ArmorTextureManager {
 			string = String.format(armorString, material.name());
 			ResourceLocation resourceLocation = new ResourceLocation(string);
 
-			String[] textures = ArmorTextures.getTextures(matid);
+			List<String> textures = ArmorTextures.getTextures(matid);
 			ProcessedTexture texture;
 			if (textures != null)
 				texture = new IconColorTexture(resourceLocation, base, material.primaryColor, textures);
@@ -96,9 +97,14 @@ public class ArmorTextureManager {
 		int col;
 		if (material == null) col = 0xffffffff;
 		else {
-			String[] textures = ArmorTextures.getTextures(matid);
+			List<String> textures = ArmorTextures.getTextures(matid);
 			if (textures != null) {
-				col = ProcessedTexture.avgColors(IconColorTexture.addColors(new TIntArrayList(), textures, Minecraft.getMinecraft().getResourceManager()).toArray());
+				TIntArrayList list = IconColorTexture.addColors(new TIntArrayList(), textures, Minecraft.getMinecraft().getResourceManager());
+				if (!list.isEmpty()) {
+					col = ProcessedTexture.avgColors(list.toArray());
+				} else {
+					col = material.primaryColor | 0xFF000000;
+				}
 			} else {
 				col = material.primaryColor | 0xFF000000;
 			}

@@ -1,9 +1,14 @@
 package com.rwtema.tinkertailor.render.textures;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.render.RendererHandler;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -16,28 +21,37 @@ import tconstruct.library.tools.ToolMaterial;
 import tconstruct.tools.items.ToolShard;
 
 public class ArmorTextures {
-	public static String[] getTextures(int material) {
-		return getIcon(getItemKeyFromMat(material));
+	@Nonnull
+	public static List<String> getTextures(int material) {
+		List<String> icons = new ArrayList<String>();
+		for (PatternBuilder.ItemKey itemKey : getItemKeyFromMat(material)) {
+			icons.addAll(getIcon(itemKey));
+		}
+		return icons;
 	}
 
-	private static PatternBuilder.ItemKey getItemKeyFromMat(int matid) {
-		ToolMaterial toolMaterial = TConstructRegistry.toolMaterials.get(matid);
-		if (toolMaterial == null) return null;
-		return getItemKey(matid);
+	@Nonnull
+	private static List<PatternBuilder.ItemKey> getItemKeyFromMat(int matId) {
+		ToolMaterial toolMaterial = TConstructRegistry.toolMaterials.get(matId);
+		if (toolMaterial == null) return ImmutableList.of();
+		return getItemKey(matId);
 	}
 
-	private static String[] getIcon(PatternBuilder.ItemKey itemKey) {
-
+	@Nonnull
+	private static List<String> getIcon(PatternBuilder.ItemKey itemKey) {
+		List<String> icons = new ArrayList<String>();
 		if (itemKey.item instanceof ItemBlock) {
 			Block field_150939_a = ((ItemBlock) itemKey.item).field_150939_a;
-			String[] icons = getIcons(field_150939_a, itemKey.damage);
-			if (icons != null) return icons;
+			icons.addAll(getIcons(field_150939_a, itemKey.damage));
 		}
 
-		return getIcon(itemKey.item, itemKey.damage);
+		if (icons.isEmpty())
+			icons.addAll(getIcon(itemKey.item, itemKey.damage));
+		return icons;
 	}
 
-	private static String[] getIcon(Item item, int meta) {
+	@Nonnull
+	private static List<String> getIcon(Item item, int meta) {
 		String iconName = null;
 
 		if (meta != OreDictionary.WILDCARD_VALUE) {
@@ -67,12 +81,13 @@ public class ArmorTextures {
 			}
 		}
 
-		if (iconName == null) return null;
+		if (iconName == null) return ImmutableList.of();
 
-		return new String[]{iconName};
+		return Lists.newArrayList(iconName);
 	}
 
-	private static String[] getIcons(Block block, int meta) {
+	@Nonnull
+	private static List<String> getIcons(Block block, int meta) {
 		String any = null;
 		String top = null;
 		String side = null;
@@ -107,7 +122,7 @@ public class ArmorTextures {
 			}
 		}
 
-		if (any == null) return null;
+		if (any == null) return ImmutableList.of();
 
 		for (int i = 0; i < icons.length; i++) {
 			if (icons[i] != null) continue;
@@ -116,10 +131,11 @@ public class ArmorTextures {
 			else icons[i] = any;
 		}
 
-		return icons;
+		return Lists.newArrayList(icons);
 
 	}
 
+	@Nullable
 	private static String getIconName(IIcon icon) {
 		if (icon == null) return null;
 
@@ -131,36 +147,24 @@ public class ArmorTextures {
 			return null;
 	}
 
-	private static PatternBuilder.ItemKey getItemKey(int material) {
-		PatternBuilder.ItemKey r = null;
+	@Nonnull
+	private static List<PatternBuilder.ItemKey> getItemKey(int material) {
+		List<PatternBuilder.ItemKey> list = new ArrayList<PatternBuilder.ItemKey>();
+
 		for (Map.Entry<String, PatternBuilder.MaterialSet> entry : PatternBuilder.instance.materialSets.entrySet()) {
 			if (entry.getValue().materialID == material) {
 				String key = entry.getKey();
 				for (PatternBuilder.ItemKey itemKey : PatternBuilder.instance.materials) {
-
 					if (key.equals(itemKey.key)) {
-						if (itemKey.item instanceof ItemBlock)
-							return itemKey;
-
-
-						if (r == null || !(itemKey.item instanceof ToolShard)) {
-							r = itemKey;
+						if (!(itemKey.item instanceof ToolShard)) {
+							list.add(itemKey);
 						}
-
-
 					}
 				}
 			}
 		}
 
-		return r;
+		return list;
 	}
 
-	private static String getKey(int matid) {
-		for (Map.Entry<String, PatternBuilder.MaterialSet> entry : PatternBuilder.instance.materialSets.entrySet()) {
-			if (entry.getValue().materialID == matid)
-				return entry.getKey();
-		}
-		return null;
-	}
 }
