@@ -12,6 +12,6 @@ public class RandomHelper {
 
 
 	public static int nextInt(int seed, int n) {
-		return (int) (Math.abs(nextRand(seed)) % n);
+		return (int) (Math.abs((int)nextRand(seed)) % n);
 	}
 }

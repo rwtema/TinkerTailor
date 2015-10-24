@@ -12,7 +12,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import java.util.HashMap;
 import java.util.List;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -123,16 +122,6 @@ public class ModifierRegistry {
 		visBoost = new ModifierSimple("visBoost", 150, ItemHelper.makeOreIntArray(thaumcraftResource, 7 /*Enchanted Fabric*/)) {
 			{
 				modifierStep = maxLevel;
-			}
-
-			@Override
-			public void addInfo(List<String> list, EntityPlayer player, ItemStack item, int slot, int level) {
-				super.addInfo(list, player, item, slot, level);
-			}
-
-			@Override
-			public void addArmorSetInfo(List<String> list, EntityPlayer player) {
-				super.addArmorSetInfo(list, player);
 			}
 		}.setRequiredMods("Thaumcraft");
 		registerModifier(visBoost);
