@@ -99,7 +99,7 @@ public class ArmorTextureManager {
 		else {
 			List<ArmorColors.TextureDetails> textures = ArmorColors.getTextures(matid);
 			if (!textures.isEmpty()) {
-				TIntArrayList list = IconColorTexture.addColors(new TIntArrayList(), textures, Minecraft.getMinecraft().getResourceManager());
+				TIntArrayList list = IconColorTexture.getColors(textures, Minecraft.getMinecraft().getResourceManager());
 				if (!list.isEmpty()) {
 					col = ProcessedTexture.avgColors(list.toArray());
 				} else {

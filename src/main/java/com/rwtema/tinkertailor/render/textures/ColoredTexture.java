@@ -6,7 +6,6 @@ import net.minecraft.util.ResourceLocation;
 public class ColoredTexture extends ProcessedTexture {
 	protected final int color;
 
-
 	public ColoredTexture(ResourceLocation location, ResourceLocation fallback, int color) {
 		super(location, fallback);
 		this.color = color;

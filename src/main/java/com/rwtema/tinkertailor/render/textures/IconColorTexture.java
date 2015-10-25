@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 public class IconColorTexture extends ColoredTexture {
 	protected final List<ArmorColors.TextureDetails> icons;
 
-	protected TIntArrayList cols = new TIntArrayList();
+	protected TIntArrayList cols;
 
 	public IconColorTexture(ResourceLocation location, ResourceLocation fallback, int color, List<ArmorColors.TextureDetails> icons) {
 		super(location, fallback, color);
@@ -21,13 +21,12 @@ public class IconColorTexture extends ColoredTexture {
 
 	@Override
 	protected void processTexture(BufferedImage destImage, BufferedImage baseImage, IResourceManager mgr) throws IOException {
-		addColors(cols, icons, mgr);
-
+		cols = getColors(icons, mgr);
 		super.processTexture(destImage, baseImage, mgr);
 	}
 
-	public static TIntArrayList addColors(TIntArrayList cols, List<ArmorColors.TextureDetails> icons, IResourceManager mgr) {
-		cols.clear();
+	public static TIntArrayList getColors(List<ArmorColors.TextureDetails> icons, IResourceManager mgr) {
+		TIntArrayList cols = new TIntArrayList();
 
 		for (ArmorColors.TextureDetails textureDetails : icons) {
 			cols.addAll(textureDetails.gettIntArrayList(mgr));
@@ -40,8 +39,8 @@ public class IconColorTexture extends ColoredTexture {
 	protected int processPixel(BufferedImage img, int x, int y, int color) {
 		if (cols.isEmpty())
 			return super.processPixel(img, x, y, color);
-
-		return mixColor(color, getMixedCol(x, y));
+		else
+			return mixColor(color, getMixedCol(x, y));
 	}
 
 	private int getMixedCol(int x, int y) {
