@@ -62,9 +62,9 @@ public class ArmorTextureManager {
 			string = String.format(armorString, material.name());
 			ResourceLocation resourceLocation = new ResourceLocation(string);
 
-			List<String> textures = ArmorTextures.getTextures(matid);
+			List<ArmorColors.TextureDetails> textures = ArmorColors.getTextures(matid);
 			ProcessedTexture texture;
-			if (textures != null)
+			if (!textures.isEmpty())
 				texture = new IconColorTexture(resourceLocation, base, material.primaryColor, textures);
 			else
 				texture = new ColoredTexture(resourceLocation, base, material.primaryColor);
@@ -97,8 +97,8 @@ public class ArmorTextureManager {
 		int col;
 		if (material == null) col = 0xffffffff;
 		else {
-			List<String> textures = ArmorTextures.getTextures(matid);
-			if (textures != null) {
+			List<ArmorColors.TextureDetails> textures = ArmorColors.getTextures(matid);
+			if (!textures.isEmpty()) {
 				TIntArrayList list = IconColorTexture.addColors(new TIntArrayList(), textures, Minecraft.getMinecraft().getResourceManager());
 				if (!list.isEmpty()) {
 					col = ProcessedTexture.avgColors(list.toArray());
