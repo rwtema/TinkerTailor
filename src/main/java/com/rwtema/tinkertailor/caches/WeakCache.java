@@ -1,125 +1,19 @@
 package com.rwtema.tinkertailor.caches;
 
-import com.google.common.base.Throwables;
-import com.rwtema.tinkertailor.nbt.ConfigKeys;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class WeakCache<K, V> {
-	private static final boolean disableCache = ConfigKeys.DisableAdvancedCache.getBool(false);
-	private static final int OVERFULL_THRESHOLD = 32760;
-	private final HashMap<WeakReference<K>, V> map = createMap();
-	private final ReferenceQueue<Object> refQueue = new ReferenceQueue<Object>();
-	private final Lookup lookup = new Lookup();
-
-	protected HashMap<WeakReference<K>, V> createMap() {
-		return new HashMap<WeakReference<K>, V>(16, 0.5F);
-	}
-
-	@SuppressWarnings("SuspiciousMethodCalls")
-	public synchronized V get(@Nullable final K key) {
-		if (disableCache) return key == null ? getNullValue() : calc(key);
-
-		expungeStaleEntries();
-		if (map.size() >= OVERFULL_THRESHOLD) {
-			map.clear();
-		}
-
-		if (key == null) return getNullValue();
-
-		V v;
-		int hashCode = System.identityHashCode(key);
-
-		try {
-			lookup.set(key, hashCode);
-			v = map.get(lookup);
-			lookup.ref = null;
-		} catch (Throwable err) {
-			lookup.ref = null;
-			throw Throwables.propagate(err);
-		}
-
-		if (v == null) {
-			v = calc(key);
-			if (v == null)
-				throw new NullPointerException("Calculated null value for [" + key + "]");
-
-			map.put(new WeakIdentityRef<K>(key, hashCode), v);
-		}
+public abstract class WeakCache<K, V> extends CacheBase<K, V, V> {
+	@Override
+	protected final V insertCacheEntry(@Nonnull K key, int hashCode) {
+		V v = calc(key);
+		map.put(createWeakKey(key, hashCode), v);
 		return v;
 	}
 
-	protected abstract V calc(@Nonnull K key);
-
-	protected V getNullValue() {
-		throw new NullPointerException();
+	@Nullable
+	@Override
+	protected final V retrieve(@Nullable V valueStorage) {
+		return valueStorage;
 	}
-
-	@SuppressWarnings("SuspiciousMethodCalls")
-	private void expungeStaleEntries() {
-		Reference ref;
-		while ((ref = refQueue.poll()) != null) {
-			map.remove(ref);
-		}
-	}
-
-	private final class WeakIdentityRef<T> extends WeakReference<K> {
-		private final int hashCode;
-
-		public WeakIdentityRef(K referent, int hashCode) {
-			super(referent, refQueue);
-			this.hashCode = hashCode;
-		}
-
-		@Override
-		public int hashCode() {
-			return hashCode;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public boolean equals(Object other) {
-			if (this == other) return true;
-
-			Object value = get();
-			if (value == null) return false;
-
-			if (other == lookup) {
-				return lookup.ref == value;
-			}
-
-			if (!(other instanceof WeakIdentityRef)) {
-				return false;
-			}
-			WeakIdentityRef wr = (WeakIdentityRef) other;
-
-			return value == wr.get();
-		}
-	}
-
-	private final class Lookup {
-		K ref;
-		int hash;
-
-		public void set(K ref, int hashCode) {
-			this.ref = ref;
-			this.hash = hashCode;
-		}
-
-		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-		@Override
-		public boolean equals(Object obj) {
-			return obj.equals(this);
-		}
-
-		@Override
-		public int hashCode() {
-			return hash;
-		}
-	}
-
 }

@@ -28,6 +28,7 @@ public class Caches {
 
 	public static final WeakCache<ItemStack, Integer> color = new WeakCache<ItemStack, Integer>() {
 
+		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
 			NBTTagCompound tags = stack.getTagCompound();
@@ -48,6 +49,7 @@ public class Caches {
 
 	public static final WeakCache<ItemStack, Integer> material = new WeakCache<ItemStack, Integer>() {
 
+		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
 			NBTTagCompound tags = stack.getTagCompound();
@@ -60,6 +62,7 @@ public class Caches {
 		}
 	};
 	public static final WeakCache<ItemStack, List<ModifierInstance>> modifiers = new WeakCache<ItemStack, List<ModifierInstance>>() {
+		@Nonnull
 		@SuppressWarnings("unchecked")
 		@Override
 		protected List<ModifierInstance> calc(@Nonnull ItemStack stack) {
@@ -95,6 +98,7 @@ public class Caches {
 		}
 	};
 	public static final WeakCache<ItemStack, Integer> slot = new WeakCache<ItemStack, Integer>() {
+		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack key) {
 			if (!(key.getItem() instanceof ArmorCore))
@@ -104,6 +108,7 @@ public class Caches {
 	};
 	public static final WeakCache<ItemStack, Integer> maxDurability = new WeakCache<ItemStack, Integer>() {
 
+		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
 			Integer matID = material.get(stack);
@@ -123,6 +128,7 @@ public class Caches {
 	};
 
 	public static final WeakCache<ItemStack, Float> damageResistance = new WeakCache<ItemStack, Float>() {
+		@Nonnull
 		@Override
 		protected Float calc(@Nonnull ItemStack stack) {
 			return (float) (DamageEventHandler.matDRcache.get(Caches.material.get(stack)) * ArmorCore.ratings[slot.get(stack)]) * 4;
@@ -130,6 +136,7 @@ public class Caches {
 	};
 
 	public static final WeakCache<ItemStack, Multimap<String, AttributeModifier>> attributes = new WeakCache<ItemStack, Multimap<String, AttributeModifier>>() {
+		@Nonnull
 		@Override
 		protected Multimap<String, AttributeModifier> calc(@Nonnull ItemStack key) {
 			Multimap<String, AttributeModifier> map = HashMultimap.create();
@@ -143,6 +150,7 @@ public class Caches {
 	};
 
 	public static final WeakCache<ItemStack, List<ModifierInstance>> tickers = new WeakCache<ItemStack, List<ModifierInstance>>() {
+		@Nonnull
 		@Override
 		protected List<ModifierInstance> calc(@Nonnull ItemStack key) {
 			List<ModifierInstance> modifierInstances = modifiers.get(key);
@@ -160,6 +168,7 @@ public class Caches {
 	};
 
 	public static final WeakCache<ItemStack, Collection<Integer>> potionIds = new WeakCache<ItemStack, Collection<Integer>>() {
+		@Nonnull
 		@Override
 		protected Collection<Integer> calc(@Nonnull ItemStack key) {
 			if (!(key.getItem() instanceof ArmorCore))
@@ -179,6 +188,7 @@ public class Caches {
 
 
 	public static final WeakCache<ItemStack, Integer> visBoost = new WeakCache<ItemStack, Integer>() {
+		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack itemstack) {
 			int armorType = slot.get(itemstack);
