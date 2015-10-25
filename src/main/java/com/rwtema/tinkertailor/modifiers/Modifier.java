@@ -107,6 +107,11 @@ public abstract class Modifier implements Comparable<Modifier> {
 		return maxLevel;
 	}
 
+	public Modifier setModifierStep(int modifierStep) {
+		this.modifierStep = modifierStep;
+		return this;
+	}
+
 	public int getModifierStep() {
 		return modifierStep;
 	}

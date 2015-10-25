@@ -69,7 +69,7 @@ public class ModifierRegistry {
 
 		registerModifier(new ModifierPotion("digspeed", 3, Potion.digSpeed, ItemHelper.makeOreIntArray(OreIntMap.newMap("dustGlowstone"), Ingredients.netherBerry)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
 
-		registerModifier(new ModifierPotion("waterbreathing", 1, Potion.waterBreathing, ItemHelper.makeOreIntArray(Items.reeds, Ingredients.cloud)).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
+		registerModifier(new ModifierPotion("waterbreathing", 1, Potion.waterBreathing, ItemHelper.makeOreIntArray(Items.reeds, Ingredients.cloud)).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY).setModifierStep(50));
 
 		registerModifier(invisibility = new ModifierSimple("invisibility", 1,
 				OreIntMap.newMap(
