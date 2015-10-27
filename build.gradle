@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "alpha-0.1.0"
+version = "alpha-0.2.0"
 group= "com.rwtema.tinkerstailor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "TinkersTailor"
 
