@@ -2,6 +2,7 @@ package com.rwtema.tinkertailor.modifiers;
 
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.caches.WeakCache;
+import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.nbt.StringHelper;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
@@ -36,6 +37,9 @@ public abstract class Modifier implements Comparable<Modifier> {
 		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
+			if (!(stack.getItem() instanceof ArmorCore))
+				return 0;
+
 			NBTTagCompound tag = stack.getTagCompound();
 			if (tag == null)
 				return 0;

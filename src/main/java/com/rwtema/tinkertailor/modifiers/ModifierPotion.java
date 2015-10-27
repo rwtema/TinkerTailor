@@ -1,6 +1,7 @@
 package com.rwtema.tinkertailor.modifiers;
 
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.List;
@@ -62,8 +63,12 @@ public class ModifierPotion extends Modifier {
 	}
 
 	public PotionEffect getEffect(int level) {
-		if (modifierStep != 1)
-			level = level / modifierStep;
+		if (modifierStep != 1) {
+			int i = level / modifierStep;
+			if ((level % modifierStep) < TinkersTailorConstants.RANDOM.nextInt(modifierStep)) i++;
+			level = i;
+		}
+
 		if (level == 0) return null;
 
 		if (effectCache == null) {

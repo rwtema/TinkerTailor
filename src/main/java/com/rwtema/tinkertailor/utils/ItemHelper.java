@@ -89,7 +89,7 @@ public class ItemHelper {
 			} else if (o instanceof ItemValueMap) {
 				list.add((ItemValueMap) o);
 			} else if (!(o instanceof Integer)) {
-				ItemValueMap map = new OreIntMap();
+				OreIntMap map = new OreIntMap();
 				map.put(o, 1);
 				list.add(map);
 			}

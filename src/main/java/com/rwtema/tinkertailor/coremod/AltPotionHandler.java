@@ -1,6 +1,5 @@
 package com.rwtema.tinkertailor.coremod;
 
-import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.ModifierPotion;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -24,7 +23,7 @@ public class AltPotionHandler {
 		if (modifier == null) return null;
 		int level = 0;
 		for (ItemStack itemStack : base.getLastActiveItems()) {
-			if (itemStack != null && itemStack.getItem() instanceof ArmorCore) {
+			if (itemStack != null) {
 				level = Math.max(level, modifier.level.get(itemStack));
 			}
 		}
