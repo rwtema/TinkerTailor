@@ -2,6 +2,7 @@ package com.rwtema.tinkertailor.nbt;
 
 import com.google.common.collect.Lists;
 import com.rwtema.tinkertailor.modifiers.Modifier;
+import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -16,7 +17,7 @@ public enum ProtectionTypes {
 		}
 
 		@Override
-		public OreIntMap getOreValues() {
+		public ItemValueMap getOreValues() {
 			return super.getOreValues().put("blockIron", 9);
 		}
 	},
@@ -47,7 +48,7 @@ public enum ProtectionTypes {
 		}
 
 		@Override
-		public OreIntMap getOreValues() {
+		public ItemValueMap getOreValues() {
 			return super.getOreValues().put("blockDiamond", 9);
 		}
 	},
@@ -59,7 +60,7 @@ public enum ProtectionTypes {
 		}
 
 		@Override
-		public OreIntMap getOreValues() {
+		public ItemValueMap getOreValues() {
 			return super.getOreValues().put(Blocks.nether_brick, 4).put("blockBrickNether", 4);
 		}
 	},
@@ -115,8 +116,8 @@ public enum ProtectionTypes {
 		return 0;
 	}
 
-	public OreIntMap getOreValues() {
-		OreIntMap map = new OreIntMap();
+	public ItemValueMap getOreValues() {
+		ItemValueMap map = new OreIntMap();
 		map.put(itemStack, 1);
 		return map;
 	}

@@ -12,7 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class OreIntMap {
+public class OreIntMap implements ItemValueMap {
 
 	public TObjectIntCustomHashMap<Item> genericItemStacks = null;
 	public TObjectIntCustomHashMap<ItemStack> specificItemStacks = null;
@@ -35,35 +35,35 @@ public class OreIntMap {
 		return map;
 	}
 
-	public static OreIntMap woodValues() {
-		OreIntMap oreIntMap = new OreIntMap();
+	public static ItemValueMap woodValues() {
+		ItemValueMap ItemValueMap = new OreIntMap();
 
-		oreIntMap.put("stickWood", 1);
-		oreIntMap.put("plankWood", 2);
-		oreIntMap.put("logWood", 4);
-		oreIntMap.put("slabWood", 1);
+		ItemValueMap.put("stickWood", 1);
+		ItemValueMap.put("plankWood", 2);
+		ItemValueMap.put("logWood", 4);
+		ItemValueMap.put("slabWood", 1);
 
-		return oreIntMap;
+		return ItemValueMap;
 	}
 
+	@Override
 	public OreIntMap put(Object s, int value) {
-		synchronized (this) {
-			if (s instanceof String)
-				return putOres((String) s, value);
-			if (s instanceof ItemStack)
-				return putItemStack((ItemStack) s, value);
-			if (s instanceof Item)
-				return putItem((Item) s, value);
-			if (s instanceof Block)
-				return putBlock((Block) s, value);
-			if (s instanceof List) {
-				List list = (List) s;
-				for (Object o : list) {
-					put(o, value);
-				}
-				return this;
+		if (s instanceof String)
+			return putOres((String) s, value);
+		if (s instanceof ItemStack)
+			return putItemStack((ItemStack) s, value);
+		if (s instanceof Item)
+			return putItem((Item) s, value);
+		if (s instanceof Block)
+			return putBlock((Block) s, value);
+		if (s instanceof List) {
+			List list = (List) s;
+			for (Object o : list) {
+				put(o, value);
 			}
+			return this;
 		}
+
 		throw new IllegalArgumentException(String.valueOf(s));
 	}
 
@@ -111,6 +111,7 @@ public class OreIntMap {
 		return this;
 	}
 
+	@Override
 	public int get(ItemStack itemStack) {
 		int i;
 		if (specificItemStacks != null && (i = specificItemStacks.get(itemStack)) > 0) return i;
@@ -118,14 +119,7 @@ public class OreIntMap {
 		return 0;
 	}
 
-	public ItemStack[] makeItemStackArray() {
-		final ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-
-		addItemsToList(items);
-
-		return items.toArray(new ItemStack[items.size()]);
-	}
-
+	@Override
 	public void addItemsToList(final List<ItemStack> items) {
 		if (genericItemStacks != null)
 			genericItemStacks.forEachKey(new TObjectProcedure<Item>() {
@@ -145,7 +139,7 @@ public class OreIntMap {
 			});
 	}
 
-
+	@Override
 	public ItemStack makeItemStack() {
 		if (genericItemStacks != null && !genericItemStacks.isEmpty()) {
 			for (Item item : genericItemStacks.keySet()) {

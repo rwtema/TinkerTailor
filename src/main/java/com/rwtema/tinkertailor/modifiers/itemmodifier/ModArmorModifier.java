@@ -4,7 +4,7 @@ import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
-import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
+import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,14 +15,14 @@ import tconstruct.library.modifier.ItemModifier;
 
 public class ModArmorModifier extends ItemModifier {
 
-	public final OreIntMap[] recipe;
+	public final ItemValueMap[] recipe;
 	private final Modifier modifier;
 	public int modifierStep = 1;
 	public int maxLevel = -1;
 	public int armorAllowMask = 0;
 	public boolean useModifiers = true;
 
-	public ModArmorModifier(Modifier modifier, OreIntMap... recipe) {
+	public ModArmorModifier(Modifier modifier, ItemValueMap... recipe) {
 		super(convertRecipe(recipe), modifier.effect, modifier.name);
 		this.modifier = modifier;
 		this.recipe = recipe;
@@ -31,10 +31,10 @@ public class ModArmorModifier extends ItemModifier {
 		armorAllowMask = modifier.getAllowedArmorTypes();
 	}
 
-	public static ItemStack[] convertRecipe(OreIntMap[] recipe) {
+	public static ItemStack[] convertRecipe(ItemValueMap[] recipe) {
 		List<ItemStack> list = new ArrayList<ItemStack>();
-		for (OreIntMap oreIntMap : recipe) {
-			ItemStack stack = oreIntMap.makeItemStack();
+		for (ItemValueMap ItemValueMap : recipe) {
+			ItemStack stack = ItemValueMap.makeItemStack();
 			if (stack != null)
 				list.add(stack);
 		}
@@ -107,11 +107,11 @@ public class ModArmorModifier extends ItemModifier {
 			return 0;
 		}
 		if (this.recipe.length == 1) {
-			OreIntMap oreIntMap = this.recipe[0];
+			ItemValueMap ItemValueMap = this.recipe[0];
 			int val = 0;
 			for (ItemStack itemStack : recipe) {
 				if (itemStack != null)
-					val += oreIntMap.get(itemStack);
+					val += ItemValueMap.get(itemStack);
 			}
 			return val;
 		}
@@ -121,8 +121,8 @@ public class ModArmorModifier extends ItemModifier {
 
 	public int getValue(ItemStack itemStack) {
 		if (itemStack == null) return 0;
-		for (OreIntMap oreIntMap : recipe) {
-			int i = oreIntMap.get(itemStack);
+		for (ItemValueMap ItemValueMap : recipe) {
+			int i = ItemValueMap.get(itemStack);
 			if (i > 0)
 				return i;
 		}
@@ -139,7 +139,7 @@ public class ModArmorModifier extends ItemModifier {
 
 		if (this.recipe.length == 1) {
 			boolean canCraft = false;
-			OreIntMap map = this.recipe[0];
+			ItemValueMap map = this.recipe[0];
 			for (ItemStack craftingStack : recipe) {
 				if (craftingStack != null) {
 					canCraft = true;
@@ -152,15 +152,15 @@ public class ModArmorModifier extends ItemModifier {
 			return canCraft;
 		}
 
-		ArrayList<OreIntMap> list = new ArrayList<OreIntMap>();
+		ArrayList<ItemValueMap> list = new ArrayList<ItemValueMap>();
 		Collections.addAll(list, this.recipe);
 
 		loop:
 		for (ItemStack craftingStack : recipe) {
 			if (craftingStack != null) {
-				for (OreIntMap oreIntMap : list) {
-					if (oreIntMap.get(craftingStack) > 0) {
-						list.remove(oreIntMap);
+				for (ItemValueMap ItemValueMap : list) {
+					if (ItemValueMap.get(craftingStack) > 0) {
+						list.remove(ItemValueMap);
 						continue loop;
 					}
 				}

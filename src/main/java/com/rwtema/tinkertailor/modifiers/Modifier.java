@@ -7,7 +7,7 @@ import com.rwtema.tinkertailor.nbt.StringHelper;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.font.RenderCustomColor;
 import com.rwtema.tinkertailor.utils.Lang;
-import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
+import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nonnull;
@@ -27,7 +27,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 	public static final int ARMORTYPE_SHOES_ONLY = 7;
 
 	public int effect = 0;
-	public OreIntMap[] recipe;
+	public ItemValueMap[] recipe;
 	public int allowedArmorTypes;
 	public int color = 0;
 	public ModArmorModifier itemModifier;
@@ -48,7 +48,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 	protected int modifierStep = 1;
 	String colorString = null;
 
-	protected Modifier(String name, int maxLevel, OreIntMap... recipe) {
+	protected Modifier(String name, int maxLevel, ItemValueMap... recipe) {
 		this.name = name;
 		this.maxLevel = maxLevel;
 		this.recipe = recipe;

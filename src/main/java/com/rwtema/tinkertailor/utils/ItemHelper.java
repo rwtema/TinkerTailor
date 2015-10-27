@@ -1,5 +1,6 @@
 package com.rwtema.tinkertailor.utils;
 
+import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
@@ -45,9 +46,9 @@ public class ItemHelper {
 		return list.toArray(new ItemStack[list.size()]);
 	}
 
-	public static OreIntMap[] makeOreIntArray(Object... items) {
-		List<OreIntMap> maps = makeOreIntList(items);
-		return maps.toArray(new OreIntMap[maps.size()]);
+	public static ItemValueMap[] makeOreIntArray(Object... items) {
+		List<ItemValueMap> maps = makeOreIntList(items);
+		return maps.toArray(new ItemValueMap[maps.size()]);
 	}
 
 	public static ArrayList<ItemStack> makeStackList(Object... items) {
@@ -73,8 +74,8 @@ public class ItemHelper {
 	}
 
 
-	public static List<OreIntMap> makeOreIntList(Object... items) {
-		ArrayList<OreIntMap> list = new ArrayList<OreIntMap>(items.length);
+	public static List<ItemValueMap> makeOreIntList(Object... items) {
+		ArrayList<ItemValueMap> list = new ArrayList<ItemValueMap>(items.length);
 		for (int i = 0; i < items.length; i++) {
 			Object o = items[i];
 			if (o == null) continue;
@@ -85,10 +86,10 @@ public class ItemHelper {
 				else if (items[i] instanceof Block)
 					list.add(OreIntMap.newMap(new ItemStack((Block) o, 1, (Integer) items[i + 1])));
 				i++;
-			} else if (o instanceof OreIntMap) {
-				list.add((OreIntMap) o);
+			} else if (o instanceof ItemValueMap) {
+				list.add((ItemValueMap) o);
 			} else if (!(o instanceof Integer)) {
-				OreIntMap map = new OreIntMap();
+				ItemValueMap map = new OreIntMap();
 				map.put(o, 1);
 				list.add(map);
 			}

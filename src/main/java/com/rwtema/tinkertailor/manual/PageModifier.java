@@ -6,7 +6,7 @@ import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.Lang;
-import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
+import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import cpw.mods.fml.common.Loader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ public class PageModifier extends PageBase {
 
 		rand.setSeed(curTime());
 
-		OreIntMap[] recipe = modifier.itemModifier.recipe;
+		ItemValueMap[] recipe = modifier.itemModifier.recipe;
 		if (recipe.length == 0) {
 
 		} else if (recipe.length == 1) {
 
 			List<ItemStack> stacks = new ArrayList<ItemStack>();
-			for (OreIntMap map : recipe) {
+			for (ItemValueMap map : recipe) {
 				map.addItemsToList(stacks);
 			}
 
@@ -90,10 +90,12 @@ public class PageModifier extends PageBase {
 
 			int x = (PAGE_WIDTH - recipe.length * 18) / 2;
 			for (int i = 0; i < recipe.length; i++) {
-				OreIntMap map = recipe[i];
+				ItemValueMap map = recipe[i];
 				if (map == null) continue;
 
-				ItemStack[] itemStacks = map.makeItemStackArray();
+				ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+				map.addItemsToList(items);
+				ItemStack[] itemStacks = items.toArray(new ItemStack[items.size()]);
 				if (itemStacks.length == 0) continue;
 				ItemStack item = itemStacks[rand.nextInt(itemStacks.length)];
 				renderStack(item, x + i * 18, 20);

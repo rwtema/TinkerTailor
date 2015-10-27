@@ -30,6 +30,6 @@ public class AltPotionHandler {
 		}
 		if (level == 0) return null;
 
-		return modifier.getCachedEffect(level);
+		return modifier.getEffect(level);
 	}
 }
