@@ -188,9 +188,7 @@ public class ArmorColors implements IResourceManagerReloadListener {
 				String key = entry.getKey();
 				for (PatternBuilder.ItemKey itemKey : PatternBuilder.instance.materials) {
 					if (key.equals(itemKey.key)) {
-//						if (!(itemKey.item instanceof ToolShard))
-							list.add(itemKey);
-
+						list.add(itemKey);
 					}
 				}
 			}

@@ -16,10 +16,9 @@
         <text>This mod is currently in early beta. No balancing has yet been attempted. Bugs will happen.</text>
     </page>
 
-    <page type="text">
-        <text>
-A good tinkerer should know that the world is a dangerous and evil place with many things wishing to kill you. While tools and weapons are important, a good set of armor is vital to a tinkers continuous survival.
-</text>
+    <page type="tailorSection">
+        <section>Introduction</section>
+        <text>A good tinkerer should know that the world is a dangerous and evil place with many things wishing to kill you. While tools and weapons are important, a good set of armor is vital to a tinkers continuous survival.</text>
     </page>
 
     <page type="tailorSection">
@@ -209,8 +208,6 @@ A good tinkerer should know that the world is a dangerous and evil place with ma
         <modifier>visBoost</modifier>
         <desc>Lining the interior of armor to boost wand performance.</desc>
     </page>
-
-
 
     <page type="tailorSection">
         <section>Modification Station</section>
