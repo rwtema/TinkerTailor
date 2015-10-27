@@ -155,7 +155,6 @@ public class PageModifier extends PageBase {
 			}
 			yPos += drawTextLine(builder.toString(), 4, yPos);
 		}
-
 	}
 
 
@@ -163,8 +162,7 @@ public class PageModifier extends PageBase {
 	protected void loadData() throws IOException {
 		String modifierName = loadText("modifier");
 		modifier = ModifierRegistry.modifiers.get(modifierName);
-		assert modifier != null;
-
+		if (modifier == null) throw new IOException("Modifier Does Not Exist");
 		desc = loadText("desc");
 	}
 }
