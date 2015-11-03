@@ -7,12 +7,13 @@ import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
-import com.rwtema.tinkertailor.nbt.ConfigKeys;
+import com.rwtema.tinkertailor.nbt.Config;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.ModelArmor;
 import com.rwtema.tinkertailor.render.RendererHandler;
 import com.rwtema.tinkertailor.render.font.CustomFontRenderer;
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
+import com.rwtema.tinkertailor.utils.CollectionHelper;
 import com.rwtema.tinkertailor.utils.ItemHelper;
 import com.rwtema.tinkertailor.utils.Lang;
 import cpw.mods.fml.common.Optional;
@@ -61,7 +62,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 
 	public static final ArmorCore[] armors = new ArmorCore[4];
 	public static final String[] traits = new String[0];
-	public static final boolean weaponInvis = ConfigKeys.WeaponInvis.getBool(false);
 	public static boolean DEBUG_ALWAYS_RELOAD = false;
 	@SideOnly(Side.CLIENT)
 	ModelArmor armor;
@@ -155,7 +155,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		if (entityLiving.hurtTime > 0)
 			armor.setInvisible(entityLiving, false);
 		else {
-			boolean invis = ModifierRegistry.invisibility.hasEffect(itemStack) && !entityLiving.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer) && (!ItemHelper.isPlayerHoldingWeapon() || !weaponInvis);
+			boolean invis = ModifierRegistry.invisibility.hasEffect(itemStack) && !entityLiving.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer) && (!ItemHelper.isPlayerHoldingWeapon() || !Config.WeaponInvis.get());
 			armor.stepInvisible(entityLiving, invis);
 		}
 	}

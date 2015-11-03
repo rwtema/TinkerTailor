@@ -9,7 +9,7 @@ import com.rwtema.tinkertailor.items.ItemArmorCast;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
 import com.rwtema.tinkertailor.items.ItemTailorsManual;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
-import com.rwtema.tinkertailor.nbt.ConfigKeys;
+import com.rwtema.tinkertailor.nbt.Config;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.ModCompatibilityModule;
 import cpw.mods.fml.common.LoaderException;
@@ -117,7 +117,7 @@ public class TinkersTailor {
 	public static ItemTailorsManual manual;
 	@SidedProxy(serverSide = "com.rwtema.tinkertailor.Proxy", clientSide = "com.rwtema.tinkertailor.ProxyClient")
 	public static Proxy proxy;
-	public static Configuration config;
+
 	public static List<ModCompatibilityModule> modCompatabilities;
 
 	static {
@@ -148,13 +148,13 @@ public class TinkersTailor {
 
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
+		Config.load(new Configuration(event.getSuggestedConfigurationFile()));
+
 		modCompatabilities = ModCompatibilityModule.loadModCompatibilityModules(event);
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.onCreated();
 		}
 
-		config = new Configuration(event.getSuggestedConfigurationFile());
-		config.load();
 
 		proxy.initSided();
 
@@ -239,7 +239,7 @@ public class TinkersTailor {
 			Smeltery.addMelting(FluidType.getFluidType(TinkerSmeltery.moltenAlubrassFluid), output, 0, TConstruct.blockLiquidValue);
 		}
 
-		if (ConfigKeys.SoftMetal.getBool(true)) {
+		if (Config.SoftMetal.get()) {
 			for (int mat : new int[]{TinkerTools.MaterialID.Copper, TinkerTools.MaterialID.Iron}) {
 				for (int meta = 0; meta <= 12; meta++) {
 					TConstructRegistry.addPartMapping(TinkerTools.woodPattern, meta + 1, mat, new ItemStack(TinkerTools.patternOutputs[meta], 1, mat));
@@ -268,18 +268,23 @@ public class TinkersTailor {
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.postInit();
 		}
-
-
 	}
 
 
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
+		double dungeonProbability = Config.DungeonProbability.get();
+		if (dungeonProbability > 1e-5) {
+			ItemHelper.addDungeonItem(new ItemStack(hat), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+			ItemHelper.addDungeonItem(new ItemStack(shirt), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+			ItemHelper.addDungeonItem(new ItemStack(trousers), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+			ItemHelper.addDungeonItem(new ItemStack(shoes), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+		}
+
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.loadComplete();
 		}
 
-		if (config.hasChanged())
-			config.save();
+		Config.save();
 	}
 }

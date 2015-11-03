@@ -1,7 +1,7 @@
 package com.rwtema.tinkertailor.caches;
 
 import com.google.common.base.Throwables;
-import com.rwtema.tinkertailor.nbt.ConfigKeys;
+import com.rwtema.tinkertailor.nbt.Config;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class CacheBase<K, V, S> {
-	private static final boolean disableCache = ConfigKeys.DisableAdvancedCache.getBool(false);
+	private static final boolean disableCache = Config.DisableAdvancedCache.get();
 	private static final int OVERFULL_THRESHOLD = 10000;
 	protected final HashMap<WeakReference<K>, S> map = createMap();
 	private final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
