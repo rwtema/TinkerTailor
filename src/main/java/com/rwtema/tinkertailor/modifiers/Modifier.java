@@ -1,7 +1,9 @@
 package com.rwtema.tinkertailor.modifiers;
 
 import com.google.common.collect.Multimap;
+import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.caches.WeakCache;
+import com.rwtema.tinkertailor.compat.ModCompatibilityModule;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.nbt.StringHelper;
@@ -20,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
 
 public abstract class Modifier implements Comparable<Modifier> {
 	public static final int ARMORTYPE_HAT_ONLY = 14;
@@ -27,12 +30,20 @@ public abstract class Modifier implements Comparable<Modifier> {
 	public static final int ARMORTYPE_TROUSERS_ONLY = 11;
 	public static final int ARMORTYPE_SHOES_ONLY = 7;
 
+	public static final int MALODEROUS_NONE = 0;
+	public static final int MALODEROUS_ALWAYS = 1;
+	public static final int MALODEROUS_WHENNEGATIVE = 2;
+
 	public int effect = 0;
 	public ItemValueMap[] recipe;
 	public int allowedArmorTypes;
 	public int color = 0;
 	public ModArmorModifier itemModifier;
 	public String name;
+	public int maloderous = MALODEROUS_NONE;
+
+	public int priority;
+
 	public final WeakCache<ItemStack, Integer> level = new WeakCache<ItemStack, Integer>() {
 		@Nonnull
 		@Override
@@ -48,6 +59,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 		}
 	};
 	public String[] requiredMods = null;
+	public boolean allModsPresent = true;
 	protected int maxLevel;
 	protected int modifierStep = 1;
 	String colorString = null;
@@ -56,6 +68,9 @@ public abstract class Modifier implements Comparable<Modifier> {
 		this.name = name;
 		this.maxLevel = maxLevel;
 		this.recipe = recipe;
+
+		if (TinkersTailor.deobf)
+			getLocalizedName();
 	}
 
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
@@ -103,7 +118,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 		return false;
 	}
 
-	public void onArmorTick(EntityLivingBase entity, ItemStack item, int slot, int level) {
+	public void onArmorTick(World world, EntityLivingBase entity, ItemStack item, int slot, int level) {
 
 	}
 
@@ -121,9 +136,11 @@ public abstract class Modifier implements Comparable<Modifier> {
 	}
 
 	public String getLevelTooltip(int level) {
+		if (level < 0)
+			return " " + StringHelper.toRomanNumeral(-1 + level / modifierStep);
+
 		if (getMaxLevel() == 1) return "";
-		int l = 1 + level / modifierStep;
-		return " " + StringHelper.toRomanNumeral(l);
+		return " " + StringHelper.toRomanNumeral(1 + level / modifierStep);
 	}
 
 	public int getAllowedArmorTypes() {
@@ -150,12 +167,14 @@ public abstract class Modifier implements Comparable<Modifier> {
 			}
 
 			colorString = RenderCustomColor.getCol(color);
-
 		}
 		return colorString;
 	}
 
-	public int compareTo(Modifier o) {
+	public int compareTo(@Nonnull Modifier o) {
+		if (priority != o.priority) {
+			return (priority < o.priority) ? -1 : 1;
+		}
 		return getLocalizedName().compareTo(o.getLocalizedName());
 	}
 
@@ -164,7 +183,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 	}
 
 	public boolean shouldHaveDocEntry() {
-		return true;
+		return maloderous != MALODEROUS_ALWAYS;
 	}
 
 
@@ -174,6 +193,29 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	public Modifier setRequiredMods(String... requiredMods) {
 		this.requiredMods = requiredMods;
+
+		allModsPresent = true;
+		for (String requiredMod : requiredMods) {
+			if (!ModCompatibilityModule.isModLoaded(requiredMod)) {
+				allModsPresent = false;
+				break;
+			}
+		}
+
 		return this;
+	}
+
+	public Modifier setMaloderous() {
+		maloderous = MALODEROUS_ALWAYS;
+		return this;
+	}
+
+	public Modifier setNegativeMaloderous() {
+		maloderous = MALODEROUS_WHENNEGATIVE;
+		return this;
+	}
+
+	public boolean allowRandom(){
+		return allModsPresent && itemModifier.useModifiers;
 	}
 }

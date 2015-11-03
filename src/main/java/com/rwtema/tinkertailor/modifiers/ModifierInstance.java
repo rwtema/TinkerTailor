@@ -1,5 +1,10 @@
 package com.rwtema.tinkertailor.modifiers;
 
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import javax.annotation.Nonnull;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+
 public final class ModifierInstance implements Comparable<ModifierInstance> {
 	public final Modifier modifier;
 	public final int level;
@@ -25,9 +30,22 @@ public final class ModifierInstance implements Comparable<ModifierInstance> {
 	}
 
 	@Override
-	public int compareTo(ModifierInstance other) {
+	public int compareTo(@Nonnull ModifierInstance other) {
 		int i = this.modifier.compareTo(other.modifier);
 		if (i != 0) return i;
 		return Double.compare(this.level, other.level);
+	}
+
+	public void applyToStack(ItemStack stack) {
+		applyToStack(stack.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG));
+	}
+
+	public void applyToStack(NBTTagCompound tag) {
+		addModLevel(tag, modifier, level);
+	}
+
+	public static void addModLevel(NBTTagCompound tag, Modifier modifier, int level) {
+		int i = Math.min(tag.getInteger(modifier.name) + level, modifier.maxLevel);
+		tag.setInteger(modifier.name, i);
 	}
 }

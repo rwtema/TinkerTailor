@@ -23,6 +23,8 @@ public class ModifierProtection extends Modifier {
 
 		maxLevel = protectionTypes.maxLevel * modifierStep;
 
+		protectionTypes.modifier = this;
+
 	}
 
 	@Override

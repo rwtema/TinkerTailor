@@ -1,17 +1,22 @@
 package com.rwtema.tinkertailor.modifiers;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.crafting.Ingredients;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorRepair;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModCreativeArmorModifier;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModInducedExtraModifier;
 import com.rwtema.tinkertailor.nbt.ProtectionTypes;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.ItemHelper;
 import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import cpw.mods.fml.common.registry.GameRegistry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -19,6 +24,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
 import tconstruct.armor.TinkerArmor;
 import tconstruct.library.accessory.IHealthAccessory;
 import tconstruct.library.crafting.ModifyBuilder;
@@ -30,20 +37,23 @@ public class ModifierRegistry {
 	public static ModifierSimple invisibility;
 	public static Modifier gogglesRevealing;
 	public static Modifier visBoost;
+	public static Modifier energy;
+	public static Modifier prickly;
+	public static Modifier wither;
 
 	public static void init() {
 		ModifyBuilder.registerModifier(new ModArmorRepair());
 
 		for (ProtectionTypes protectionTypes : ProtectionTypes.values()) {
-			registerModifier(new ModifierProtection(protectionTypes));
+			registerModifier(protectionTypes.createModifier());
 		}
 
 		registerModifier(new ModifierPotion("nightvision", 1, Potion.nightVision, ItemHelper.makeOreIntArray(Items.golden_carrot, Ingredients.netherBerry, Ingredients.netherBerryMetaNightvision)).setDuration(205).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY));
-		registerModifier(new ModifierPotion("jump", 3, Potion.jump, ItemHelper.makeOreIntArray(TinkerWorld.slimePad, Ingredients.netherBerry, Ingredients.netherBerryMetaJump)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
+		registerModifier(new ModifierPotion("jump", 3, Potion.jump, ItemHelper.makeOreIntArray(TinkerWorld.slimePad, Ingredients.netherBerry, Ingredients.netherBerryMetaJump)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY).setNegativeMaloderous());
 
-		registerModifier(new ModifierAttributes("attack", 40, 4, SharedMonsterAttributes.attackDamage, 0, 0, 8, OreIntMap.newMap(Blocks.piston), OreIntMap.newMap(Blocks.quartz_block, "blockQuartz")).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
+		registerModifier(new ModifierAttributes("attack", 40, 4, SharedMonsterAttributes.attackDamage, 0, 0, 8, OreIntMap.newMap(Blocks.piston), OreIntMap.newMap(Blocks.quartz_block, "blockQuartz")).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY).setNegativeMaloderous());
 		registerModifier(new ModifierAttributes("knockback", 20, 4, SharedMonsterAttributes.knockbackResistance, 0, 0, 0.8, OreIntMap.newMap(Blocks.obsidian, "blockObsidian")));
-		registerModifier(new ModifierAttributes("haste", 50, 4, SharedMonsterAttributes.movementSpeed, 1, 0, 2, OreIntMap.newMap("dustGlowstone", 1, "glowstone", 4)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY));
+		registerModifier(new ModifierAttributes("haste", 50, 4, SharedMonsterAttributes.movementSpeed, 1, 0, 2, OreIntMap.newMap("dustGlowstone", 1, "glowstone", 4)).setAllowedArmorTypes(Modifier.ARMORTYPE_SHOES_ONLY).setNegativeMaloderous());
 		registerModifier(new ModifierAttributes("health", 2, 8, SharedMonsterAttributes.maxHealth, 0, 0, 4, ItemHelper.makeOreIntArray(new ItemValueMap() {
 			@Override
 			public ItemValueMap put(Object s, int value) {
@@ -77,7 +87,7 @@ public class ModifierRegistry {
 			public ItemStack makeItemStack() {
 				return new ItemStack(TinkerArmor.heartCanister, 1, 2);
 			}
-		}, Ingredients.netherBerry, Ingredients.netherBerryMetaHealing)));
+		}, Ingredients.netherBerry, Ingredients.netherBerryMetaHealing)).setNegativeMaloderous());
 
 		registerModifier(new ModifierPotion("digspeed", 3, Potion.digSpeed, ItemHelper.makeOreIntArray("dustGlowstone", "dustRedstone")).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
 
@@ -138,13 +148,59 @@ public class ModifierRegistry {
 		}.setRequiredMods("Thaumcraft");
 		registerModifier(visBoost);
 
+
+		registerModifier(new ModifierPotion("poison", 4, Potion.poison).setMaloderous());
+		registerModifier(wither = new ModifierPotion("witherDamage", 4, Potion.wither).setMaloderous());
+		registerModifier(new ModifierPotion("blindness", 1, Potion.blindness).setAllowedArmorTypes(Modifier.ARMORTYPE_HAT_ONLY).setMaloderous());
+		registerModifier(new ModifierPotion("confusion", 1, Potion.confusion).setDuration(120).setMaloderous());
+		registerModifier(new ModifierPotion("slowdig", 4, Potion.digSlowdown).setMaloderous());
+
+		prickly = new ModifierSimple("prickly", 2) {
+			@Override
+			public boolean doesTick(ItemStack item, int level) {
+				return true;
+			}
+
+			@Override
+			public void onArmorTick(World world, EntityLivingBase entity, ItemStack item, int slot, int level) {
+				if (!world.isRemote)
+					if (entity.onGround && (entity.motionX != 0 || entity.motionZ != 0)) {
+						if (TinkersTailorConstants.RANDOM.nextInt(5) == 0) {
+							entity.attackEntityFrom(DamageSource.cactus, 1.0F);
+						}
+					}
+			}
+		}.setMaloderous();
+
+		registerModifier(prickly);
+		bonusModifiers.put(TinkerTools.MaterialID.Cactus, new ModifierInstance(prickly, prickly.modifierStep));
+
+		registerModifier(new ModifierDurability("durability", 4, 25, 2000, OreIntMap.newMap(
+				"gemEmerald", 1,
+				"blockEmerald", 9
+		)));
+
+
 		ModifyBuilder.registerModifier(new ModCreativeArmorModifier(new ItemStack[]{new ItemStack(TinkerTools.creativeModifier)}));
 		ModifyBuilder.registerModifier(new ModInducedExtraModifier());
 	}
 
 	public static void registerModifier(Modifier mod) {
+		if (ModifierRegistry.modifiers.containsKey(mod.name)) throw new RuntimeException("Duplicate keys: " + mod.name);
 		ModifierRegistry.modifiers.put(mod.name, mod);
 		mod.itemModifier = mod.createItemModifier();
 		ModifyBuilder.registerModifier(mod.itemModifier);
+
+		if (mod.allowRandom()) {
+			if (mod.maloderous == Modifier.MALODEROUS_NONE || mod.maloderous == Modifier.MALODEROUS_WHENNEGATIVE)
+				plusModifiers.add(mod);
+			if (mod.maloderous == Modifier.MALODEROUS_ALWAYS || mod.maloderous == Modifier.MALODEROUS_WHENNEGATIVE)
+				negModifiers.add(mod);
+		}
 	}
+
+	public static List<Modifier> plusModifiers = new ArrayList<Modifier>();
+	public static List<Modifier> negModifiers = new ArrayList<Modifier>();
+
+	public static Multimap<Integer, ModifierInstance> bonusModifiers = HashMultimap.create();
 }

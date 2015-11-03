@@ -4,7 +4,7 @@ import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import net.minecraft.item.ItemStack;
 
 public class ModifierSimple extends Modifier {
-	protected ModifierSimple(String name, int maxLevel, ItemValueMap... itemStacks) {
+	public ModifierSimple(String name, int maxLevel, ItemValueMap... itemStacks) {
 		super(name, maxLevel, itemStacks);
 
 	}

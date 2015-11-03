@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.world.World;
 
 public class ModifierPotion extends Modifier {
 	public static final ModifierPotion[] modifiers = new ModifierPotion[256];
@@ -41,7 +42,7 @@ public class ModifierPotion extends Modifier {
 	}
 
 	@Override
-	public void onArmorTick(EntityLivingBase entity, ItemStack item, int slot, int level) {
+	public void onArmorTick(World world, EntityLivingBase entity, ItemStack item, int slot, int level) {
 		PotionEffect cachedEffect = getEffect(level);
 		if (cachedEffect == null) return;
 
@@ -83,6 +84,7 @@ public class ModifierPotion extends Modifier {
 
 		return potionEffect;
 	}
+
 
 
 }

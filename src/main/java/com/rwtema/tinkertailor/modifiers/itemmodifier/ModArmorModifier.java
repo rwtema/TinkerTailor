@@ -7,6 +7,8 @@ import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,7 +18,7 @@ import tconstruct.library.modifier.ItemModifier;
 public class ModArmorModifier extends ItemModifier {
 
 	public final ItemValueMap[] recipe;
-	private final Modifier modifier;
+	public final Modifier modifier;
 	public int modifierStep = 1;
 	public int maxLevel = -1;
 	public int armorAllowMask = 0;
@@ -95,7 +97,7 @@ public class ModArmorModifier extends ItemModifier {
 			tags.setInteger(key, val);
 		}
 
-		if (curValue % modifierStep == 0 && useModifiers) {
+		if ((modifierStep <= 1 || curValue % modifierStep == 0) && useModifiers) {
 			int modifiers = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS);
 			modifiers -= 1;
 			tags.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, modifiers);
@@ -106,6 +108,7 @@ public class ModArmorModifier extends ItemModifier {
 		if (this.recipe.length == 0) {
 			return 0;
 		}
+
 		if (this.recipe.length == 1) {
 			ItemValueMap ItemValueMap = this.recipe[0];
 			int val = 0;
@@ -116,7 +119,31 @@ public class ModArmorModifier extends ItemModifier {
 			return val;
 		}
 
-		return 1;
+		int val = -1;
+
+		LinkedList<ItemStack> itemStacks = new LinkedList<ItemStack>();
+		Collections.addAll(itemStacks, recipe);
+
+		loop:
+		for (ItemValueMap itemValueMap : this.recipe) {
+			for (Iterator<ItemStack> iterator = itemStacks.iterator(); iterator.hasNext(); ) {
+				ItemStack itemStack = iterator.next();
+				int i = itemValueMap.get(itemStack);
+				if (i > 0) {
+					if (val == -1)
+						val = i;
+					else if (val != i)
+						return 0;
+
+					iterator.remove();
+					continue loop;
+				}
+			}
+
+			return 0;
+		}
+
+		return val;
 	}
 
 	public int getValue(ItemStack itemStack) {
