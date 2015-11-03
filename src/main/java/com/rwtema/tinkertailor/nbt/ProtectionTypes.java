@@ -2,6 +2,7 @@ package com.rwtema.tinkertailor.nbt;
 
 import com.google.common.collect.Lists;
 import com.rwtema.tinkertailor.modifiers.Modifier;
+import com.rwtema.tinkertailor.modifiers.ModifierProtection;
 import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import net.minecraft.init.Blocks;
@@ -99,6 +100,7 @@ public enum ProtectionTypes {
 	public final Object itemStack;
 	public final EnumChatFormatting color;
 	public final String name;
+	public ModifierProtection modifier;
 
 
 	ProtectionTypes(DamageSource damageSource, int factor, Object itemStack, EnumChatFormatting color) {
@@ -124,5 +126,9 @@ public enum ProtectionTypes {
 
 	public int modifierStep() {
 		return 16;
+	}
+
+	public ModifierProtection createModifier() {
+		return (modifier = new ModifierProtection(this));
 	}
 }

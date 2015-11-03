@@ -23,6 +23,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeSet;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
@@ -40,7 +41,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
+import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.oredict.OreDictionary;
 import tconstruct.library.TConstructRegistry;
@@ -117,7 +120,53 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 3);
 		stack.setTagCompound(tag);
 		stack.setStackDisplayName(defaultToolName(TConstructRegistry.toolMaterials.get(i)));
+
+		for (ModifierInstance modifierInstance : ModifierRegistry.bonusModifiers.get(i)) {
+			modifierInstance.applyToStack(infiTool);
+		}
+
 		return stack;
+	}
+
+	public ItemStack createFullModifiedStack(int i) {
+		return createFullModifiedStack(i, TinkersTailorConstants.RANDOM);
+	}
+
+	public ItemStack createFullModifiedStack(int i, Random random) {
+		ItemStack armor = createDefaultStack(i);
+		NBTTagCompound tag = armor.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
+		int modifiers = Math.max(tag.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS) , 1);
+
+		int malMod = 1 + random.nextInt(2);
+
+		for (int j = 0; j < malMod; j++) {
+			Modifier modifier;
+
+				modifier = CollectionHelper.getRandomElement(ModifierRegistry.negModifiers, random);
+
+			if (modifier == ModifierRegistry.wither) modifiers++;
+			if (modifier.maloderous == Modifier.MALODEROUS_WHENNEGATIVE) {
+				ModifierInstance.addModLevel(tag, modifier, -modifier.getModifierStep());
+			} else
+				ModifierInstance.addModLevel(tag, modifier, modifier.getModifierStep());
+		}
+
+		for (int j = 0; j < modifiers; j++) {
+			Modifier modifier = CollectionHelper.getRandomElement(ModifierRegistry.plusModifiers, random);
+			ModifierInstance.addModLevel(tag, modifier, modifier.getModifierStep());
+		}
+
+		tag.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 0);
+
+		return armor;
+	}
+
+	@Override
+	public WeightedRandomChestContent getChestGenBase(ChestGenHooks chest, Random rnd, WeightedRandomChestContent original) {
+		int mat = CollectionHelper.getRandomElement(TConstructRegistry.toolMaterials.keySet(), rnd);
+		ItemStack itemstack = createFullModifiedStack(mat, rnd);
+		return new WeightedRandomChestContent(itemstack, original.theMinimumChanceToGenerateItem,
+				original.theMaximumChanceToGenerateItem, original.itemWeight);
 	}
 
 	private String defaultToolName(tconstruct.library.tools.ToolMaterial material) {
@@ -288,7 +337,12 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public FontRenderer getFontRenderer(ItemStack stack) {
-		return CustomFontRenderer.instance;
+		try {
+			return CustomFontRenderer.instance;
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
+			throw Throwables.propagate(throwable);
+		}
 	}
 
 	@Override
@@ -320,7 +374,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
 		List<ModifierInstance> modifierInstances = Caches.tickers.get(itemStack);
 		for (ModifierInstance modifierInstance : modifierInstances) {
-			modifierInstance.modifier.onArmorTick(player, itemStack, armorType, modifierInstance.level);
+			modifierInstance.modifier.onArmorTick(world, player, itemStack, armorType, modifierInstance.level);
 		}
 		super.onArmorTick(world, player, itemStack);
 	}

@@ -2,6 +2,7 @@ package com.rwtema.tinkertailor;
 
 import com.rwtema.tinkertailor.blocks.BlockToolModifyStation;
 import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
+import com.rwtema.tinkertailor.compat.ModCompatibilityModule;
 import com.rwtema.tinkertailor.coremod.CoreTinkerTailor;
 import com.rwtema.tinkertailor.crafting.BlockArmorCast;
 import com.rwtema.tinkertailor.items.ArmorCore;
@@ -11,7 +12,7 @@ import com.rwtema.tinkertailor.items.ItemTailorsManual;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.Config;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
-import com.rwtema.tinkertailor.utils.ModCompatibilityModule;
+import com.rwtema.tinkertailor.utils.ItemHelper;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -34,6 +35,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -220,7 +222,7 @@ public class TinkersTailor {
 				int fluidAmount = (ItemArmorPattern.slotCost[meta] * TConstruct.ingotLiquidValue / 2);
 				ItemStack output = ArmorCore.armors[meta].createDefaultStack(liquidDamage[i]);
 				basinCasting.addCastingRecipe(output, new FluidStack(fs, fluidAmount), metalCast, 100);
-				Smeltery.addMelting(FluidType.getFluidType(fs), output, 0, fluidAmount);
+//				Smeltery.addMelting(FluidType.getFluidType(fs), output, 0, fluidAmount);
 			}
 
 			for (int mat = 0; mat < TinkersTailorConstants.NON_METALS.length; mat++) {
@@ -228,6 +230,7 @@ public class TinkersTailor {
 			}
 
 		}
+
 		for (int meta = 0; meta < 4; meta++) {
 			FluidStack alBrass = new FluidStack(TinkerSmeltery.moltenAlubrassFluid, TConstruct.blockLiquidValue);
 			ItemStack output = new ItemStack(armorCast, 1, meta);
