@@ -129,6 +129,6 @@ public enum ProtectionTypes {
 	}
 
 	public ModifierProtection createModifier() {
-		return (modifier = new ModifierProtection(this));
+		return (modifier = (ModifierProtection) new ModifierProtection(this).setNegativeMaloderous());
 	}
 }

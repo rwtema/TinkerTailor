@@ -98,7 +98,7 @@ public class DamageEventHandler {
 
 				for (ModifierInstance modifierInstance : Caches.modifiers.get(itemStack)) {
 					float bonusResistance = modifierInstance.modifier.getBonusResistance(event.entityLiving, event.source, event.ammount, itemStack, armorCore.armorType, modifierInstance.level);
-					bRR[armorCore.armorType] += bonusResistance;
+					bRR[armorCore.armorType] += Math.max(bonusResistance, 0);
 					bR += bonusResistance;
 				}
 			}
@@ -116,8 +116,13 @@ public class DamageEventHandler {
 
 		if (bR > 0) {
 			prevDamage = damage;
-			damage = damage * (1 - MathHelper.clamp_float(bR / 100F, 0, 0.8F));
+			damage = damage * (1 - Math.min(bR / 100F, 0.8F));
 			assignDamage(bR, bRR, damageToDistribute, damage, prevDamage);
+		} else if (bR < 0) {
+			prevDamage = damage;
+			float d2 = (damage * 9) / 10;
+			assignDamage(bR, bRR, damageToDistribute, d2, prevDamage);
+			damage = damage * (1 - bR / 100F);
 		}
 
 		if (bR == 0 && dR == 0) return;
