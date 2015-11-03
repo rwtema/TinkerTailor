@@ -21,6 +21,7 @@ import com.rwtema.tinkertailor.utils.Lang;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -135,14 +136,13 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	public ItemStack createFullModifiedStack(int i, Random random) {
 		ItemStack armor = createDefaultStack(i);
 		NBTTagCompound tag = armor.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
-		int modifiers = Math.max(tag.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS) , 1);
+		int modifiers = Math.max(tag.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS), 1);
 
 		int malMod = 1 + random.nextInt(2);
 
 		for (int j = 0; j < malMod; j++) {
 			Modifier modifier;
-
-				modifier = CollectionHelper.getRandomElement(ModifierRegistry.negModifiers, random);
+			modifier = getRandModifier(random, armor, ModifierRegistry.negModifiers);
 
 			if (modifier == ModifierRegistry.wither) modifiers++;
 			if (modifier.maloderous == Modifier.MALODEROUS_WHENNEGATIVE) {
@@ -152,13 +152,21 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		}
 
 		for (int j = 0; j < modifiers; j++) {
-			Modifier modifier = CollectionHelper.getRandomElement(ModifierRegistry.plusModifiers, random);
+			Modifier modifier = getRandModifier(random, armor, ModifierRegistry.plusModifiers);
 			ModifierInstance.addModLevel(tag, modifier, modifier.getModifierStep());
 		}
 
 		tag.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 0);
 
 		return armor;
+	}
+
+	private Modifier getRandModifier(Random random, ItemStack armor, Collection<Modifier> modifiers) {
+		Modifier modifier;
+		do {
+			modifier = CollectionHelper.getRandomElement(modifiers, random);
+		} while (!modifier.itemModifier.canApplyItemType(armor));
+		return modifier;
 	}
 
 	@Override

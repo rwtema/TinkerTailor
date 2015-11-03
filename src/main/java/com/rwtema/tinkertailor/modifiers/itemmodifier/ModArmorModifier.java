@@ -47,11 +47,7 @@ public class ModArmorModifier extends ItemModifier {
 	protected boolean canModify(ItemStack input, ItemStack[] recipe) {
 		if (input == null || !(input.getItem() instanceof ArmorCore)) return false;
 
-		if (armorAllowMask != 0) {
-			if (((1 << Caches.slot.get(input)) & armorAllowMask) != 0) {
-				return false;
-			}
-		}
+		if (!canApplyItemType(input)) return false;
 
 		NBTTagCompound tags = input.getTagCompound().getCompoundTag(getTagName(input));
 		int curValue = tags.getInteger(key);
@@ -73,6 +69,15 @@ public class ModArmorModifier extends ItemModifier {
 
 		if (modifierStep == 1 || curValue % modifierStep == 0) return false;
 		return curValue == 0 || ((curValue) / modifierStep) == ((curValue + val) / modifierStep);
+	}
+
+	public boolean canApplyItemType(ItemStack input) {
+		if (armorAllowMask != 0) {
+			if (((1 << Caches.slot.get(input)) & armorAllowMask) != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 
