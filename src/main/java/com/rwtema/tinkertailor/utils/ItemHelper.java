@@ -1,5 +1,6 @@
 package com.rwtema.tinkertailor.utils;
 
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.utils.oremapping.ItemValueMap;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import cpw.mods.fml.common.registry.GameData;
@@ -15,6 +16,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.oredict.OreDictionary;
 import tconstruct.library.tools.Weapon;
 import tconstruct.library.weaponry.ProjectileWeapon;
@@ -136,4 +139,26 @@ public class ItemHelper {
 		}
 		return a;
 	}
+
+
+	public static void addDungeonItem(ItemStack item, int min, int max, String category, double probability) {
+		int n = getWeightTotal(ChestGenHooks.getItems(category, TinkersTailorConstants.RANDOM));
+		int a = (int) Math.ceil(probability * n);
+		ChestGenHooks.addItem(category, new WeightedRandomChestContent(item, min, max, a));
+	}
+
+	public static int getWeightTotal(WeightedRandomChestContent[] items) {
+		if (items == null || items.length == 0) {
+			return 1;
+		}
+
+		int weight = 0;
+
+		for (WeightedRandomChestContent item : items) {
+			weight += item.itemWeight;
+		}
+
+		return weight;
+	}
+
 }
