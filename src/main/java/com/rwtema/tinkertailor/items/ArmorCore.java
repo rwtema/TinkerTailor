@@ -1,5 +1,7 @@
 package com.rwtema.tinkertailor.items;
 
+import cofh.api.energy.IEnergyContainerItem;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.TinkersTailor;
@@ -55,7 +57,7 @@ import thaumcraft.api.nodes.IRevealer;
 		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.IVisDiscountGear"),
 		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.nodes.IRevealer")
 })
-public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, IGoggles, IRevealer, IVisDiscountGear {
+public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, IGoggles, IRevealer, IVisDiscountGear, IEnergyContainerItem {
 
 	public static final ArmorProperties ZERO_ARMORP_ROPERTIES = new ArmorProperties(0, 0, 0);
 	public static final float[] ratings = new float[]{0.15F, 0.40F, 0.30F, 0.15F};
@@ -364,5 +366,29 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	@Optional.Method(modid = "Thaumcraft|API")
 	public int getVisDiscount(ItemStack itemstack, EntityPlayer player, Aspect aspect) {
 		return Caches.visBoost.get(itemstack);
+	}
+
+	@Override
+	@Optional.Method(modid = "CoFHAPI|energy")
+	public int receiveEnergy(ItemStack container, int maxReceive, boolean simulate) {
+		return 0;
+	}
+
+	@Override
+	@Optional.Method(modid = "CoFHAPI|energy")
+	public int extractEnergy(ItemStack container, int maxExtract, boolean simulate) {
+		return 0;
+	}
+
+	@Override
+	@Optional.Method(modid = "CoFHAPI|energy")
+	public int getEnergyStored(ItemStack container) {
+		return 0;
+	}
+
+	@Override
+	@Optional.Method(modid = "CoFHAPI|energy")
+	public int getMaxEnergyStored(ItemStack container) {
+		return 0;
 	}
 }

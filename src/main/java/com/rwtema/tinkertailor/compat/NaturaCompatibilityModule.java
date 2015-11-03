@@ -1,6 +1,6 @@
-package com.rwtema.tinkertailor.crafting;
+package com.rwtema.tinkertailor.compat;
 
-import com.rwtema.tinkertailor.utils.ModCompatibilityModule;
+import com.rwtema.tinkertailor.crafting.Ingredients;
 import mods.natura.common.NContent;
 
 @ModCompatibilityModule.InitialiseMe(requiredMods = "Natura")

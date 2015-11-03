@@ -11,6 +11,7 @@ import com.rwtema.tinkertailor.modifiers.ModifierPotion;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
+import com.rwtema.tinkertailor.utils.IntFunction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -123,6 +124,8 @@ public class Caches {
 				durability += modifierInstance.modifier.durabilityBoost(stack, modifierInstance.level);
 			}
 
+			if (durability <= 0) return 1;
+			if (durability > 32767) return 32767;
 			return durability;
 		}
 	};
@@ -207,4 +210,9 @@ public class Caches {
 			return modifier;
 		}
 	};
+
+	@SuppressWarnings("unchecked")
+	public static IntFunction<ItemStack> getMaxEnergy = IntFunction.zeroFunction;
+	@SuppressWarnings("unchecked")
+	public static IntFunction<ItemStack> getCurEnergy = IntFunction.zeroFunction;
 }

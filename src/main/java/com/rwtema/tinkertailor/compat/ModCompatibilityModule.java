@@ -1,7 +1,8 @@
-package com.rwtema.tinkertailor.utils;
+package com.rwtema.tinkertailor.compat;
 
 import com.google.common.base.Throwables;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModAPIManager;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import java.lang.annotation.ElementType;
@@ -25,7 +26,7 @@ public abstract class ModCompatibilityModule {
 			String requiredMods = (String) asmData.getAnnotationInfo().get("requiredMods");
 			if (Strings.isNotEmpty(requiredMods)) {
 				for (String mod : requiredMods.split(";")) {
-					if (!Loader.isModLoaded(mod))
+					if (!isModLoaded(mod))
 						continue loopClasses;
 				}
 			}
@@ -37,6 +38,10 @@ public abstract class ModCompatibilityModule {
 			}
 		}
 		return modCompatibilityModules;
+	}
+
+	public static boolean isModLoaded(String mod) {
+		return Loader.isModLoaded(mod) || ModAPIManager.INSTANCE.hasAPI(mod);
 	}
 
 	public void onCreated() {
