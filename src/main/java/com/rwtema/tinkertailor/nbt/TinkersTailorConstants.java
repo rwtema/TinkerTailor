@@ -41,4 +41,5 @@ public class TinkersTailorConstants {
 	public static final DecimalFormat formatTenDigits = new DecimalFormat("#.##########");
 
 
+	public static final int[] slotCost = new int[]{10, 16, 14, 8};
 }

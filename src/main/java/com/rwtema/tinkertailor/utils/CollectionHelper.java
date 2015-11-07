@@ -21,7 +21,7 @@ public class CollectionHelper {
 		if (collection.isEmpty()) throw new IllegalArgumentException("Collections " + collection + " is Empty");
 
 		if (collection instanceof RandomAccess) {
-			return ((List<T>) collection).get(rand.nextInt(collection.size()));
+			return getRandomElementList(((List<T>) collection), rand);
 		}
 
 		int i = rand.nextInt(collection.size());
@@ -32,5 +32,9 @@ public class CollectionHelper {
 		}
 
 		return result;
+	}
+
+	private static <T> T getRandomElementList(List<T> list, Random rand) {
+		return list.get(rand.nextInt(list.size()));
 	}
 }

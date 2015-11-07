@@ -84,10 +84,11 @@ public class ItemHelper {
 			if (o == null) continue;
 
 			if ((i + 1) < items.length && items[i + 1] instanceof Integer) {
-				if (items[i] instanceof Item)
+				if (items[i] instanceof Item) {
 					list.add(OreIntMap.newMap(new ItemStack((Item) o, 1, (Integer) items[i + 1])));
-				else if (items[i] instanceof Block)
+				}else if (items[i] instanceof Block) {
 					list.add(OreIntMap.newMap(new ItemStack((Block) o, 1, (Integer) items[i + 1])));
+				}
 				i++;
 			} else if (o instanceof ItemValueMap) {
 				list.add((ItemValueMap) o);
@@ -111,10 +112,11 @@ public class ItemHelper {
 		else if (obj instanceof String)
 			return getSingleStack(OreDictionary.getOres((String) obj, false));
 		else if (obj instanceof List)
-			return getSingleStack((List<ItemStack>) obj);
+			return getSingleStack((List) obj);
 		else if (obj instanceof ItemStack[])
 			return getSingleStack(Arrays.asList((ItemStack[]) obj));
-
+		else if (obj instanceof ItemValueMap)
+			return ((ItemValueMap) obj).makeItemStack();
 		return null;
 	}
 

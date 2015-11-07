@@ -1,6 +1,7 @@
 package com.rwtema.tinkertailor.items;
 
 import com.rwtema.tinkertailor.TinkersTailor;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import mantle.blocks.abstracts.MultiItemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
@@ -18,7 +19,7 @@ public class ItemArmorCast extends MultiItemBlock implements IPattern {
 
 	@Override
 	public int getPatternCost(ItemStack pattern) {
-		return ItemArmorPattern.slotCost[pattern.getItemDamage()];
+		return TinkersTailorConstants.slotCost[pattern.getItemDamage()];
 	}
 
 	@Override

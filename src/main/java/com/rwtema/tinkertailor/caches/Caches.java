@@ -11,7 +11,7 @@ import com.rwtema.tinkertailor.modifiers.ModifierPotion;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
 import com.rwtema.tinkertailor.render.textures.ArmorTextureManager;
-import com.rwtema.tinkertailor.utils.IntFunction;
+import com.rwtema.tinkertailor.utils.functions.IntFunction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

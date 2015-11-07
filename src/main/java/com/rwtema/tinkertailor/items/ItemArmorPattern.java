@@ -9,7 +9,6 @@ import tconstruct.library.crafting.PatternBuilder;
 import tconstruct.library.util.IPattern;
 
 public class ItemArmorPattern extends CraftingItem implements IPattern {
-	public static final int[] slotCost = new int[]{10, 16, 14, 8};
 	static String[] names = new String[]{"helmet", "chestplate", "leggings", "boots"};
 
 	public ItemArmorPattern() {
@@ -28,7 +27,7 @@ public class ItemArmorPattern extends CraftingItem implements IPattern {
 
 	@Override
 	public int getPatternCost(ItemStack pattern) {
-		return slotCost[pattern.getItemDamage()];
+		return TinkersTailorConstants.slotCost[pattern.getItemDamage()];
 	}
 
 	@Override

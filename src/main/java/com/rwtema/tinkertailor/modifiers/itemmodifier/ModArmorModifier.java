@@ -68,7 +68,7 @@ public class ModArmorModifier extends ItemModifier {
 		if (modifiers > 0) return true;
 
 		if (modifierStep == 1 || curValue % modifierStep == 0) return false;
-		return curValue == 0 || ((curValue) / modifierStep) == ((curValue + val) / modifierStep);
+		return curValue == 0 || ((curValue) / modifierStep) == ((curValue + val) / modifierStep) || ((curValue + val) % modifierStep == 0);
 	}
 
 	public boolean canApplyItemType(ItemStack input) {
@@ -127,7 +127,11 @@ public class ModArmorModifier extends ItemModifier {
 		int val = -1;
 
 		LinkedList<ItemStack> itemStacks = new LinkedList<ItemStack>();
-		Collections.addAll(itemStacks, recipe);
+		for (ItemStack itemStack : recipe) {
+			if (itemStack != null) itemStacks.add(itemStack);
+		}
+
+		if (itemStacks.isEmpty()) return 0;
 
 		loop:
 		for (ItemValueMap itemValueMap : this.recipe) {

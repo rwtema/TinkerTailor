@@ -3,11 +3,17 @@ package com.rwtema.tinkertailor;
 import com.rwtema.tinkertailor.caches.Caches;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
-import com.rwtema.tinkertailor.utils.ICallableClient;
+import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
+import com.rwtema.tinkertailor.utils.functions.ICallableClient;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
@@ -53,6 +59,7 @@ public class DamageEventHandler {
 		}
 	};
 	private static final float MIN_REDUCTION = 0.2F;
+	private static TIntArrayList orderedMaterials = null;
 
 	private static double getBaseDR(ToolMaterial material) {
 		double q = getRawQ(material);
@@ -69,6 +76,26 @@ public class DamageEventHandler {
 				- 0.0036839928 * durability
 				+ 0.5798563938 * material.harvestLevel()
 				+ 1.3925798111 * Math.log(durability);
+	}
+
+	public static TIntArrayList getOrderedMaterialList() {
+		if (orderedMaterials == null) {
+			TreeMap<Double, Integer> materialTreeMap = new TreeMap<Double, Integer>();
+			for (Map.Entry<Integer, ToolMaterial> integerToolMaterialEntry : TConstructRegistry.toolMaterials.entrySet()) {
+				double v = matDRcache.get(integerToolMaterialEntry.getKey());
+				materialTreeMap.put(v, integerToolMaterialEntry.getKey());
+			}
+
+			Collection<Integer> values = materialTreeMap.values();
+			orderedMaterials = new TIntArrayList();
+			orderedMaterials.addAll(values);
+		}
+		return orderedMaterials;
+	}
+
+	public static int getRandomMaterial(Random random) {
+		TIntArrayList orderedMaterials = getOrderedMaterialList();
+		return orderedMaterials.get((int) (random.nextFloat() * (1-random.nextFloat()) * random.nextFloat() * orderedMaterials.size()));
 	}
 
 	public void register() {
@@ -119,9 +146,6 @@ public class DamageEventHandler {
 			damage = damage * (1 - Math.min(bR / 100F, 0.8F));
 			assignDamage(bR, bRR, damageToDistribute, damage, prevDamage);
 		} else if (bR < 0) {
-			prevDamage = damage;
-			float d2 = (damage * 9) / 10;
-			assignDamage(bR, bRR, damageToDistribute, d2, prevDamage);
 			damage = damage * (1 - bR / 100F);
 		}
 
@@ -153,5 +177,9 @@ public class DamageEventHandler {
 		for (int i = 0; i < 4; i++) {
 			damageToDistribute[i] += r * dRR[i];
 		}
+	}
+
+	public static int getRandomMaterial() {
+		return getRandomMaterial(TinkersTailorConstants.RANDOM);
 	}
 }

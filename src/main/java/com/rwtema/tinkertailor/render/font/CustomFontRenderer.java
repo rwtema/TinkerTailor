@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 public class CustomFontRenderer extends FontRenderer {
 
-	public static final CustomFontRenderer instance = new CustomFontRenderer();
+	public static CustomFontRenderer instance;
 	public HashMap<Character, ICharRenderer> renderOverrides = new HashMap<Character, ICharRenderer>();
 	public boolean dropShadow;
 	private float r;

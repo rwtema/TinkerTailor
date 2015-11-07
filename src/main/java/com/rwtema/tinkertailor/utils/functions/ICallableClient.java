@@ -1,4 +1,4 @@
-package com.rwtema.tinkertailor.utils;
+package com.rwtema.tinkertailor.utils.functions;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

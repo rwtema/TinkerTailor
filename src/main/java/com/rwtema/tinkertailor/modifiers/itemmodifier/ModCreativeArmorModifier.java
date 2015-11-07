@@ -14,7 +14,19 @@ public class ModCreativeArmorModifier extends ItemModifier {
 
 	@Override
 	protected boolean canModify(ItemStack tool, ItemStack[] input) {
-		return tool.getItem() instanceof ArmorCore;
+		if (!(tool.getItem() instanceof ArmorCore)) return false;
+
+		for (ItemStack stack : input) {
+			if (stack != null && stack.hasTagCompound()) {
+				String name = TinkersTailorConstants.NAMES[((ArmorCore) tool.getItem()).armorType];
+
+				String targetLock = stack.getTagCompound().getString("TargetLock");
+				if (!targetLock.equals("") && !targetLock.equals(name))
+					return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override

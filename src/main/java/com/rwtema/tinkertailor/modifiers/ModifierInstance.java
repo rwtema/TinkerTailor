@@ -44,6 +44,10 @@ public final class ModifierInstance implements Comparable<ModifierInstance> {
 		addModLevel(tag, modifier, level);
 	}
 
+	public static void addModLevel(ItemStack stack, Modifier modifier, int level) {
+		addModLevel(stack.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG), modifier, level);
+	}
+
 	public static void addModLevel(NBTTagCompound tag, Modifier modifier, int level) {
 		int i = Math.min(tag.getInteger(modifier.name) + level, modifier.maxLevel);
 		tag.setInteger(modifier.name, i);

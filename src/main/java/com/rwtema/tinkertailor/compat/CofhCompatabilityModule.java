@@ -7,7 +7,7 @@ import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.modifiers.ModifierSimple;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
-import com.rwtema.tinkertailor.utils.IntFunction;
+import com.rwtema.tinkertailor.utils.functions.IntFunction;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -78,8 +78,7 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 		}
 
 		@Override
-		protected boolean canModify(ItemStack input, ItemStack[] recipe) {
-
+		public boolean matches(ItemStack[] recipe, ItemStack input) {
 			NBTTagCompound tags = input.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
 
 			ItemStack foundBattery = getBattery(recipe);
@@ -148,8 +147,7 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 			ItemStack subject42 = inputBattery.copy();
 			int progress = 0, change = 1; // prevent endless loops with creative battery, blah
 			// fill the battery full
-			while (progress < maxCharge && change > 0)
-			{
+			while (progress < maxCharge && change > 0) {
 				change = energyContainer.receiveEnergy(subject42, 100000, false);
 				progress += change;
 			}
@@ -161,8 +159,7 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 			// completely empty the battery
 			progress = 0;
 			change = 1;
-			while (progress < maxCharge && change > 0)
-			{
+			while (progress < maxCharge && change > 0) {
 				change = energyContainer.extractEnergy(subject42, 100000, false);
 				progress += change;
 			}

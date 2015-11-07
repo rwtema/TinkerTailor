@@ -9,10 +9,12 @@ import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.items.ItemArmorCast;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
 import com.rwtema.tinkertailor.items.ItemTailorsManual;
+import com.rwtema.tinkertailor.modifiers.BonusModifiers;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.nbt.Config;
 import com.rwtema.tinkertailor.nbt.TinkersTailorConstants;
-import com.rwtema.tinkertailor.utils.ItemHelper;
+import com.rwtema.tinkertailor.render.font.CustomFontRenderer;
+import com.rwtema.tinkertailor.utils.functions.ICallableClient;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -35,7 +37,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -157,10 +158,10 @@ public class TinkersTailor {
 			modCompatibilityModule.onCreated();
 		}
 
-
 		proxy.initSided();
 
 		DamageEventHandler.instance.register();
+//		MinecraftForge.EVENT_BUS.register(new SpawnHandler());
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
@@ -199,6 +200,14 @@ public class TinkersTailor {
 			modCompatibilityModule.initStart();
 		}
 
+		proxy.run(new ICallableClient() {
+			@Override
+			@SideOnly(Side.CLIENT)
+			public void run() {
+				CustomFontRenderer.instance = new CustomFontRenderer();
+			}
+		});
+
 		ModifierRegistry.init();
 		PatternBuilder.instance.addToolPattern(armorPattern);
 
@@ -219,7 +228,7 @@ public class TinkersTailor {
 
 			for (int i = 0; i < TinkerSmeltery.liquids.length; i++) {
 				Fluid fs = TinkerSmeltery.liquids[i].getFluid();
-				int fluidAmount = (ItemArmorPattern.slotCost[meta] * TConstruct.ingotLiquidValue / 2);
+				int fluidAmount = (TinkersTailorConstants.slotCost[meta] * TConstruct.ingotLiquidValue / 2);
 				ItemStack output = ArmorCore.armors[meta].createDefaultStack(liquidDamage[i]);
 				basinCasting.addCastingRecipe(output, new FluidStack(fs, fluidAmount), metalCast, 100);
 //				Smeltery.addMelting(FluidType.getFluidType(fs), output, 0, fluidAmount);
@@ -268,6 +277,7 @@ public class TinkersTailor {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		BonusModifiers.init();
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.postInit();
 		}
@@ -276,13 +286,13 @@ public class TinkersTailor {
 
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
-		double dungeonProbability = Config.DungeonProbability.get();
-		if (dungeonProbability > 1e-5) {
-			ItemHelper.addDungeonItem(new ItemStack(hat), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
-			ItemHelper.addDungeonItem(new ItemStack(shirt), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
-			ItemHelper.addDungeonItem(new ItemStack(trousers), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
-			ItemHelper.addDungeonItem(new ItemStack(shoes), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
-		}
+//		double dungeonProbability = Config.DungeonProbability.get();
+//		if (dungeonProbability > 1e-5) {
+//			ItemHelper.addDungeonItem(new ItemStack(hat), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+//			ItemHelper.addDungeonItem(new ItemStack(shirt), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+//			ItemHelper.addDungeonItem(new ItemStack(trousers), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+//			ItemHelper.addDungeonItem(new ItemStack(shoes), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
+//		}
 
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.loadComplete();

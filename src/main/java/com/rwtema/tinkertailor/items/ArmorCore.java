@@ -4,8 +4,10 @@ import cofh.api.energy.IEnergyContainerItem;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
+import com.rwtema.tinkertailor.DamageEventHandler;
 import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.caches.Caches;
+import com.rwtema.tinkertailor.modifiers.BonusModifiers;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
@@ -56,7 +58,6 @@ import thaumcraft.api.nodes.IRevealer;
 
 @Optional.InterfaceList({
 		@Optional.Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyContainerItem"),
-		@Optional.Interface(modid = "CoFHCore", iface = "cofh.core.item.IEqualityOverrideItem"),
 		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.IGoggles"),
 		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.IVisDiscountGear"),
 		@Optional.Interface(modid = "Thaumcraft|API", iface = "thaumcraft.api.nodes.IRevealer")
@@ -118,7 +119,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		NBTTagCompound infiTool = new NBTTagCompound();
 		tag.setTag(TinkersTailorConstants.NBT_MAINTAG, infiTool);
 		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MATERIAL, i);
-		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 3);
+		infiTool.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, BonusModifiers.getBonusModifiers(i, armorType));
 		stack.setTagCompound(tag);
 		stack.setStackDisplayName(defaultToolName(TConstructRegistry.toolMaterials.get(i)));
 
@@ -136,29 +137,33 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	public ItemStack createFullModifiedStack(int i, Random random) {
 		ItemStack armor = createDefaultStack(i);
 		NBTTagCompound tag = armor.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
-		int modifiers = Math.max(tag.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS), 1);
+		int modifiers = Math.max(tag.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS) - 1, 1);
 
-		int malMod = 1 + random.nextInt(2);
+		int malMod = random.nextInt(1) + random.nextInt(1);
 
-		for (int j = 0; j < malMod; j++) {
+		addRandomModifiers(armor, modifiers, malMod, random);
+
+		return armor;
+	}
+
+	public void addRandomModifiers(ItemStack armor, int numPlusMod, int numNegMod, Random random) {
+		NBTTagCompound tag = armor.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
+		for (int j = 0; j < numNegMod; j++) {
 			Modifier modifier;
 			modifier = getRandModifier(random, armor, ModifierRegistry.negModifiers);
 
-			if (modifier == ModifierRegistry.wither) modifiers++;
 			if (modifier.maloderous == Modifier.MALODEROUS_WHENNEGATIVE) {
 				ModifierInstance.addModLevel(tag, modifier, -modifier.getModifierStep());
 			} else
 				ModifierInstance.addModLevel(tag, modifier, modifier.getModifierStep());
 		}
 
-		for (int j = 0; j < modifiers; j++) {
+		for (int j = 0; j < numPlusMod; j++) {
 			Modifier modifier = getRandModifier(random, armor, ModifierRegistry.plusModifiers);
 			ModifierInstance.addModLevel(tag, modifier, modifier.getModifierStep());
 		}
 
 		tag.setInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS, 0);
-
-		return armor;
 	}
 
 	private Modifier getRandModifier(Random random, ItemStack armor, Collection<Modifier> modifiers) {
@@ -171,7 +176,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 
 	@Override
 	public WeightedRandomChestContent getChestGenBase(ChestGenHooks chest, Random rnd, WeightedRandomChestContent original) {
-		int mat = CollectionHelper.getRandomElement(TConstructRegistry.toolMaterials.keySet(), rnd);
+		int mat = DamageEventHandler.getRandomMaterial(rnd);
 		ItemStack itemstack = createFullModifiedStack(mat, rnd);
 		return new WeightedRandomChestContent(itemstack, original.theMinimumChanceToGenerateItem,
 				original.theMaximumChanceToGenerateItem, original.itemWeight);

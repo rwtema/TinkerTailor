@@ -1,8 +1,8 @@
 package com.rwtema.tinkertailor;
 
-import com.rwtema.tinkertailor.utils.ICallableClient;
-import com.rwtema.tinkertailor.utils.ISidedCallable;
-import com.rwtema.tinkertailor.utils.ISidedFunction;
+import com.rwtema.tinkertailor.utils.functions.ICallableClient;
+import com.rwtema.tinkertailor.utils.functions.ISidedCallable;
+import com.rwtema.tinkertailor.utils.functions.ISidedFunction;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import java.util.List;

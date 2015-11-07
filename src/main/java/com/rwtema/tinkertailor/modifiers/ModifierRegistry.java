@@ -62,6 +62,7 @@ public class ModifierRegistry {
 
 			@Override
 			public int get(ItemStack itemStack) {
+				if(itemStack == null) return 0;
 				Item item = itemStack.getItem();
 				if (!(item instanceof IHealthAccessory))
 					return 0;
@@ -87,7 +88,7 @@ public class ModifierRegistry {
 			public ItemStack makeItemStack() {
 				return new ItemStack(TinkerArmor.heartCanister, 1, 2);
 			}
-		}, Ingredients.netherBerry, Ingredients.netherBerryMetaHealing)).setNegativeMaloderous());
+		})).setNegativeMaloderous());
 
 		registerModifier(new ModifierPotion("digspeed", 3, Potion.digSpeed, ItemHelper.makeOreIntArray("dustGlowstone", "dustRedstone")).setAllowedArmorTypes(Modifier.ARMORTYPE_SHIRT_ONLY));
 

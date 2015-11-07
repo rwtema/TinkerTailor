@@ -34,5 +34,5 @@ public class Config {
 	public final static ConfigKey<Boolean> SoftMetal = new ConfigKey<Boolean>("SoftMetalPartsCrafting", "Enable 'simple' iron/copper tool parts being buildable in the part builder.", true);
 	public final static ConfigKey<Boolean> WeaponInvis = new ConfigKey<Boolean>("WeaponOverridesInvis", "Holding a weapon or bow cancels armor invisibility on other players.", false).setReConfiguarable();
 	public final static ConfigKey<Boolean> DisableAdvancedCache = new ConfigKey<Boolean>(TinkersTailorConstants.CONFIG_ADVANCED_CATEGORY, "DisableAdvancedCaching", "Disables advanced caching of item properties (decreases performance)", false);
-	public static ConfigKey<Double> DungeonProbability = new ConfigKey<Double>("DungeonChestProbability", "Probability of an armor appearing in a dungeon chest", 0.05D);
+//	public static ConfigKey<Double> DungeonProbability = new ConfigKey<Double>("DungeonChestProbability", "Probability of an armor appearing in a dungeon chest", 0.05D);
 }
