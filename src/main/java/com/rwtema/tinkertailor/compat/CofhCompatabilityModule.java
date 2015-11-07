@@ -76,10 +76,8 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 
 		@Override
 		public int reduceArmorDamage(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int originalDamage, int slot, int level) {
-			int energyStored = ArmorCore.armors[slot].getEnergyStored(stack);
-
-
-			return 0;
+			damage -= ArmorCore.armors[slot].extractEnergy(stack, damage * 100, true) / 100;
+			return damage;
 		}
 	}
 
