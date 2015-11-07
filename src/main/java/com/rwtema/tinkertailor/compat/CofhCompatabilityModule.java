@@ -2,6 +2,7 @@ package com.rwtema.tinkertailor.compat;
 
 import cofh.api.energy.IEnergyContainerItem;
 import com.rwtema.tinkertailor.caches.Caches;
+import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
 import com.rwtema.tinkertailor.modifiers.ModifierSimple;
@@ -11,10 +12,12 @@ import com.rwtema.tinkertailor.utils.functions.IntFunction;
 import com.rwtema.tinkertailor.utils.oremapping.OreIntMap;
 import java.util.List;
 import javax.annotation.Nonnull;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
 import tconstruct.library.modifier.IModifyable;
 import tconstruct.tools.TinkerTools;
 import tconstruct.util.config.PHConstruct;
@@ -57,7 +60,8 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 
 		@Override
 		public void addInfo(List<String> list, EntityPlayer player, ItemStack item, int slot, int level) {
-			list.add(getColorString() + getLocalizedName() + resetColorString());
+			ArmorCore armor = ArmorCore.armors[slot];
+			list.add(getColorString() + getLocalizedName() + ": (" + armor.getEnergyStored(item) + " / " + armor.getMaxEnergyStored(item) + ")" + resetColorString());
 		}
 
 		@Override
@@ -68,6 +72,14 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 		@Override
 		public boolean allowRandom() {
 			return false;
+		}
+
+		@Override
+		public int reduceArmorDamage(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage, int originalDamage, int slot, int level) {
+			int energyStored = ArmorCore.armors[slot].getEnergyStored(stack);
+
+
+			return 0;
 		}
 	}
 
@@ -91,7 +103,7 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 
 			if (maxEnergyStored <= 0) return false;
 
-			if (PHConstruct.balancedFluxModifier && Caches.maxDurability.get(input) < maxEnergyStored / 1000)
+			if (PHConstruct.balancedFluxModifier && Caches.maxDurability.get(input.copy()) < maxEnergyStored / 1000)
 				return false;
 
 			int curEnergyMax = tags.getInteger("EnergyMax");
@@ -121,7 +133,8 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 
 		@Override
 		public void modify(ItemStack[] recipe, ItemStack input) {
-			NBTTagCompound tags = input.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
+			NBTTagCompound mainTags = input.getTagCompound();
+			NBTTagCompound tags = mainTags.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
 
 			if (tags.getInteger("EnergyMax") == 0) {
 				int modifiers = tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MODIFIERS);
@@ -166,11 +179,13 @@ public class CofhCompatabilityModule extends ModCompatibilityModule {
 			int maxReceive = energyContainer.receiveEnergy(subject42, Integer.MAX_VALUE, true);
 
 			charge = Math.min(charge, maxCharge);
+			tags.setInteger(key, 1);
 
-			tags.setInteger("Energy", charge);
-			tags.setInteger("EnergyMax", maxCharge);
-			tags.setInteger("EnergyExtractionRate", maxExtract);
-			tags.setInteger("EnergyReceiveRate", maxReceive);
+			mainTags.setInteger("Energy", charge);
+			mainTags.setInteger("EnergyMax", maxCharge);
+			mainTags.setInteger("EnergyExtractionRate", maxExtract);
+			mainTags.setInteger("EnergyReceiveRate", maxReceive);
+
 		}
 
 		public void addMatchingEffect(ItemStack tool) {

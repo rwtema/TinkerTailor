@@ -438,24 +438,60 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	@Override
 	@Optional.Method(modid = "CoFHAPI|energy")
 	public int receiveEnergy(ItemStack container, int maxReceive, boolean simulate) {
-		return 0;
+		NBTTagCompound tags = container.getTagCompound();
+		if (tags == null || !tags.hasKey("Energy"))
+			return 0;
+		int energy = tags.getInteger("Energy");
+		int energyReceived = tags.getInteger("EnergyReceiveRate");
+		int maxEnergy = tags.getInteger("EnergyMax");
+
+		// calculate how much we can receive
+		energyReceived = Math.min(maxEnergy - energy, Math.min(energyReceived, maxReceive));
+		if (!simulate) {
+			energy += energyReceived;
+			tags.setInteger("Energy", energy);
+			//container.setItemDamage(1 + (getMaxEnergyStored(container) - energy) * (container.getMaxDamage() - 2) / getMaxEnergyStored(container));
+		}
+		return energyReceived;
 	}
 
 	@Override
 	@Optional.Method(modid = "CoFHAPI|energy")
 	public int extractEnergy(ItemStack container, int maxExtract, boolean simulate) {
-		return 0;
+		NBTTagCompound tags = container.getTagCompound();
+		if (tags == null || !tags.hasKey("Energy")) {
+			return 0;
+		}
+		int energy = tags.getInteger("Energy");
+		int energyExtracted = tags.getInteger("EnergyExtractionRate");
+
+		// calculate how much we can extract
+		energyExtracted = Math.min(energy, Math.min(energyExtracted, maxExtract));
+		if (!simulate) {
+			energy -= energyExtracted;
+			tags.setInteger("Energy", energy);
+		}
+		return energyExtracted;
 	}
 
 	@Override
 	@Optional.Method(modid = "CoFHAPI|energy")
 	public int getEnergyStored(ItemStack container) {
-		return 0;
+		NBTTagCompound tags = container.getTagCompound();
+		if (tags == null || !tags.hasKey("Energy")) {
+			return 0;
+		}
+		return tags.getInteger("Energy");
 	}
 
 	@Override
 	@Optional.Method(modid = "CoFHAPI|energy")
 	public int getMaxEnergyStored(ItemStack container) {
-		return 0;
+		NBTTagCompound tags = container.getTagCompound();
+		if (tags == null || !tags.hasKey("Energy"))
+			return 0;
+
+		return tags.getInteger("EnergyMax");
 	}
+
 }
