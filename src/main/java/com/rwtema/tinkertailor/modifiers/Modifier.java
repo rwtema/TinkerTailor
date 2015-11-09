@@ -2,7 +2,7 @@ package com.rwtema.tinkertailor.modifiers;
 
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.TinkersTailor;
-import com.rwtema.tinkertailor.caches.WeakCache;
+import com.rwtema.tinkertailor.caches.base.WeakCache;
 import com.rwtema.tinkertailor.compat.ModCompatibilityModule;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;

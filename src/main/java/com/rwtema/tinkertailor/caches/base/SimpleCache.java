@@ -1,4 +1,4 @@
-package com.rwtema.tinkertailor.caches;
+package com.rwtema.tinkertailor.caches.base;
 
 import java.util.HashMap;
 import javax.annotation.Nonnull;
@@ -11,8 +11,6 @@ public abstract class SimpleCache<K, V> {
 		V v = map.get(key);
 		if (v == null) {
 			v = calc(key);
-			//noinspection ConstantConditions
-			if (v == null) throw new NullPointerException();
 			map.put(key, v);
 		}
 		return v;

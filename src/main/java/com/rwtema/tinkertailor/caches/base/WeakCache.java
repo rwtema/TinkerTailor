@@ -1,4 +1,4 @@
-package com.rwtema.tinkertailor.caches;
+package com.rwtema.tinkertailor.caches.base;
 
 import com.google.common.base.Throwables;
 import com.rwtema.tinkertailor.nbt.Config;
@@ -9,18 +9,17 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class CacheBase<K, V, S> {
+public abstract class WeakCache<K, V> {
 	private static final boolean disableCache = Config.DisableAdvancedCache.get();
 	private static final int OVERFULL_THRESHOLD = 10000;
-	protected final HashMap<WeakReference<K>, S> map = createMap();
-	private final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
-	private final Lookup lookup = new Lookup();
+	final HashMap<Object, V> map = createMap();
+	final ReferenceQueue<K> refQueue = new ReferenceQueue<K>();
+	final LookupReference lookup = new LookupReference();
 
-	protected HashMap<WeakReference<K>, S> createMap() {
-		return new HashMap<WeakReference<K>, S>(16, 0.5F);
+	HashMap<Object, V> createMap() {
+		return new HashMap<Object, V>(16, 0.5F);
 	}
 
-	@SuppressWarnings("SuspiciousMethodCalls")
 	public synchronized V get(@Nullable final K key) {
 		if (disableCache) return key == null ? getNullValue() : calc(key);
 
@@ -36,28 +35,20 @@ public abstract class CacheBase<K, V, S> {
 
 		try {
 			lookup.set(key, hashCode);
-			v = retrieve(map.get(lookup));
-			lookup.ref = null;
+			v = map.get(lookup);
+			lookup.key = null;
 		} catch (Throwable err) {
-			lookup.ref = null;
+			lookup.key = null;
 			throw Throwables.propagate(err);
 		}
 
 		if (v == null) {
-			v = insertCacheEntry(key, hashCode);
+			v = calc(key);
+			map.put(new WeakIdentityRef(key, hashCode), v);
 		}
 
 		return v;
 	}
-
-	protected abstract V insertCacheEntry(@Nonnull K key, int hashCode);
-
-	protected WeakIdentityRef createWeakKey(@Nonnull K key, int hashCode) {
-		return new WeakIdentityRef(key, hashCode);
-	}
-
-	@Nullable
-	protected abstract V retrieve(@Nullable S valueStorage);
 
 	@Nonnull
 	protected abstract V calc(@Nonnull K key);
@@ -66,15 +57,14 @@ public abstract class CacheBase<K, V, S> {
 		throw new NullPointerException();
 	}
 
-	@SuppressWarnings("SuspiciousMethodCalls")
-	protected void expungeStaleEntries() {
+	void expungeStaleEntries() {
 		Reference ref;
 		while ((ref = refQueue.poll()) != null) {
 			map.remove(ref);
 		}
 	}
 
-	protected final class WeakIdentityRef extends WeakReference<K> {
+	final class WeakIdentityRef extends WeakReference<K> {
 		private final int hashCode;
 
 		public WeakIdentityRef(@Nonnull K referent, int hashCode) {
@@ -92,40 +82,43 @@ public abstract class CacheBase<K, V, S> {
 		public boolean equals(Object other) {
 			if (this == other) return true;
 
-			Object value = get();
-			if (value == null) return false;
+			if (other.getClass() != WeakIdentityRef.class) return false;
 
-			if (other == lookup) {
-				return lookup.ref == value;
-			}
-
-			if (other.getClass() != WeakIdentityRef.class) {
-				return false;
-			}
 			WeakIdentityRef wr = (WeakIdentityRef) other;
 
-			return value == wr.get();
+			return hashCode == wr.hashCode && get() == wr.get();
+		}
+
+
+		@Override
+		public String toString() {
+			return "WeakKey{" + get() + ", " + hashCode + "}";
 		}
 	}
 
-	private final class Lookup {
-		K ref;
-		int hash;
+	final class LookupReference {
+		K key;
+		int hashCode;
 
 		public void set(@Nonnull K ref, int hashCode) {
-			this.ref = ref;
-			this.hash = hashCode;
+			this.key = ref;
+			this.hashCode = hashCode;
 		}
 
+		@SuppressWarnings({"unchecked", "EqualsWhichDoesntCheckParameterClass"})
 		@Override
 		public boolean equals(Object obj) {
-			return obj.getClass() == WeakIdentityRef.class && obj.equals(this);
+			return ((WeakIdentityRef) obj).get() == key;
 		}
 
 		@Override
 		public int hashCode() {
-			return hash;
+			return hashCode;
+		}
+
+		@Override
+		public String toString() {
+			return "Lookup{" + key + ", " + hashCode + "}";
 		}
 	}
-
 }
