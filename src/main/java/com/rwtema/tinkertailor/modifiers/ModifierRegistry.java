@@ -16,6 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.init.Blocks;
@@ -27,8 +28,10 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import tconstruct.armor.TinkerArmor;
+import tconstruct.library.TConstructRegistry;
 import tconstruct.library.accessory.IHealthAccessory;
 import tconstruct.library.crafting.ModifyBuilder;
+import tconstruct.library.tools.ToolMaterial;
 import tconstruct.tools.TinkerTools;
 import tconstruct.world.TinkerWorld;
 
@@ -62,7 +65,7 @@ public class ModifierRegistry {
 
 			@Override
 			public int get(ItemStack itemStack) {
-				if(itemStack == null) return 0;
+				if (itemStack == null) return 0;
 				Item item = itemStack.getItem();
 				if (!(item instanceof IHealthAccessory))
 					return 0;
@@ -204,4 +207,24 @@ public class ModifierRegistry {
 	public static List<Modifier> negModifiers = new ArrayList<Modifier>();
 
 	public static Multimap<Integer, ModifierInstance> bonusModifiers = HashMultimap.create();
+
+	public static Map<ToolMaterial, Integer> reverseMap = new HashMap<ToolMaterial, Integer>() {
+
+		@Override
+		public Integer get(Object key) {
+			if(key == null) return -1;
+			Integer integer = super.get(key);
+			if (integer == null) {
+				for (Map.Entry<Integer, ToolMaterial> entry : TConstructRegistry.toolMaterials.entrySet()) {
+					put(entry.getValue(), entry.getKey());
+				}
+
+				integer = super.get(key);
+
+				if (integer == null) return -1;
+			}
+
+			return integer;
+		}
+	};
 }
