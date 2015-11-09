@@ -5,6 +5,8 @@ import com.rwtema.tinkertailor.blocks.TileEntityToolModifyStation;
 import com.rwtema.tinkertailor.compat.ModCompatibilityModule;
 import com.rwtema.tinkertailor.coremod.CoreTinkerTailor;
 import com.rwtema.tinkertailor.crafting.BlockArmorCast;
+import com.rwtema.tinkertailor.imc.IMCHandler;
+import com.rwtema.tinkertailor.imc.IMCNBTLoader;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.items.ItemArmorCast;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
@@ -19,6 +21,7 @@ import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -273,6 +276,10 @@ public class TinkersTailor {
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.initEnd();
 		}
+
+		if(deobf_folder){
+			IMCNBTLoader.sendTest();
+		}
 	}
 
 	@Mod.EventHandler
@@ -283,6 +290,10 @@ public class TinkersTailor {
 		}
 	}
 
+	@Mod.EventHandler
+	public void handleIMC(FMLInterModComms.IMCEvent e) {
+		IMCHandler.processIMC(e.getMessages(), false);
+	}
 
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event) {
@@ -293,6 +304,8 @@ public class TinkersTailor {
 //			ItemHelper.addDungeonItem(new ItemStack(trousers), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
 //			ItemHelper.addDungeonItem(new ItemStack(shoes), 1, 1, ChestGenHooks.DUNGEON_CHEST, dungeonProbability / 4);
 //		}
+
+		IMCHandler.processIMC(FMLInterModComms.fetchRuntimeMessages(this), true);
 
 		for (ModCompatibilityModule modCompatibilityModule : modCompatabilities) {
 			modCompatibilityModule.loadComplete();
