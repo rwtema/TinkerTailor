@@ -20,38 +20,46 @@ public abstract class WeakCache<K, V> {
 		return new HashMap<Object, V>(16, 0.5F);
 	}
 
-	public synchronized V get(@Nullable final K key) {
+	public V get(@Nullable final K key) {
 		if (disableCache) return key == null ? getNullValue() : calc(key);
 
-		expungeStaleEntries();
-		if (map.size() >= OVERFULL_THRESHOLD) {
-			map.clear();
+		synchronized (map) {
+			expungeStaleEntries();
+			if (map.size() >= OVERFULL_THRESHOLD) {
+				map.clear();
+			}
+
+			if (key == null) return getNullValue();
+
+			V v;
+			int hashCode = System.identityHashCode(key);
+
+			try {
+				lookup.set(key, hashCode);
+				v = map.get(lookup);
+				lookup.key = null;
+			} catch (Throwable err) {
+				lookup.key = null;
+				throw Throwables.propagate(err);
+			}
+
+			if (v == null) {
+				v = calc(key);
+				map.put(new WeakIdentityRef(key, hashCode), v);
+			}
+
+			return v;
 		}
-
-		if (key == null) return getNullValue();
-
-		V v;
-		int hashCode = System.identityHashCode(key);
-
-		try {
-			lookup.set(key, hashCode);
-			v = map.get(lookup);
-			lookup.key = null;
-		} catch (Throwable err) {
-			lookup.key = null;
-			throw Throwables.propagate(err);
-		}
-
-		if (v == null) {
-			v = calc(key);
-			map.put(new WeakIdentityRef(key, hashCode), v);
-		}
-
-		return v;
 	}
 
 	@Nonnull
 	protected abstract V calc(@Nonnull K key);
+
+	void clear(K key){
+		synchronized (map) {
+			map.remove(key);
+		}
+	}
 
 	protected V getNullValue() {
 		throw new NullPointerException();

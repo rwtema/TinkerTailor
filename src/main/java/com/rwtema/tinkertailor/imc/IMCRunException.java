@@ -1,6 +1,6 @@
 package com.rwtema.tinkertailor.imc;
 
-public class IMCRunException extends RuntimeException {
+public class IMCRunException extends Throwable {
 	public IMCRunException() {
 		super();
 	}

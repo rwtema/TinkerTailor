@@ -43,6 +43,7 @@ public class ModifierRegistry {
 	public static Modifier energy;
 	public static Modifier prickly;
 	public static Modifier wither;
+	public static Modifier thorns;
 
 	public static void init() {
 		ModifyBuilder.registerModifier(new ModArmorRepair());
@@ -184,6 +185,10 @@ public class ModifierRegistry {
 				"blockEmerald", 9
 		)));
 
+		thorns = new ModifierSimple("spikes", 3, ItemHelper.makeOreIntArray(Blocks.cactus)){
+
+		};
+
 
 		ModifyBuilder.registerModifier(new ModCreativeArmorModifier(new ItemStack[]{new ItemStack(TinkerTools.creativeModifier)}));
 		ModifyBuilder.registerModifier(new ModInducedExtraModifier());
@@ -212,7 +217,7 @@ public class ModifierRegistry {
 
 		@Override
 		public Integer get(Object key) {
-			if(key == null) return -1;
+			if (key == null) return -1;
 			Integer integer = super.get(key);
 			if (integer == null) {
 				for (Map.Entry<Integer, ToolMaterial> entry : TConstructRegistry.toolMaterials.entrySet()) {

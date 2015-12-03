@@ -9,7 +9,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
@@ -24,19 +23,7 @@ import tconstruct.library.tools.ToolMaterial;
 public class DamageEventHandler {
 
 	public static final DamageEventHandler instance = new DamageEventHandler();
-	@SuppressWarnings("ExternalizableWithoutPublicNoArgConstructor")
-	public static final TObjectDoubleHashMap<ToolMaterial> materialDR = new TObjectDoubleHashMap<ToolMaterial>(10, 0.5F, -1) {
-		@Override
-		public double get(Object key) {
-			double v = super.get(key);
-			if (v == -1) {
-				v = getBaseDR((ToolMaterial) key);
-				put((ToolMaterial) key, v);
-			}
 
-			return v;
-		}
-	};
 	@SuppressWarnings("ExternalizableWithoutPublicNoArgConstructor")
 	public static final TIntDoubleHashMap matDRcache = new TIntDoubleHashMap() {
 		@Override
@@ -51,14 +38,13 @@ public class DamageEventHandler {
 				i = 0;
 				ToolMaterial toolMaterial = TConstructRegistry.toolMaterials.get(key);
 				if (toolMaterial != null) {
-					i = materialDR.get(toolMaterial);
+					i = getBaseDR(toolMaterial);
 				}
 				put(key, i);
 			}
 			return i;
 		}
 	};
-	private static final float MIN_REDUCTION = 0.2F;
 	private static TIntArrayList orderedMaterials = null;
 
 	private static double getBaseDR(ToolMaterial material) {
@@ -95,7 +81,7 @@ public class DamageEventHandler {
 
 	public static int getRandomMaterial(Random random) {
 		TIntArrayList orderedMaterials = getOrderedMaterialList();
-		return orderedMaterials.get((int) (random.nextFloat() * (1-random.nextFloat()) * random.nextFloat() * orderedMaterials.size()));
+		return orderedMaterials.get((int) (random.nextFloat() * (1 - random.nextFloat()) * random.nextFloat() * orderedMaterials.size()));
 	}
 
 	public void register() {
@@ -123,7 +109,7 @@ public class DamageEventHandler {
 				dRR[armorCore.armorType] += damageResistance;
 				dR += damageResistance;
 
-				for (ModifierInstance modifierInstance : Caches.modifiers.get(itemStack)) {
+				for (ModifierInstance modifierInstance : Caches.bonusModifiers.get(itemStack)) {
 					float bonusResistance = modifierInstance.modifier.getBonusResistance(event.entityLiving, event.source, event.ammount, itemStack, armorCore.armorType, modifierInstance.level);
 					bRR[armorCore.armorType] += Math.max(bonusResistance, 0);
 					bR += bonusResistance;

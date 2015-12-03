@@ -1,5 +1,7 @@
 package com.rwtema.tinkertailor.nbt;
 
+import gnu.trove.map.hash.TIntIntHashMap;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,5 +47,38 @@ public class StringHelper {
 			i = i % value;
 		}
 		return builder.toString();
+	}
+
+	public static ArrayList<String> formatTabsToTableSpaced(ArrayList<String> strings) {
+		TIntIntHashMap lens = new TIntIntHashMap(10, 0.5F, 0, 0);
+		for (String string : strings) {
+			String[] split = string.split("\t");
+			int n;
+			for (int i = 0; i < split.length; i++) {
+				n = split[i].length();
+				if (lens.get(i) < n)
+					lens.put(i, n);
+			}
+		}
+
+		int n = 0;
+		for (int i = 0; i < lens.size(); i++) {
+			n += lens.get(i) + 2;
+			lens.put(i, n);
+		}
+
+		ArrayList<String> result = new ArrayList<String>();
+		for (String string : strings) {
+			StringBuilder builder = new StringBuilder();
+			String[] split = string.split("\t");
+			for (int i = 0; i < split.length; i++) {
+				builder.append(split[i]);
+				n = lens.get(i);
+				while (builder.length() < n)
+					builder.append(" ");
+			}
+			result.add(builder.toString());
+		}
+		return result;
 	}
 }

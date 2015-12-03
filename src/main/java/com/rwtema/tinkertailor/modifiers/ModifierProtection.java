@@ -28,6 +28,11 @@ public class ModifierProtection extends Modifier {
 	}
 
 	@Override
+	public boolean givesBonusResistance() {
+		return true;
+	}
+
+	@Override
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
 		if (!protectionTypes.handles(source))
 			return 0;

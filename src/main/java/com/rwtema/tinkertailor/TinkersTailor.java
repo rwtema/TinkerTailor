@@ -10,6 +10,7 @@ import com.rwtema.tinkertailor.imc.IMCNBTLoader;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.items.ItemArmorCast;
 import com.rwtema.tinkertailor.items.ItemArmorPattern;
+import com.rwtema.tinkertailor.items.ItemChainmail;
 import com.rwtema.tinkertailor.items.ItemTailorsManual;
 import com.rwtema.tinkertailor.modifiers.BonusModifiers;
 import com.rwtema.tinkertailor.modifiers.ModifierRegistry;
@@ -177,6 +178,8 @@ public class TinkersTailor {
 		shoes = (ArmorCore) new ArmorCore(3).setUnlocalizedName("TinkerTailor.Shoes");
 		GameRegistry.registerItem(shoes, "boots");
 
+		GameRegistry.registerItem(new ItemChainmail(), "chainmetal");
+
 		armorCast = new BlockArmorCast();
 		GameRegistry.registerBlock(armorCast, ItemArmorCast.class, "ArmorCast");
 		armorPattern = new ItemArmorPattern();
@@ -277,7 +280,7 @@ public class TinkersTailor {
 			modCompatibilityModule.initEnd();
 		}
 
-		if(deobf_folder){
+		if (deobf_folder) {
 			IMCNBTLoader.sendTest();
 		}
 	}

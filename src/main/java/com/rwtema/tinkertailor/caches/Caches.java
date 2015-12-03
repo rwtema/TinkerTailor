@@ -4,7 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.DamageEventHandler;
-import com.rwtema.tinkertailor.caches.base.WeakCache;
+import com.rwtema.tinkertailor.caches.base.WeakItemStackCache;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
@@ -28,7 +28,7 @@ import tconstruct.library.tools.ToolMaterial;
 
 public class Caches {
 
-	public static final WeakCache<ItemStack, Integer> color = new WeakCache<ItemStack, Integer>() {
+	public static final WeakItemStackCache<Integer> color = new WeakItemStackCache<Integer>() {
 
 		@Nonnull
 		@Override
@@ -49,21 +49,48 @@ public class Caches {
 		}
 	};
 
-	public static final WeakCache<ItemStack, Integer> material = new WeakCache<ItemStack, Integer>() {
+	public static final WeakItemStackCache<Integer> material = new WeakItemStackCache<Integer>() {
 
 		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
-			NBTTagCompound tags = stack.getTagCompound();
+			if (stack.getItem() instanceof ArmorCore) {
+				NBTTagCompound tags = stack.getTagCompound();
 
-			if (tags != null) {
-				tags = tags.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
-				return tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MATERIAL);
+				if (tags != null) {
+					tags = tags.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
+					return tags.getInteger(TinkersTailorConstants.NBT_MAINTAG_MATERIAL);
+				}
 			}
 			return -1;
 		}
 	};
-	public static final WeakCache<ItemStack, List<ModifierInstance>> modifiers = new WeakCache<ItemStack, List<ModifierInstance>>() {
+
+	public static final WeakItemStackCache<List<ModifierInstance>> bonusModifiers = new WeakModifierListCache() {
+		@Override
+		protected boolean shouldAdd(ItemStack key, ModifierInstance modifierInstance) {
+			return modifierInstance.modifier.givesBonusResistance();
+		}
+	};
+
+
+	public static final WeakItemStackCache<Boolean> broken = new WeakItemStackCache<Boolean>() {
+		@Nonnull
+		@Override
+		protected Boolean calc(@Nonnull ItemStack key) {
+			return ArmorCore.isBroken(key);
+		}
+	};
+
+	public static final WeakItemStackCache<List<ModifierInstance>> modifiers = new WeakModifierListCache() {
+
+		@Override
+		protected boolean shouldAdd(ItemStack key, ModifierInstance modifierInstance) {
+			return true;
+		}
+	};
+
+	public static final WeakItemStackCache<List<ModifierInstance>> allModifiers = new WeakItemStackCache<List<ModifierInstance>>() {
 		@Nonnull
 		@SuppressWarnings("unchecked")
 		@Override
@@ -75,6 +102,7 @@ public class Caches {
 			if (tag == null)
 				return ImmutableList.of();
 
+			boolean isBroken = broken.get(stack);
 
 			NBTTagCompound tags_data = stack.getTagCompound().getCompoundTag(TinkersTailorConstants.NBT_MAINTAG);
 
@@ -85,7 +113,7 @@ public class Caches {
 				Modifier modifier = ModifierRegistry.modifiers.get(key);
 				if (modifier != null) {
 					int level = tags_data.getInteger(key);
-					if (level != 0)
+					if (level != 0 && !(isBroken && modifier.worksIfBroken(level)))
 						list.add(new ModifierInstance(modifier, level));
 				}
 			}
@@ -99,7 +127,8 @@ public class Caches {
 			return ImmutableList.of();
 		}
 	};
-	public static final WeakCache<ItemStack, Integer> slot = new WeakCache<ItemStack, Integer>() {
+
+	public static final WeakItemStackCache<Integer> slot = new WeakItemStackCache<Integer>() {
 		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack key) {
@@ -108,7 +137,7 @@ public class Caches {
 			return ((ArmorCore) key.getItem()).armorType;
 		}
 	};
-	public static final WeakCache<ItemStack, Integer> maxDurability = new WeakCache<ItemStack, Integer>() {
+	public static final WeakItemStackCache<Integer> maxDurability = new WeakItemStackCache<Integer>() {
 
 		@Nonnull
 		@Override
@@ -131,7 +160,7 @@ public class Caches {
 		}
 	};
 
-	public static final WeakCache<ItemStack, Float> damageResistance = new WeakCache<ItemStack, Float>() {
+	public static final WeakItemStackCache<Float> damageResistance = new WeakItemStackCache<Float>() {
 		@Nonnull
 		@Override
 		protected Float calc(@Nonnull ItemStack stack) {
@@ -139,7 +168,7 @@ public class Caches {
 		}
 	};
 
-	public static final WeakCache<ItemStack, Multimap<String, AttributeModifier>> attributes = new WeakCache<ItemStack, Multimap<String, AttributeModifier>>() {
+	public static final WeakItemStackCache<Multimap<String, AttributeModifier>> attributes = new WeakItemStackCache<Multimap<String, AttributeModifier>>() {
 		@Nonnull
 		@Override
 		protected Multimap<String, AttributeModifier> calc(@Nonnull ItemStack key) {
@@ -153,37 +182,31 @@ public class Caches {
 		}
 	};
 
-	public static final WeakCache<ItemStack, List<ModifierInstance>> tickers = new WeakCache<ItemStack, List<ModifierInstance>>() {
-		@Nonnull
+	public static final WeakItemStackCache<List<ModifierInstance>> tickers = new WeakModifierListCache() {
 		@Override
-		protected List<ModifierInstance> calc(@Nonnull ItemStack key) {
-			List<ModifierInstance> modifierInstances = modifiers.get(key);
-			if (modifierInstances.isEmpty()) return ImmutableList.of();
-
-			List<ModifierInstance> result = new ArrayList<ModifierInstance>(modifierInstances.size());
-			for (ModifierInstance modifierInstance : modifierInstances) {
-				if (modifierInstance.modifier.doesTick(key, modifierInstance.level)) {
-					result.add(modifierInstance);
-				}
-			}
-			if (result.isEmpty()) return ImmutableList.of();
-			return result;
+		protected boolean shouldAdd(ItemStack key, ModifierInstance modifierInstance) {
+			return modifierInstance.modifier.doesTick(key, modifierInstance.level);
 		}
 	};
 
-	public static final WeakCache<ItemStack, Collection<Integer>> potionIds = new WeakCache<ItemStack, Collection<Integer>>() {
+	public static final WeakItemStackCache<List<ModifierInstance>> potionModifiers = new WeakModifierListCache() {
+		@Override
+		protected boolean shouldAdd(ItemStack key, ModifierInstance modifierInstance) {
+			return modifierInstance.modifier instanceof ModifierPotion;
+		}
+	};
+
+	public static final WeakItemStackCache<Collection<Integer>> potionIds = new WeakItemStackCache<Collection<Integer>>() {
 		@Nonnull
 		@Override
 		protected Collection<Integer> calc(@Nonnull ItemStack key) {
 			if (!(key.getItem() instanceof ArmorCore))
 				return ImmutableList.of();
 			HashSet<Integer> iSet = null;
-			List<ModifierInstance> modifiers = Caches.modifiers.get(key);
+			List<ModifierInstance> modifiers = Caches.potionModifiers.get(key);
 			for (ModifierInstance modifier : modifiers) {
-				if (modifier.modifier instanceof ModifierPotion) {
-					if (iSet == null) iSet = new HashSet<Integer>(modifiers.size());
-					iSet.add(((ModifierPotion) modifier.modifier).potion.id);
-				}
+				if (iSet == null) iSet = new HashSet<Integer>(modifiers.size());
+				iSet.add(((ModifierPotion) modifier.modifier).potion.id);
 			}
 			if (iSet == null) return ImmutableList.of();
 			return iSet;
@@ -191,7 +214,7 @@ public class Caches {
 	};
 
 
-	public static final WeakCache<ItemStack, Integer> visBoost = new WeakCache<ItemStack, Integer>() {
+	public static final WeakItemStackCache<Integer> visBoost = new WeakItemStackCache<Integer>() {
 		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack itemstack) {
@@ -216,4 +239,26 @@ public class Caches {
 	public static IntFunction<ItemStack> getMaxEnergy = IntFunction.zeroFunction;
 	@SuppressWarnings("unchecked")
 	public static IntFunction<ItemStack> getCurEnergy = IntFunction.zeroFunction;
+
+	private abstract static class WeakModifierListCache extends WeakItemStackCache<List<ModifierInstance>> {
+		@Nonnull
+		@Override
+		protected List<ModifierInstance> calc(@Nonnull ItemStack key) {
+			List<ModifierInstance> modifierInstances = allModifiers.get(key);
+			if (modifierInstances.isEmpty()) return modifierInstances;
+
+			boolean isBroken = broken.get(key);
+
+			ArrayList<ModifierInstance> list = new ArrayList<ModifierInstance>();
+			for (ModifierInstance modifierInstance : modifierInstances) {
+				if (shouldAdd(key, modifierInstance))
+					if (!isBroken || modifierInstance.modifier.worksIfBroken(modifierInstance.level))
+						list.add(modifierInstance);
+			}
+
+			return ImmutableList.copyOf(list);
+		}
+
+		protected abstract boolean shouldAdd(ItemStack key, ModifierInstance modifierInstance);
+	}
 }

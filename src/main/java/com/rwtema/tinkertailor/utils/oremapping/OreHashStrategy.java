@@ -8,7 +8,7 @@ public class OreHashStrategy implements HashingStrategy<ItemStack> {
 
 	@Override
 	public int computeHashCode(ItemStack itemstack) {
-		return itemstack.getItem().hashCode() * 31 + itemstack.getItemDamage();
+		return System.identityHashCode(itemstack.getItem()) * 31 + itemstack.getItemDamage();
 	}
 
 	@Override

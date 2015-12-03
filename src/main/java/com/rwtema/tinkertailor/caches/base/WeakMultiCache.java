@@ -10,7 +10,12 @@ import java.util.HashMap;
 public abstract class WeakMultiCache<V> {
 
 	final Lookup lookup = new Lookup();
-	final HashMap<Object, V> map = new HashMap<Object, V>();
+	final HashMap<Object, V> map = createMap();
+
+	protected HashMap<Object, V> createMap() {
+		return new HashMap<Object, V>(16, 0.25F);
+	}
+
 	final ReferenceQueue<Object> refQueue = new ReferenceQueue<Object>();
 
 	@SuppressWarnings("unchecked")
@@ -56,17 +61,17 @@ public abstract class WeakMultiCache<V> {
 		protected abstract V calc(K1 k1, K2 k2);
 	}
 
-	public static abstract class Set<K, V> extends WeakMultiCache<V> {
-		public Set() {
+	public static abstract class Array<K, V> extends WeakMultiCache<V> {
+		public Array() {
 			super();
-			lookup.objects = new Object[2];
+			this.lookup.objects = new Object[0];
 		}
 
 		public synchronized V get(K... keys) {
 			expungeStaleEntries();
 			V val;
 
-			int hash = 1 + keys.length;
+			int hash = keys.length;
 			for (K key : keys) {
 				hash = hash * 31 + System.identityHashCode(key);
 			}
@@ -99,7 +104,8 @@ public abstract class WeakMultiCache<V> {
 			this.keys = new WeakRef[keys.length];
 			for (int i = 0; i < keys.length; i++) {
 				Object key = keys[i];
-				this.keys[i] = new WeakRef<Object>(key, this);
+				if (key != null)
+					this.keys[i] = new WeakRef<Object>(key, this);
 			}
 
 			this.hash = hash;
@@ -109,18 +115,28 @@ public abstract class WeakMultiCache<V> {
 		@SuppressWarnings("unchecked")
 		public boolean equals(Object o) {
 			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (o == null || o.getClass() != Key.class) return false;
 
 			Key key = (Key) o;
 
 			if (hash != key.hash) return false;
-			if (keys.length != key.keys.length) return false;
+			WeakRef[] otherKeys = key.keys;
+			if (this.keys.length != otherKeys.length) return false;
 
-			for (int i = 0; i < keys.length; i++) {
-				Object k = keys[i].get();
-				if (k == null || k != key.keys[i].get())
-					return false;
+			for (int i = 0; i < this.keys.length; i++) {
+				WeakRef ref = this.keys[i];
+				WeakRef otherRef = otherKeys[i];
 
+				if (ref == null) {
+					if (otherRef != null) return false;
+				} else {
+					if (otherRef == null) return false;
+
+					Object k = ref.get();
+
+					if (k == null || k != otherRef.get())
+						return false;
+				}
 			}
 			return true;
 		}
@@ -165,13 +181,21 @@ public abstract class WeakMultiCache<V> {
 		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
-			if (obj.getClass() != Key.class) return false;
+			if (obj == null || obj.getClass() != Key.class) return false;
+
 			Key key = (Key) obj;
-			if (hash != key.hash || objects.length != key.keys.length) return false;
+			WeakRef[] keys = key.keys;
+			if (hash != key.hash || objects.length != keys.length) return false;
 
 			for (int i = 0; i < objects.length; i++) {
-				if (objects[i] != key.keys[i].get())
-					return false;
+				WeakRef ref = keys[i];
+				if (ref == null) {
+					if (objects[i] != null) return false;
+				} else {
+					Object o = ref.get();
+					if (o == null || objects[i] != o)
+						return false;
+				}
 			}
 			return true;
 		}

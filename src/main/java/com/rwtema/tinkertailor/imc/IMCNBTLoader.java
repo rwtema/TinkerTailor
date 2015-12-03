@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import static java.lang.reflect.Modifier.isStatic;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import net.minecraft.block.Block;
@@ -17,20 +19,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
 import tconstruct.library.TConstructRegistry;
-import tconstruct.library.tools.ToolMaterial;
 
 public class IMCNBTLoader {
-	static HashMap<String, IMCNBTLoader> nbtLoaders = new HashMap<String, IMCNBTLoader>();
-	Class<? extends IMC> base;
-	HashMap<Field, IMCFieldHandler> fields = new HashMap<Field, IMCFieldHandler>();
-
-	static HashMap<Class, IMCFieldHandler> typeHandlers;
-	static HashMap<String, IMCFieldHandler> nameHandlers;
-	HashSet<String> required = new HashSet<String>();
+	public static HashMap<String, IMCNBTLoader> nbtLoaders = new HashMap<String, IMCNBTLoader>();
+	public static HashMap<String, IMCSimple<String>> stringLoaders = new HashMap<String, IMCSimple<String>>();
+	public static HashMap<String, IMCSimple<ItemStack>> itemStackLoaders = new HashMap<String, IMCSimple<ItemStack>>();
+	public static HashMap<Class, IMCFieldHandler> typeHandlers;
+	public static HashMap<String, IMCFieldHandler> nameHandlers;
 
 	static {
 		nameHandlers = new HashMap<String, IMCFieldHandler>();
-		nameHandlers.put("material_id", new IMCFieldHandler((int) 0) {
+		nameHandlers.put("material_id", new IMCFieldHandler((int) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException, NBTLoadException {
 				int i;
@@ -45,8 +44,8 @@ public class IMCNBTLoader {
 			}
 		});
 
-		typeHandlers = new HashMap<Class, IMCFieldHandler>();
-		typeHandlers.put(boolean.class, new IMCFieldHandler(false) {
+		typeHandlers = new LinkedHashMap<Class, IMCFieldHandler>();
+		typeHandlers.put(boolean.class, new IMCFieldHandler(false, "") {
 
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
@@ -54,101 +53,91 @@ public class IMCNBTLoader {
 			}
 		});
 
-		typeHandlers.put(byte.class, new IMCFieldHandler((byte) 0) {
+		typeHandlers.put(byte.class, new IMCFieldHandler((byte) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.setByte(instance, compound.getByte(key));
 			}
 		});
 
-		typeHandlers.put(short.class, new IMCFieldHandler((short) 0) {
+		typeHandlers.put(short.class, new IMCFieldHandler((short) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.setShort(instance, compound.getShort(key));
 			}
 		});
 
-		typeHandlers.put(int.class, new IMCFieldHandler((int) 0) {
+		typeHandlers.put(int.class, new IMCFieldHandler((int) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.setInt(instance, compound.getInteger(key));
 			}
 		});
 
-		typeHandlers.put(long.class, new IMCFieldHandler((long) 0) {
+		typeHandlers.put(long.class, new IMCFieldHandler((long) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.setLong(instance, compound.getLong(key));
 			}
 		});
 
-		typeHandlers.put(float.class, new IMCFieldHandler((float) 0) {
+		typeHandlers.put(float.class, new IMCFieldHandler((float) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.setFloat(instance, compound.getFloat(key));
 			}
 		});
 
-		typeHandlers.put(double.class, new IMCFieldHandler((double) 0) {
+		typeHandlers.put(double.class, new IMCFieldHandler((double) 0, "") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.setDouble(instance, compound.getDouble(key));
 			}
 		});
 
-		typeHandlers.put(String.class, new IMCFieldHandler() {
+		typeHandlers.put(String.class, new IMCFieldHandler("") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.set(instance, compound.getString(key));
 			}
 		});
 
-		typeHandlers.put(int[].class, new IMCFieldHandler() {
+		typeHandlers.put(int[].class, new IMCFieldHandler("") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.set(instance, compound.getIntArray(key));
 			}
 		});
 
-		typeHandlers.put(NBTTagCompound.class, new IMCFieldHandler() {
+		typeHandlers.put(NBTTagCompound.class, new IMCFieldHandler("") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.set(instance, compound.getCompoundTag(key));
 			}
 		});
 
-		typeHandlers.put(ItemStack.class, new IMCFieldHandler() {
+		typeHandlers.put(ItemStack.class, new IMCFieldHandler("") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.set(instance, ItemStack.loadItemStackFromNBT(compound.getCompoundTag(key)));
 			}
 		});
 
-		typeHandlers.put(Block.class, new IMCFieldHandler() {
+		typeHandlers.put(Block.class, new IMCFieldHandler("Block ID") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.set(instance, Block.getBlockFromName(compound.getString(key)));
 			}
 		});
 
-		typeHandlers.put(Item.class, new IMCFieldHandler() {
+		typeHandlers.put(Item.class, new IMCFieldHandler("Item ID") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException {
 				field.set(instance, Item.itemRegistry.getObject(compound.getString(key)));
 			}
 		});
 
-		typeHandlers.put(ToolMaterial.class, new IMCFieldHandler() {
-			@Override
-			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException, NBTLoadException {
-				String string = compound.getString(key);
-				ToolMaterial value = TConstructRegistry.toolMaterialStrings.get(string);
-				if (value == null && required) throw new NBTLoadException("Material " + string + " not found");
-				field.set(instance, value);
-			}
-		});
-
-		typeHandlers.put(Modifier.class, new IMCFieldHandler() {
+		typeHandlers.put(Modifier.class, new IMCFieldHandler("Modifier ID") {
 			@Override
 			public void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException, NBTLoadException {
 				String string = compound.getString(key);
@@ -160,8 +149,15 @@ public class IMCNBTLoader {
 
 	}
 
-	public IMCNBTLoader(Class<? extends IMC> base) {
+	public Class<? extends IMC> base;
+	public HashMap<Field, IMCFieldHandler> fields = new LinkedHashMap<Field, IMCFieldHandler>();
+	public HashSet<String> required = new LinkedHashSet<String>();
+	public HashMap<Field, Object> defaults = new HashMap<Field, Object>();
+	public final String desc;
+
+	public IMCNBTLoader(Class<? extends IMC> base, String desc) {
 		this.base = base;
+		this.desc = desc;
 
 		IMC test = newInstance();
 
@@ -179,10 +175,12 @@ public class IMCNBTLoader {
 
 			try {
 				Object o = field.get(test);
-				Object defaultValue;
-				if (o == null || (defaultValue = defaultTypeValue) == null || defaultValue.equals(o)) {
+				Object defaultValue = imcFieldHandler.defaultValue;
+				if (o == null || defaultValue.equals(o)) {
 					required.add(field.getName());
 				}
+
+				defaults.put(field, o);
 
 				fields.put(field, imcFieldHandler);
 			} catch (IllegalAccessException e) {
@@ -191,12 +189,20 @@ public class IMCNBTLoader {
 		}
 	}
 
-	public static void register(Class<? extends IMC> clazz) {
-		nbtLoaders.put(clazz.getName(), new IMCNBTLoader(clazz));
+	public static void registerString(String key, IMCSimple<String> handler) {
+		stringLoaders.put(key, handler);
 	}
 
-	public static void register(String name, IMC imc) {
-		nbtLoaders.put(name, new IMCNBTLoader(imc.getClass()));
+	public static void registerItemStack(String key, IMCSimple<ItemStack> handler) {
+		itemStackLoaders.put(key, handler);
+	}
+
+	public static void registerNBT(Class<? extends IMC> clazz, String desc) {
+		nbtLoaders.put(clazz.getName(), new IMCNBTLoader(clazz, desc));
+	}
+
+	public static void registerNBT(String name, IMC imc, String desc) {
+		nbtLoaders.put(name, new IMCNBTLoader(imc.getClass(), desc));
 	}
 
 	public static void sendTest() {
@@ -214,7 +220,7 @@ public class IMCNBTLoader {
 		FMLInterModComms.sendMessage(TinkersTailorConstants.MOD_ID, "addDefaultModifierToMaterial", (NBTTagCompound) tag.copy());
 	}
 
-	public void load(NBTTagCompound tag) throws NBTLoadException {
+	public void load(NBTTagCompound tag) throws NBTLoadException, IMCRunException {
 		for (String s : required) {
 			if (!tag.hasKey(s)) throw new NBTLoadException(s + " is missing");
 		}
@@ -236,27 +242,6 @@ public class IMCNBTLoader {
 
 	}
 
-	public static abstract class IMCFieldHandler {
-		@Nonnull
-		Object defaultValue;
-
-		public IMCFieldHandler() {
-			this(new Object());
-		}
-
-		public IMCFieldHandler(@Nonnull Object defaultValue) {
-			this.defaultValue = defaultValue;
-		}
-
-
-		public abstract void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException, NBTLoadException;
-
-		public String name(){
-			return null;
-		}
-	}
-
-
 	private IMC newInstance() {
 		IMC check;
 		try {
@@ -267,4 +252,24 @@ public class IMCNBTLoader {
 		return check;
 	}
 
+	public static abstract class IMCSimple<T> {
+		abstract void load(T t) throws IMCRunException;
+	}
+
+	public static abstract class IMCFieldHandler {
+		@Nonnull
+		Object defaultValue;
+		public final String expectedType;
+
+		public IMCFieldHandler(String expectedType) {
+			this(new Object(), expectedType);
+		}
+
+		public IMCFieldHandler(@Nonnull Object defaultValue, String expectedType) {
+			this.defaultValue = defaultValue;
+			this.expectedType = expectedType;
+		}
+
+		public abstract void load(Field field, IMC instance, String key, NBTTagCompound compound, boolean required) throws IllegalAccessException, NBTLoadException;
+	}
 }

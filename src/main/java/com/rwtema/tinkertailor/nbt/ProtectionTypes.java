@@ -11,7 +11,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 
 public enum ProtectionTypes {
-	normal(new DamageSource("normal"), 12, "ingotIron", EnumChatFormatting.GRAY) {
+	normal(new DamageSource("normal"), 8, "ingotIron", EnumChatFormatting.GRAY) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return !source.isMagicDamage();
@@ -23,14 +23,14 @@ public enum ProtectionTypes {
 		}
 	},
 
-	explosion((new DamageSource("explosion")).setDifficultyScaled().setExplosion(), 6, Lists.newArrayList(Items.gunpowder, "dustGunpowder"), EnumChatFormatting.YELLOW) {
+	explosion((new DamageSource("explosion")).setDifficultyScaled().setExplosion(), 3, Lists.newArrayList(Items.gunpowder, "dustGunpowder"), EnumChatFormatting.YELLOW) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isExplosion();
 		}
 	},
 
-	projectile((new DamageSource("projectile")).setProjectile(), 6, "logWood", EnumChatFormatting.GREEN) {
+	projectile((new DamageSource("projectile")).setProjectile(), 3, "logWood", EnumChatFormatting.GREEN) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isProjectile();
@@ -42,7 +42,7 @@ public enum ProtectionTypes {
 		}
 	},
 
-	magic(DamageSource.magic, 20, "gemDiamond", EnumChatFormatting.BLUE) {
+	magic(DamageSource.magic, 8, "gemDiamond", EnumChatFormatting.BLUE) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isMagicDamage() || (source == DamageSource.wither || "wither".equals(source.damageType));
@@ -54,7 +54,7 @@ public enum ProtectionTypes {
 		}
 	},
 
-	fire((new DamageSource("fire")).setFireDamage(), 6, "ingotBrickNether", EnumChatFormatting.RED) {
+	fire((new DamageSource("fire")).setFireDamage(), 3, "ingotBrickNether", EnumChatFormatting.RED) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isFireDamage();
@@ -66,14 +66,14 @@ public enum ProtectionTypes {
 		}
 	},
 
-	wither(DamageSource.wither, 8, Items.skull, EnumChatFormatting.DARK_GRAY) {
+	wither(DamageSource.wither, 4, Items.skull, EnumChatFormatting.DARK_GRAY) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source.isMagicDamage() && (source == DamageSource.wither || "wither".equals(source.damageType));
 		}
 	},
 
-	fall(DamageSource.fall, 4, Items.feather, EnumChatFormatting.AQUA) {
+	fall(DamageSource.fall, 1, Items.feather, EnumChatFormatting.AQUA) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source == DamageSource.fall || "fall".equals(source.damageType);
@@ -84,7 +84,7 @@ public enum ProtectionTypes {
 			return Modifier.ARMORTYPE_SHOES_ONLY;
 		}
 	},
-	anvil(DamageSource.anvil, 3, Lists.newArrayList(Blocks.wool, "blockWool"), EnumChatFormatting.BLUE) {
+	anvil(DamageSource.anvil, 1, Lists.newArrayList(Blocks.wool, "blockWool"), EnumChatFormatting.BLUE) {
 		@Override
 		public boolean handles(DamageSource source) {
 			return source == DamageSource.anvil || source == DamageSource.fallingBlock;

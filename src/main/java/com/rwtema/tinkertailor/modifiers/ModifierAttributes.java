@@ -8,6 +8,11 @@ import net.minecraft.item.ItemStack;
 
 public class ModifierAttributes extends Modifier {
 
+	@Override
+	public boolean worksIfBroken(int level) {
+		return true;
+	}
+
 	public final ItemValueMap[] map;
 	IAttribute attribute;
 	int priority;

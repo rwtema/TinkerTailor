@@ -148,6 +148,6 @@ public class Lang {
 	}
 
 	private static File getFile() {
-		return new File(new File(new File("."), "untranslang"), "missed_en_US.lang");
+		return new File(new File(new File("."), "debug_text"), "missed_en_US.lang");
 	}
 }

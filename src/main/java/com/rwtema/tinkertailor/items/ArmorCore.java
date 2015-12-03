@@ -2,11 +2,12 @@ package com.rwtema.tinkertailor.items;
 
 import cofh.api.energy.IEnergyContainerItem;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ForwardingList;
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.DamageEventHandler;
 import com.rwtema.tinkertailor.TinkersTailor;
 import com.rwtema.tinkertailor.caches.Caches;
+import com.rwtema.tinkertailor.caches.base.WeakItemStackCache;
 import com.rwtema.tinkertailor.modifiers.BonusModifiers;
 import com.rwtema.tinkertailor.modifiers.Modifier;
 import com.rwtema.tinkertailor.modifiers.ModifierInstance;
@@ -78,13 +79,6 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		setCreativeTab(TinkersTailor.creativeTabArmor);
 		setTextureName(TinkersTailorConstants.RESOURCE_FOLDER + ":armor_" + TinkersTailorConstants.NAMES[slot].toLowerCase());
 		armors[slot] = this;
-	}
-
-	public static List<ModifierInstance> getModifiersIfUnbroken(@Nonnull ItemStack stack) {
-		if (isBroken(stack))
-			return ImmutableList.of();
-		else
-			return Caches.modifiers.get(stack);
 	}
 
 	public static boolean isBroken(@Nonnull ItemStack stack) {
@@ -266,7 +260,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 
 	public void damage(EntityLivingBase entity, ItemStack stack, DamageSource source, int damage) {
 		int originalDamage = damage;
-		for (ModifierInstance modifierInstance : getModifiersIfUnbroken(stack)) {
+		for (ModifierInstance modifierInstance : Caches.modifiers.get(stack)) {
 			damage = modifierInstance.modifier.reduceArmorDamage(entity, stack, source, damage, originalDamage, armorType, modifierInstance.level);
 		}
 
@@ -276,9 +270,15 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 	@SuppressWarnings("unchecked")
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer player, List toolTips, boolean debug) {
+	public void addInformation(ItemStack stack, EntityPlayer player, final List toolTips, boolean debug) {
 		super.addInformation(stack, player, toolTips, debug);
 		if (stack == null) return;
+
+		boolean broken = Caches.broken.get(stack);
+
+		if (broken) {
+			toolTips.add(Lang.translate("Broken"));
+		}
 
 		int i = Caches.material.get(stack);
 		tconstruct.library.tools.ToolMaterial toolMaterial = TConstructRegistry.toolMaterials.get(i);
@@ -288,10 +288,31 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 		if (!ability.equals(""))
 			toolTips.add(toolMaterial.style() + ability);
 
-		List<ModifierInstance> modifiers = Caches.modifiers.get(stack);
+		List<ModifierInstance> modifiers = Caches.allModifiers.get(stack);
 
 		for (ModifierInstance modifier : modifiers) {
-			modifier.modifier.addInfo(toolTips, player, stack, armorType, modifier.level);
+			boolean strikeThru = broken && !modifier.modifier.worksIfBroken(modifier.level);
+			if (strikeThru) {
+				modifier.modifier.addInfo(
+						new ForwardingList<String>() {
+							@Override
+							protected List<String> delegate() {
+								return toolTips;
+							}
+
+							@Override
+							public boolean add(@Nonnull String element) {
+								return super.add(getElement(element));
+							}
+
+							public String getElement(@Nonnull String element) {
+								return EnumChatFormatting.STRIKETHROUGH + element + EnumChatFormatting.RESET;
+							}
+						},
+						player, stack, armorType, modifier.level);
+
+			} else
+				modifier.modifier.addInfo(toolTips, player, stack, armorType, modifier.level);
 		}
 
 		toolTips.add("");
@@ -409,6 +430,7 @@ public class ArmorCore extends ItemArmor implements ISpecialArmor, IModifyable, 
 			if (damage > maxDamage) {
 				NBTTagCompound tag = stack.getTagCompound();
 				if (tag != null) {
+					WeakItemStackCache.clearAllCaches(stack);
 					tag.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG).setBoolean(TinkersTailorConstants.NBT_MAINTAG_BROKEN, true);
 					damage = maxDamage;
 				}

@@ -2,7 +2,6 @@ package com.rwtema.tinkertailor.coremod;
 
 import com.rwtema.tinkertailor.modifiers.ModifierPotion;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 
@@ -21,12 +20,9 @@ public class AltPotionHandler {
 	public static PotionEffect getActivePotionEffect(EntityLivingBase base, int id) {
 		ModifierPotion modifier = ModifierPotion.modifiers[id];
 		if (modifier == null) return null;
-		int level = 0;
-		for (ItemStack itemStack : base.getLastActiveItems()) {
-			if (itemStack != null) {
-				level = Math.max(level, modifier.level.get(itemStack));
-			}
-		}
+
+		int level = modifier.multiLevelMax.get(base.getLastActiveItems());
+
 		if (level == 0) return null;
 
 		return modifier.getEffect(level);

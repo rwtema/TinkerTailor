@@ -2,7 +2,8 @@ package com.rwtema.tinkertailor.modifiers;
 
 import com.google.common.collect.Multimap;
 import com.rwtema.tinkertailor.TinkersTailor;
-import com.rwtema.tinkertailor.caches.base.WeakCache;
+import com.rwtema.tinkertailor.caches.base.WeakItemStackCache;
+import com.rwtema.tinkertailor.caches.base.WeakMultiCache;
 import com.rwtema.tinkertailor.compat.ModCompatibilityModule;
 import com.rwtema.tinkertailor.items.ArmorCore;
 import com.rwtema.tinkertailor.modifiers.itemmodifier.ModArmorModifier;
@@ -44,7 +45,7 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 	public int priority;
 
-	public final WeakCache<ItemStack, Integer> level = new WeakCache<ItemStack, Integer>() {
+	public final WeakItemStackCache<Integer> level = new WeakItemStackCache<Integer>() {
 		@Nonnull
 		@Override
 		protected Integer calc(@Nonnull ItemStack stack) {
@@ -58,6 +59,35 @@ public abstract class Modifier implements Comparable<Modifier> {
 			return tag.getCompoundTag(TinkersTailorConstants.NBT_MAINTAG).getInteger(Modifier.this.name);
 		}
 	};
+
+	public final WeakMultiCache.Array<ItemStack, Integer> multiLevelMax = new WeakMultiCache.Array<ItemStack, Integer>() {
+		@Override
+		protected Integer calc(ItemStack... keys) {
+			int level = 0;
+			for (ItemStack itemStack : keys) {
+				if (itemStack != null) {
+					level = Math.max(level, Modifier.this.level.get(itemStack));
+				}
+			}
+			return level;
+		}
+	};
+
+
+	public final WeakMultiCache.Array<ItemStack, Integer> multiLevelSum = new WeakMultiCache.Array<ItemStack, Integer>() {
+		@Override
+		protected Integer calc(ItemStack... keys) {
+			int level = 0;
+			for (ItemStack itemStack : keys) {
+				if (itemStack != null) {
+					level += Modifier.this.level.get(itemStack);
+				}
+			}
+			return level;
+		}
+	};
+
+
 	public String[] requiredMods = null;
 	public boolean allModsPresent = true;
 	protected int maxLevel;
@@ -71,6 +101,10 @@ public abstract class Modifier implements Comparable<Modifier> {
 
 		if (TinkersTailor.deobf)
 			getLocalizedName();
+	}
+
+	public boolean givesBonusResistance() {
+		return false;
 	}
 
 	public float getBonusResistance(EntityLivingBase entity, DamageSource source, float amount, ItemStack item, int slot, int level) {
@@ -215,7 +249,11 @@ public abstract class Modifier implements Comparable<Modifier> {
 		return this;
 	}
 
-	public boolean allowRandom(){
+	public boolean allowRandom() {
 		return allModsPresent && itemModifier.useModifiers;
+	}
+
+	public boolean worksIfBroken(int level) {
+		return maloderous == MALODEROUS_ALWAYS || (maloderous == MALODEROUS_WHENNEGATIVE && level < 0);
 	}
 }

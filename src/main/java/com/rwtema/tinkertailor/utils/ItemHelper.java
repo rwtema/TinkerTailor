@@ -40,8 +40,6 @@ public class ItemHelper {
 		Item item;
 		if (heldItem == null || (item = heldItem.getItem()) == null) return false;
 		return item instanceof ItemSword || item instanceof ItemBow || item instanceof Weapon || item instanceof ProjectileWeapon;
-
-
 	}
 
 	public static ItemStack[] makeStackArray(Object... items) {
